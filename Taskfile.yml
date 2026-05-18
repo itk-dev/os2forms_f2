@@ -1,0 +1,118 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+  compose:
+    cmds:
+      - docker compose {{.TASK_ARGS}} {{.CLI_ARGS}}
+    internal: true
+
+  composer:
+    desc: Run composer inside docker compose setup, e.g. `task {{.TASK}} -- install`
+    cmds:
+      - task: compose
+        vars:
+          TASK_ARGS: run --rm phpfpm composer {{.TASK_ARGS}}
+
+  composer:install:
+    desc: Run composer inside docker compose setup, e.g. `task {{.TASK}} -- install`
+    cmds:
+      - rm -fr composer.lock vendor
+      - |
+        # Create a temporary composer file to install https://github.com/mglaman/composer-drupal-lenient before the real install needs it.
+        docker compose run --rm --env COMPOSER=composer.lenient.json phpfpm composer init --no-interaction
+        docker compose run --rm --env COMPOSER=composer.lenient.json phpfpm composer config --no-plugins allow-plugins.mglaman/composer-drupal-lenient true
+        docker compose run --rm --env COMPOSER=composer.lenient.json phpfpm composer require mglaman/composer-drupal-lenient
+        docker compose run --rm --env COMPOSER=composer.lenient.json phpfpm rm composer.lenient.*
+
+      - task: composer
+        vars:
+          TASK_ARGS: install
+
+  coding-standards:apply:
+    desc: "Apply coding standards"
+    cmds:
+      - task: coding-standards:composer:apply
+      - task: coding-standards:markdown:apply
+      - task: coding-standards:php:apply
+      - task: coding-standards:yaml:apply
+    silent: true
+
+  coding-standards:check:
+    desc: "Check coding standards"
+    cmds:
+      - task: coding-standards:composer:check
+      - task: coding-standards:markdown:check
+      - task: coding-standards:php:check
+      - task: coding-standards:yaml:check
+    silent: true
+
+  coding-standards:composer:apply:
+    desc: "Apply coding standards for composer"
+    cmds:
+      - task: compose
+        vars:
+          TASK_ARGS: run --rm phpfpm composer normalize
+
+  coding-standards:composer:check:
+    - task: coding-standards:composer:apply
+    - task: compose
+      vars:
+        TASK_ARGS: run --rm phpfpm composer normalize --dry-run
+    - task: compose
+      vars:
+        TASK_ARGS: run --rm phpfpm composer validate
+
+  coding-standards:markdown:apply:
+    desc: "Apply coding standards for Markdown"
+    cmds:
+      # Cf. .github/workflows/markdown.yaml
+      - docker compose run --rm markdownlint markdownlint '**/*.md' --fix
+
+  coding-standards:markdown:check:
+    desc: "Apply and check coding standards for Markdown"
+    cmds:
+      - task: coding-standards:markdown:apply
+      # Cf. .github/workflows/markdown.yaml
+      - docker compose run --rm markdownlint markdownlint '**/*.md'
+
+  coding-standards:php:apply:
+    desc: "Apply coding standards for PHP"
+    cmds:
+      # Cf. .github/workflows/php.yaml
+      - docker compose run --rm phpfpm vendor/bin/phpcbf
+    silent: true
+
+  coding-standards:php:check:
+    desc: "Apply and check coding standards for PHP"
+    cmds:
+      - task: coding-standards:php:apply
+      # Cf. .github/workflows/php.yaml
+      - docker compose run --rm phpfpm vendor/bin/phpcs
+    silent: true
+
+  coding-standards:yaml:apply:
+    desc: "Apply coding standards for YAML"
+    cmds:
+      # Cf. .github/workflows/yaml.yaml
+      - docker compose run --rm prettier '**/*.{yml,yaml}' --write
+
+  coding-standards:yaml:check:
+    desc: "Apply coding standards for YAML"
+    cmds:
+      - task: coding-standards:yaml:apply
+      # Cf. .github/workflows/yaml.yaml
+      - docker compose run --rm prettier '**/*.{yml,yaml}' --check
+
+  test:
+    cmds:
+      - docker compose run --env PHP_XDEBUG_MODE --env PHP_XDEBUG_WITH_REQUEST
+        --env PHP_IDE_CONFIG --rm phpfpm vendor/bin/phpunit {{.CLI_ARGS}}
+
+  xdebug:test:
+    cmds:
+      - PHP_XDEBUG_MODE=debug PHP_XDEBUG_WITH_REQUEST=yes
+        PHP_IDE_CONFIG=serverName=localhost docker compose run --env
+        PHP_XDEBUG_MODE --env PHP_XDEBUG_WITH_REQUEST --env PHP_IDE_CONFIG --rm
+        phpfpm vendor/bin/phpunit {{.CLI_ARGS}}

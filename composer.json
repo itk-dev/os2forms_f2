@@ -1,0 +1,31 @@
+{
+    "name": "os2forms/os2forms_f2",
+    "description": "OS2Forms: F2 integration",
+    "license": "MIT",
+    "type": "drupal-module",
+    "require": {
+        "itk-dev/f2-api-client": "dev-f2-api-client as 1.0.0",
+        "os2forms/os2forms": "^5.0"
+    },
+    "require-dev": {
+        "drupal/coder": "^9.0",
+        "ergebnis/composer-normalize": "^2.52"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "minimum-stability": "dev",
+    "config": {
+        "allow-plugins": {
+            "cweagans/composer-patches": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "ergebnis/composer-normalize": true,
+            "mglaman/composer-drupal-lenient": true,
+            "simplesamlphp/composer-module-installer": true,
+            "zaporylie/composer-drupal-optimizations": true
+        }
+    }
+}

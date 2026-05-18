@@ -1,0 +1,7 @@
+name: "os2forms_f2"
+type: module
+description: "OS2Forms: F2 integration"
+package: OS2Forms
+core_version_requirement: ^10 || ^11
+dependencies:
+  - os2forms:os2forms
