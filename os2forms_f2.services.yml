@@ -1,0 +1,16 @@
+services:
+  _defaults:
+    autowire: true
+
+  logger.channel.os2forms_f2:
+    parent: logger.channel_base
+    arguments: ["os2forms_f2"]
+
+  logger.channel.os2forms_f2_submission:
+    parent: logger.channel_base
+    arguments: ["webform_submission"]
+
+  Drupal\os2forms_f2\Helper\WebformHelperF2:
+
+
+  Drupal\os2forms_f2\Settings:
