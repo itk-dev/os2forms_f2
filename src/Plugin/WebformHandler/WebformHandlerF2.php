@@ -84,6 +84,14 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         '#options' => $this->getAttachmentElements(),
       ],
 
+      ArchiveSettings::DOCUMENT_TITLE => [
+        '#type' => 'textfield',
+        '#required' => TRUE,
+        '#title' => $this->t('Document title'),
+        '#default_value' => $settings->documentTitle,
+        '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.'),
+      ],
+
       ArchiveSettings::ARCHIVE_TARGET => [
         '#type' => 'select',
         '#required' => TRUE,

@@ -25,6 +25,9 @@ final class ArchiveSettings extends AbstractSettings {
   const string ATTACHMENT_ELEMENT = 'attachment_element';
   public ?string $attachmentElement = NULL;
 
+  const string DOCUMENT_TITLE = 'document_title';
+  public ?string $documentTitle = NULL;
+
   const string ARCHIVE_TARGET = 'archive_target';
   public ?ArchiveTarget $archiveTarget = NULL;
 

@@ -185,6 +185,7 @@ final class WebformHelperF2 implements LoggerInterface {
 
       $context['webform_submission'] = $submission;
       $handlerSettings = new HandlerSettings($payload['handlerSettings']);
+      $this->replaceTokens($handlerSettings, $submission);
 
       $target = $handlerSettings->archive?->archiveTarget;
       return match ($target) {
@@ -207,6 +208,8 @@ final class WebformHelperF2 implements LoggerInterface {
    */
   private function replaceTokens(HandlerSettings $handlerSettings, WebformSubmissionInterface $submission): HandlerSettings {
     // @todo Should we clone the settings before making changes?
+    $handlerSettings->archive->documentTitle = $this->webformTokenManager->replace((string) $handlerSettings->archive->documentTitle, $submission);
+
     return $handlerSettings;
   }
 
@@ -225,7 +228,7 @@ final class WebformHelperF2 implements LoggerInterface {
       // Apparently the F2 API inspects the filename extension to determine file type, i.e. we must keep the extension in the temporary filename.
       $filePath = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
       $document = new Document();
-      $document->title = sprintf('@todo %s (from %s)', $attachment->filename, $submission->label());
+      $document->title = $handlerSettings->archive?->documentTitle ?? $attachment->filename;
       $document = $this->f2->client()->documentCreate($document, $filePath, $matter);
       $message = sprintf('Document %s created on matter %s', $document, $matter);
     }
