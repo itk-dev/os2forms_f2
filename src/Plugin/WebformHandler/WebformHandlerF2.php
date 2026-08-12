@@ -4,6 +4,7 @@ namespace Drupal\os2forms_f2\Plugin\WebformHandler;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\os2forms_f2\Helper\F2Helper;
 use Drupal\os2forms_f2\Helper\WebformHelperF2;
 use Drupal\os2forms_f2\Settings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings;
@@ -43,6 +44,11 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   private WebformHelperF2 $helper;
 
   /**
+   * The F2 helper.
+   */
+  private F2Helper $f2;
+
+  /**
    * {@inheritdoc}
    */
   #[\Override]
@@ -50,6 +56,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
     $instance->settingsService = $container->get(Settings::class);
     $instance->helper = $container->get(WebformHelperF2::class);
+    $instance->f2 = $container->get(F2Helper::class);
 
     return $instance;
   }
@@ -66,7 +73,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    */
   #[\Override]
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $settings = $this->settingsService->getArchiveSettings((array) ($this->getSettings()[ArchiveSettings::NAME] ?? NULL));
+    $settings = $this->settingsService->getArchiveSettings((array) ($this->getSetting(ArchiveSettings::NAME)));
 
     $form[ArchiveSettings::NAME] = [
       ArchiveSettings::ATTACHMENT_ELEMENT => [
@@ -87,8 +94,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         ],
       ],
 
-      ArchiveSettings::ARCHIVE_TARGET_CASE => [
-        ArchiveTargetCase::NAME => [
+      ArchiveTargetCase::NAME => [
+        ArchiveTargetCase::CASE_ID => [
           '#type' => 'textfield',
           '#required' => TRUE,
           '#title' => $this->t('Case ID'),
@@ -96,7 +103,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
 
           '#states' => [
             'visible' => [
-              ':input[name="' . ArchiveSettings::NAME . '][' . ArchiveSettings::ARCHIVE_TARGET_CASE . '][' . ArchiveTargetCase::NAME . '"]' => [
+              ':input[name="settings[' . ArchiveSettings::NAME . '][' . ArchiveTargetCase::NAME . ']"]' => [
                 'value' => ArchiveTarget::CaseID->value,
               ],
             ],
@@ -105,6 +112,24 @@ final class WebformHandlerF2 extends WebformHandlerBase {
       ],
     ];
 
+    if (ArchiveTarget::CaseID === $settings->archiveTarget) {
+      $caseId = $settings->archiveTargetCase?->caseId;
+      if (NULL !== $caseId) {
+        try {
+          $case = $this->f2->getCaseById($caseId);
+          $form[ArchiveSettings::NAME][ArchiveTargetCase::NAME]['case_info'] = [
+            '#type' => 'details',
+            '#open' => TRUE,
+            '#title' => $this->t('Case'),
+            '#markup' => $case,
+          ];
+        }
+        catch (\Throwable $e) {
+          // Ignore all errors.
+        }
+      }
+    }
+
     return parent::buildConfigurationForm($form, $form_state);
   }
 
@@ -112,8 +137,29 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
-    // @todo Validate something?
     parent::validateConfigurationForm($form, $form_state);
+
+    $target = $form_state->getValue([ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET]);
+    if (ArchiveTarget::CaseID->value === $target) {
+      $key = [ArchiveSettings::NAME, ArchiveTargetCase::NAME, ArchiveTargetCase::CASE_ID];
+      $caseId = trim((string) $form_state->getValue($key));
+      $caseId = filter_var($caseId, FILTER_SANITIZE_NUMBER_INT);
+      if (FALSE === $caseId) {
+        $form_state->setErrorByName(implode('][', $key), t('Missing or invalid case ID.'));
+      }
+      else {
+        try {
+          $this->f2->getCaseById($caseId);
+        }
+        catch (\Throwable $throwable) {
+          $form_state->setErrorByName(implode('][', $key), t('Cannot get case by ID @case_id (@message).', [
+            '@case_id' => $caseId,
+            '@message' => $throwable->getMessage(),
+          ]));
+        }
+      }
+    }
+
   }
 
   /**
@@ -146,7 +192,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    */
   #[\Override]
   public function getSummary() {
-    $settings = $this->settingsService->getArchiveSettings();
+    $settings = $this->settingsService->getHandlerSettings($this);
 
     $build = [
       'info' => [
@@ -154,6 +200,17 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         '#suffix' => '</div>',
       ],
     ];
+
+    switch ($settings->archive?->archiveTarget) {
+      case ArchiveTarget::CaseID:
+        $caseId = $settings->archive->archiveTargetCase?->caseId;
+        if ($caseId) {
+          $build['info'][ArchiveTargetCase::NAME] = [
+            '#markup' => $this->t('Archive on case @case_id', ['@case_id' => $caseId]),
+          ];
+        }
+        break;
+    }
 
     return $build;
   }

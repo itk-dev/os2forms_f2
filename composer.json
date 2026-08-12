@@ -4,6 +4,7 @@
     "license": "MIT",
     "type": "drupal-module",
     "require": {
+        "itk-dev/drupal_psr6_cache": "^1.1",
         "itk-dev/f2-api-client": "dev-f2-api-client as 1.0.0",
         "os2forms/os2forms": "^5.0"
     },

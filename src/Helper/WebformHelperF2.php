@@ -2,6 +2,7 @@
 
 namespace Drupal\os2forms_f2\Helper;
 
+use ArchiveSettings\ArchiveTarget;
 use Drupal\advancedqueue\Entity\QueueInterface;
 use Drupal\advancedqueue\Job;
 use Drupal\advancedqueue\JobResult;
@@ -9,17 +10,19 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\ElementInfoManager;
+use Drupal\os2forms_f2\Exception\InvalidAttachmentElementException;
 use Drupal\os2forms_f2\Exception\RuntimeException;
 use Drupal\os2forms_f2\Exception\SubmissionNotFoundException;
+use Drupal\os2forms_f2\Model\Attachment;
 use Drupal\os2forms_f2\Plugin\AdvancedQueue\JobType\F2;
 use Drupal\os2forms_f2\Plugin\WebformHandler\WebformHandlerF2;
 use Drupal\os2forms_f2\Settings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings;
 use Drupal\os2forms_f2\Settings\HandlerSettings;
-use Drupal\webform\WebformInterface;
 use Drupal\webform\WebformSubmissionInterface;
 use Drupal\webform\WebformSubmissionStorageInterface;
 use Drupal\webform\WebformTokenManagerInterface;
+use Drupal\webform_attachment\Element\WebformAttachmentBase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -29,16 +32,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 final class WebformHelperF2 implements LoggerInterface {
   use LoggerTrait;
-
-  private const string PAYLOAD_KEY = 'os2forms_f2';
-  private const string PAYLOAD_STATE = 'state';
-  private const string STATE_UPLOAD_FILES = 'upload_files';
-
-  private const string PAYLOAD_FILES = 'files';
-  private const string STATE_CHECK_FILES = 'check_files';
-
-  private const string PAYLOAD_FILES_DELIVERED = 'files_delivered';
-  private const string STATE_SEND_DISTRIBUTION_OBJECT = 'send_distribution_object';
 
   private const string PDF_MIME_TYPE = 'application/pdf';
 
@@ -62,6 +55,7 @@ final class WebformHelperF2 implements LoggerInterface {
   public function __construct(
     EntityTypeManagerInterface $entityTypeManager,
     private readonly Settings $settings,
+    private readonly F2Helper $f2,
     #[Autowire(service: 'plugin.manager.element_info')]
     private readonly ElementInfoManager $elementInfoManager,
     #[Autowire(service: 'webform.token_manager')]
@@ -85,29 +79,6 @@ final class WebformHelperF2 implements LoggerInterface {
     $submission = $this->webformSubmissionStorage->load($id);
 
     return $submission;
-  }
-
-  /**
-   * Load submission IDs for a webform.
-   */
-  public function loadSubmissionIds(WebformInterface $webform): array {
-    return $this->webformSubmissionStorage->getQuery()
-      ->accessCheck()
-      ->condition('webform_id', $webform->id())
-      ->sort('created', 'DESC')
-      ->sort('sid', 'DESC')
-      ->execute();
-  }
-
-  /**
-   * Load latest submission on a webform.
-   */
-  public function loadLatestSubmission(WebformInterface $webform): ?WebformSubmissionInterface {
-    $submissionIds = $this->loadSubmissionIds($webform);
-
-    $id = reset($submissionIds);
-
-    return $id ? $this->loadSubmission($id) : NULL;
   }
 
   /**
@@ -212,26 +183,82 @@ final class WebformHelperF2 implements LoggerInterface {
       $context['webform_submission'] = $submission;
       $handlerSettings = new HandlerSettings($payload['handlerSettings']);
 
-      throw new \RuntimeException(__METHOD__ . 'not implemented');
-
-      return JobResult::success();
+      $target = $handlerSettings->archive?->archiveTarget;
+      return match ($target) {
+        ArchiveTarget::CaseID => $this->archiveOnCase($submission, $handlerSettings),
+        default => throw new RuntimeException(sprintf('Invalid archive target: %s', $target->name)),
+      };
     }
-    catch (\Exception $e) {
+    catch (\Exception $exception) {
       $this->error('Error: @message', $context + [
-        '@message' => $e->getMessage(),
-        'exception' => $e,
+        '@message' => $exception->getMessage(),
+        'exception' => $exception,
       ]);
 
-      return JobResult::failure($e->getMessage());
+      return JobResult::failure($exception->getMessage());
     }
   }
 
   /**
    * Replace tokens in handler settings supporting tokens.
    */
-  private function replaceTokens(HandlerSettings $handlerSettings, WebformSubmissionInterface $submission): ArchiveSettings {
+  private function replaceTokens(HandlerSettings $handlerSettings, WebformSubmissionInterface $submission): HandlerSettings {
     // @todo Should we clone the settings before making changes?
     return $handlerSettings;
+  }
+
+  /**
+   *
+   */
+  private function archiveOnCase(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
+    $caseId = $handlerSettings->archive?->archiveTargetCase?->caseId;
+    if (NULL === $caseId) {
+      throw new RuntimeException('Cannot get case ID');
+    }
+    $case = $this->f2->getCaseById($caseId);
+    $attachment = $this->getAttachment($submission, $handlerSettings);
+    $this->f2->client()->documentCreate();
+    throw new \RuntimeException(__METHOD__);
+  }
+
+  /**
+   * Get main document.
+   *
+   * @throws InvalidAttachmentElementException
+   *
+   * @see WebformAttachmentController::download()
+   */
+  protected function getAttachment(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): ?Attachment {
+    // Lifted from Drupal\webform_attachment\Controller\WebformAttachmentController::download.
+    $element = $handlerSettings->archive->attachmentElement;
+    if (NULL === $element) {
+      throw new InvalidAttachmentElementException('Cannot get attachment element');
+    }
+    $element = $submission->getWebform()->getElement($element) ?: [];
+    if (!isset($element['#type'])) {
+      throw new InvalidAttachmentElementException(sprintf('Cannot get attachment element %s', $element));
+    }
+    [$type] = explode(':', $element['#type']);
+    $instance = $this->elementInfoManager->createInstance($type);
+
+    if (!$instance instanceof WebformAttachmentBase) {
+      throw new InvalidAttachmentElementException(sprintf('Attachment element must be an instance of %s. Found %s.', WebformAttachmentBase::class, $instance::class));
+    }
+
+    $fileName = $instance::getFileName($element, $submission);
+    $mimeType = $instance::getFileMimeType($element, $submission);
+
+    if (self::PDF_MIME_TYPE !== $mimeType) {
+      throw new InvalidAttachmentElementException(sprintf('The attachment element must be a PDF file (%s); got %s.', self::PDF_MIME_TYPE, $mimeType));
+    }
+
+    $content = $instance::getFileContent($element, $submission);
+
+    return new Attachment(
+      $content,
+      $mimeType,
+      $fileName
+    );
   }
 
 }
