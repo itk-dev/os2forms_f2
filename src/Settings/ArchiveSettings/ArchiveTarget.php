@@ -6,5 +6,5 @@ namespace Drupal\os2forms_f2\Settings\ArchiveSettings;
  * Archive targets.
  */
 enum ArchiveTarget: string {
-  case CaseID = 'case_id';
+  case MatterID = 'matter_id';
 }

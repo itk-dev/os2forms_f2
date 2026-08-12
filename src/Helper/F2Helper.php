@@ -4,7 +4,6 @@ namespace Drupal\os2forms_f2\Helper;
 
 use Drupal\os2forms_f2\Settings;
 use ItkDev\F2ApiClient\ApiClient;
-use ItkDev\F2ApiClient\Model\CaseFile;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -18,20 +17,6 @@ class F2Helper {
     #[Autowire(service: 'drupal_psr6_cache.cache_item_pool')]
     private readonly CacheItemPoolInterface $cacheItemPool,
   ) {
-  }
-
-  /**
-   *
-   */
-  public function getCaseById(int $id): CaseFile {
-    return $this->client()->caseById($id);
-  }
-
-  /**
-   * @return CaseFile[]
-   */
-  public function caseList(string $q, int $count = 10): array {
-    return $this->client()->caseSearch($q, $count);
   }
 
   private ?ApiClient $apiClient = NULL;

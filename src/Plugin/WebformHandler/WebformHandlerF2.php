@@ -9,7 +9,7 @@ use Drupal\os2forms_f2\Helper\WebformHelperF2;
 use Drupal\os2forms_f2\Settings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget;
-use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetCase;
+use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetMatter;
 use Drupal\webform\Plugin\WebformHandlerBase;
 use Drupal\webform\Utility\WebformDialogHelper;
 use Drupal\webform\WebformSubmissionInterface;
@@ -90,21 +90,21 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         '#title' => $this->t('Archive target'),
         '#default_value' => $settings->archiveTarget?->value,
         '#options' => [
-          ArchiveTarget::CaseID->value => $this->t('CaseID'),
+          ArchiveTarget::MatterID->value => $this->t('Matter ID'),
         ],
       ],
 
-      ArchiveTargetCase::NAME => [
-        ArchiveTargetCase::CASE_ID => [
+      ArchiveTargetMatter::NAME => [
+        ArchiveTargetMatter::MATTER_ID => [
           '#type' => 'textfield',
           '#required' => TRUE,
-          '#title' => $this->t('Case ID'),
-          '#default_value' => $settings->archiveTargetCase?->caseId,
+          '#title' => $this->t('Matter ID'),
+          '#default_value' => $settings->archiveTargetMatter?->matterId,
 
           '#states' => [
             'visible' => [
-              ':input[name="settings[' . ArchiveSettings::NAME . '][' . ArchiveTargetCase::NAME . ']"]' => [
-                'value' => ArchiveTarget::CaseID->value,
+              ':input[name="settings[' . ArchiveSettings::NAME . '][' . ArchiveTargetMatter::NAME . ']"]' => [
+                'value' => ArchiveTarget::MatterID->value,
               ],
             ],
           ],
@@ -112,16 +112,17 @@ final class WebformHandlerF2 extends WebformHandlerBase {
       ],
     ];
 
-    if (ArchiveTarget::CaseID === $settings->archiveTarget) {
-      $caseId = $settings->archiveTargetCase?->caseId;
-      if (NULL !== $caseId) {
+    if (ArchiveTarget::MatterID === $settings->archiveTarget) {
+      $matterId = $settings->archiveTargetMatter?->matterId;
+      if (NULL !== $matterId) {
         try {
-          $case = $this->f2->getCaseById($caseId);
-          $form[ArchiveSettings::NAME][ArchiveTargetCase::NAME]['case_info'] = [
+          $matter = $this->f2->client()->matterById($matterId);
+
+          $form[ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
             '#type' => 'details',
             '#open' => TRUE,
-            '#title' => $this->t('Case'),
-            '#markup' => $case,
+            '#title' => $this->t('Matter'),
+            '#markup' => $matter,
           ];
         }
         catch (\Throwable $e) {
@@ -140,20 +141,20 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     parent::validateConfigurationForm($form, $form_state);
 
     $target = $form_state->getValue([ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET]);
-    if (ArchiveTarget::CaseID->value === $target) {
-      $key = [ArchiveSettings::NAME, ArchiveTargetCase::NAME, ArchiveTargetCase::CASE_ID];
-      $caseId = trim((string) $form_state->getValue($key));
-      $caseId = filter_var($caseId, FILTER_SANITIZE_NUMBER_INT);
-      if (FALSE === $caseId) {
-        $form_state->setErrorByName(implode('][', $key), t('Missing or invalid case ID.'));
+    if (ArchiveTarget::MatterID->value === $target) {
+      $key = [ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_ID];
+      $matterId = trim((string) $form_state->getValue($key));
+      $matterId = filter_var($matterId, FILTER_SANITIZE_NUMBER_INT);
+      if (FALSE === $matterId) {
+        $form_state->setErrorByName(implode('][', $key), t('Missing or invalid matter ID.'));
       }
       else {
         try {
-          $this->f2->getCaseById($caseId);
+          $this->f2->client()->matterById($matterId);
         }
         catch (\Throwable $throwable) {
-          $form_state->setErrorByName(implode('][', $key), t('Cannot get case by ID @case_id (@message).', [
-            '@case_id' => $caseId,
+          $form_state->setErrorByName(implode('][', $key), t('Cannot get matter by ID @matter_id (@message).', [
+            '@matter_id' => $matterId,
             '@message' => $throwable->getMessage(),
           ]));
         }
@@ -202,11 +203,11 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     ];
 
     switch ($settings->archive?->archiveTarget) {
-      case ArchiveTarget::CaseID:
-        $caseId = $settings->archive->archiveTargetCase?->caseId;
-        if ($caseId) {
-          $build['info'][ArchiveTargetCase::NAME] = [
-            '#markup' => $this->t('Archive on case @case_id', ['@case_id' => $caseId]),
+      case ArchiveTarget::MatterID:
+        $matterId = $settings->archive->archiveTargetMatter?->matterId;
+        if ($matterId) {
+          $build['info'][ArchiveTargetMatter::NAME] = [
+            '#markup' => $this->t('Archive on matter @matter_id', ['@matter_id' => $matterId]),
           ];
         }
         break;

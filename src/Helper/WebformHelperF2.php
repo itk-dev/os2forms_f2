@@ -2,12 +2,12 @@
 
 namespace Drupal\os2forms_f2\Helper;
 
-use ArchiveSettings\ArchiveTarget;
 use Drupal\advancedqueue\Entity\QueueInterface;
 use Drupal\advancedqueue\Job;
 use Drupal\advancedqueue\JobResult;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\ElementInfoManager;
 use Drupal\os2forms_f2\Exception\InvalidAttachmentElementException;
@@ -18,11 +18,13 @@ use Drupal\os2forms_f2\Plugin\AdvancedQueue\JobType\F2;
 use Drupal\os2forms_f2\Plugin\WebformHandler\WebformHandlerF2;
 use Drupal\os2forms_f2\Settings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings;
+use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget;
 use Drupal\os2forms_f2\Settings\HandlerSettings;
 use Drupal\webform\WebformSubmissionInterface;
 use Drupal\webform\WebformSubmissionStorageInterface;
 use Drupal\webform\WebformTokenManagerInterface;
 use Drupal\webform_attachment\Element\WebformAttachmentBase;
+use ItkDev\F2ApiClient\Model\Document;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -56,6 +58,7 @@ final class WebformHelperF2 implements LoggerInterface {
     EntityTypeManagerInterface $entityTypeManager,
     private readonly Settings $settings,
     private readonly F2Helper $f2,
+    private readonly FileSystemInterface $fileSystem,
     #[Autowire(service: 'plugin.manager.element_info')]
     private readonly ElementInfoManager $elementInfoManager,
     #[Autowire(service: 'webform.token_manager')]
@@ -185,7 +188,7 @@ final class WebformHelperF2 implements LoggerInterface {
 
       $target = $handlerSettings->archive?->archiveTarget;
       return match ($target) {
-        ArchiveTarget::CaseID => $this->archiveOnCase($submission, $handlerSettings),
+        ArchiveTarget::MatterID => $this->archiveOnMatter($submission, $handlerSettings),
         default => throw new RuntimeException(sprintf('Invalid archive target: %s', $target->name)),
       };
     }
@@ -210,15 +213,29 @@ final class WebformHelperF2 implements LoggerInterface {
   /**
    *
    */
-  private function archiveOnCase(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
-    $caseId = $handlerSettings->archive?->archiveTargetCase?->caseId;
-    if (NULL === $caseId) {
-      throw new RuntimeException('Cannot get case ID');
+  private function archiveOnMatter(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
+    $matterId = $handlerSettings->archive?->archiveTargetMatter?->matterId;
+    if (NULL === $matterId) {
+      throw new RuntimeException('Cannot get matter ID');
     }
-    $case = $this->f2->getCaseById($caseId);
+    $matter = $this->f2->client()->matterById($matterId);
     $attachment = $this->getAttachment($submission, $handlerSettings);
-    $this->f2->client()->documentCreate();
-    throw new \RuntimeException(__METHOD__);
+    $message = '';
+    try {
+      // Apparently the F2 API inspects the filename extension to determine file type, i.e. we must keep the extension in the temporary filename.
+      $filePath = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
+      $document = new Document();
+      $document->title = sprintf('@todo %s (from %s)', $attachment->filename, $submission->label());
+      $document = $this->f2->client()->documentCreate($document, $filePath, $matter);
+      $message = sprintf('Document %s created on matter %s', $document, $matter);
+    }
+    finally {
+      if (isset($filePath) && file_exists($filePath)) {
+        unlink($filePath);
+      }
+    }
+
+    return JobResult::success($message);
   }
 
   /**

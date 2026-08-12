@@ -6,7 +6,6 @@ namespace Drupal\os2forms_f2\Model;
  * The Document class.
  */
 final readonly class Attachment {
-  public const string FORMAT_NAME_PDF = 'PDF';
   public const string MIME_TYPE_PDF = 'application/pdf';
 
   /**
