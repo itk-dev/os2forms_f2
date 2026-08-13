@@ -4,6 +4,7 @@ description: "OS2Forms: F2 integration"
 package: OS2Forms
 core_version_requirement: ^10 || ^11
 dependencies:
+  - drupal_psr6_cache:drupal_psr6_cache
   - os2forms:os2forms
 
 configure: os2forms_f2.admin.settings
