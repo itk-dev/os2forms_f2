@@ -4,6 +4,7 @@ namespace Drupal\os2forms_f2\Plugin\WebformHandler;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\os2forms_f2\Helper\F2Helper;
 use Drupal\os2forms_f2\Helper\WebformHelperF2;
 use Drupal\os2forms_f2\Settings;
@@ -148,20 +149,22 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::validateConfigurationForm($form, $form_state);
 
+    $setError = static fn(string|array $path, TranslatableMarkup $message) => $form_state->setErrorByName(implode('][', (array) $path), $message);
+
     $target = $form_state->getValue([ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET]);
     if (ArchiveTarget::MatterID->value === $target) {
       $key = [ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_ID];
       $matterId = trim((string) $form_state->getValue($key));
       $matterId = filter_var($matterId, FILTER_SANITIZE_NUMBER_INT);
       if (FALSE === $matterId) {
-        $form_state->setErrorByName(implode('][', $key), t('Missing or invalid matter ID.'));
+        $setError($key, t('Missing or invalid matter ID.'));
       }
       else {
         try {
           $this->f2->client()->matterById($matterId);
         }
         catch (\Throwable $throwable) {
-          $form_state->setErrorByName(implode('][', $key), t('Cannot get matter by ID @matter_id (@message).', [
+          $setError($key, t('Cannot get matter by ID @matter_id (@message).', [
             '@matter_id' => $matterId,
             '@message' => $throwable->getMessage(),
           ]));

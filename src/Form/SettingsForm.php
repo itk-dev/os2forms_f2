@@ -13,7 +13,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\os2forms_f2\Helper\F2Helper;
 use Drupal\os2forms_f2\Settings;
 use Drupal\os2forms_f2\Settings\F2ApiSettings;
 use Drupal\os2forms_f2\Settings\GeneralSettings;
@@ -24,6 +24,8 @@ use Drupal\os2forms_f2\Settings\GeneralSettings;
 final class SettingsForm extends ConfigFormBase {
   use StringTranslationTrait;
   use AutowireTrait;
+
+  private const string ACTION_PING_API = 'action_ping_api';
 
   /**
    * The queue storage.
@@ -40,6 +42,7 @@ final class SettingsForm extends ConfigFormBase {
     TypedConfigManagerInterface $typedConfigManager,
     EntityTypeManagerInterface $entityTypeManager,
     private readonly Settings $settings,
+    private readonly F2Helper $f2,
   ) {
     parent::__construct($config_factory, $typedConfigManager);
     $this->queueStorage = $entityTypeManager->getStorage('advancedqueue_queue');
@@ -64,6 +67,8 @@ final class SettingsForm extends ConfigFormBase {
    */
   #[\Override]
   public function buildForm(array $form, FormStateInterface $form_state): array {
+    $form = parent::buildForm($form, $form_state);
+
     $form[F2ApiSettings::NAME] = [
       '#type' => 'fieldset',
       '#title' => $this->t('F2 API'),
@@ -76,7 +81,22 @@ final class SettingsForm extends ConfigFormBase {
       '#tree' => TRUE,
     ] + $this->buildFormGeneral();
 
-    return parent::buildForm($form, $form_state);
+    $form[self::ACTION_PING_API] = [
+      '#type' => 'container',
+      '#weight' => 10000,
+
+      self::ACTION_PING_API => [
+        '#type' => 'submit',
+        '#name' => self::ACTION_PING_API,
+        '#value' => $this->t('Ping API'),
+      ],
+
+      'message' => [
+        '#markup' => $this->t('Note: Pinging the API will use saved config.'),
+      ],
+    ];
+
+    return $form;
   }
 
   /**
@@ -160,9 +180,10 @@ final class SettingsForm extends ConfigFormBase {
    */
   #[\Override]
   public function validateForm(array &$form, FormStateInterface $form_state): void {
-    $setError = static fn(string|array $path, TranslatableMarkup $message) => $form_state->setErrorByName(implode('][', (array) $path), $message);
+    if (self::ACTION_PING_API === ($form_state->getTriggeringElement()['#name'] ?? NULL)) {
+      return;
+    }
 
-    // @todo Validate something?
     parent::validateForm($form, $form_state);
   }
 
@@ -171,6 +192,17 @@ final class SettingsForm extends ConfigFormBase {
    */
   #[\Override]
   public function submitForm(array &$form, FormStateInterface $form_state): void {
+    if (self::ACTION_PING_API === ($form_state->getTriggeringElement()['#name'] ?? NULL)) {
+      try {
+        $this->f2->pingApi();
+        $this->messenger()->addStatus($this->t('Pinged API successfully.'));
+      }
+      catch (\Throwable $t) {
+        $this->messenger()->addError($this->t('Pinging API failed: @message', ['@message' => $t->getMessage()]));
+      }
+      return;
+    }
+
     $config = $this->config(Settings::CONFIG_NAME);
     foreach ([
       F2ApiSettings::NAME,

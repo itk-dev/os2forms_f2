@@ -39,4 +39,11 @@ class F2Helper {
     return $this->apiClient;
   }
 
+  /**
+   *
+   */
+  public function pingApi(): void {
+    $this->client()->matterSearch('ping');
+  }
+
 }
