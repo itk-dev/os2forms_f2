@@ -155,7 +155,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     if (ArchiveTarget::MatterID->value === $target) {
       $key = [ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_ID];
       $matterId = trim((string) $form_state->getValue($key));
-      $matterId = filter_var($matterId, FILTER_SANITIZE_NUMBER_INT);
+      $matterId = filter_var($matterId, FILTER_VALIDATE_INT);
       if (FALSE === $matterId) {
         $setError($key, t('Missing or invalid matter ID.'));
       }
