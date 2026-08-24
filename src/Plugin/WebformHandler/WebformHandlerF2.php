@@ -236,7 +236,6 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     $elements = $this->getWebform()->getElementsDecodedAndFlattened();
 
     $elementTypes = [
-      'webform_entity_print_attachment:pdf',
       'os2forms_attachment',
     ];
     $elements = array_filter(
