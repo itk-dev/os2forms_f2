@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * F2 Webform Handler.
  *
  * @WebformHandler(
- *   id = "os2forms_f2",
+ *   id = "os2forms_f2_f2",
  *   label = @Translation("F2"),
  *   category = @Translation("Web services"),
  *   description = @Translation("Sends webform submission to F2."),
@@ -32,6 +32,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class WebformHandlerF2 extends WebformHandlerBase {
   use StringTranslationTrait;
 
+  // This ID should match the one assigned in the @WebformHandlerBase incantation.
   public const string ID = 'os2forms_f2_f2';
 
   /**
