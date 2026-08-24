@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @AdvancedQueueJobType(
  *   id = "Drupal\os2forms_f2\Plugin\AdvancedQueue\JobType\F2",
  *   label = @Translation("F2"),
- *   max_retries = 20,
+ *   max_retries = 5,
  *   retry_delay = 60,
  * )
  */
