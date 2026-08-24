@@ -166,12 +166,6 @@ final class SettingsForm extends ConfigFormBase {
       '#description' => $description,
     ];
 
-    $section[GeneralSettings::TEST_MODE] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Test mode'),
-      '#default_value' => $settings->testMode,
-    ];
-
     return $section;
   }
 
