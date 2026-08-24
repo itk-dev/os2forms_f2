@@ -1,16 +1,25 @@
 {
     "name": "os2forms/os2forms_f2",
     "description": "OS2Forms: F2 integration",
-    "license": "MIT",
+    "license": "EUPL-1.2",
     "type": "drupal-module",
+    "authors": [
+        {
+            "name": "Mikkel Ricky",
+            "email": "rimi@aarhus.dk"
+        }
+    ],
     "require": {
+        "php": "^8.3",
+        "drush/drush": "^12 || ^13",
         "itk-dev/drupal_psr6_cache": "^1.1",
         "itk-dev/f2-api-client": "dev-f2-api-client as 1.0.0",
-        "os2forms/os2forms": "^5.0"
+        "os2forms/os2forms": "^5.1"
     },
     "require-dev": {
-        "drupal/coder": "^9.0",
-        "ergebnis/composer-normalize": "^2.52"
+        "drupal/coder": "^8.3 || ^9.0",
+        "ergebnis/composer-normalize": "^2.52",
+        "mglaman/composer-drupal-lenient": "^1.0"
     },
     "repositories": [
         {
@@ -23,10 +32,23 @@
         "allow-plugins": {
             "cweagans/composer-patches": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
+            "drupal/core-composer-scaffold": false,
             "ergebnis/composer-normalize": true,
             "mglaman/composer-drupal-lenient": true,
             "simplesamlphp/composer-module-installer": true,
+            "simplesamlphp/composer-xmlprovider-installer": true,
+            "symfony/runtime": false,
+            "vaimo/composer-patches": true,
             "zaporylie/composer-drupal-optimizations": true
+        }
+    },
+    "extra": {
+        "drupal-lenient": {
+                        "allowed-list": [
+
+            "drupal/coc_forms_auto_export",
+                            "drupal/webform_node_element"
+                        ]
         }
     }
 }

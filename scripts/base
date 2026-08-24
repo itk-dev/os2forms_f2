@@ -109,6 +109,7 @@ setup() {
   # Use --json to actually set a boolean value (rather that a string value, e.g. "true")
   composer --no-plugins config extra.merge-plugin.merge-extra --json true
   composer --no-plugins config extra.merge-plugin.merge-extra-deep --json true
+  composer --no-plugins config policy.advisories.block --json false
 
   composer update
   # Our module and its dev requirements are now installed.
