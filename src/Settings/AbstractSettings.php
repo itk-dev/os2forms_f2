@@ -105,7 +105,7 @@ abstract class AbstractSettings implements \JsonSerializable {
     }
 
     foreach ($values as $key => $value) {
-      $name = self::kebab2camel($key);
+      $name = self::snake2camel($key);
       if (!property_exists($this, $name)) {
         if ($throwExceptionOnMissingProperty) {
           throw new \RuntimeException(
@@ -124,7 +124,7 @@ abstract class AbstractSettings implements \JsonSerializable {
         $value = NULL;
       }
       $this->$name = $value;
-      $this->values[self::camel2kebab($name)] = $value;
+      $this->values[self::camel2snake($name)] = $value;
     }
 
     return $this;
@@ -155,18 +155,21 @@ abstract class AbstractSettings implements \JsonSerializable {
   }
 
   /**
-   * Convert kebab_case to camelCase.
+   * Convert snake_case to camelCase.
+   *
+   * @see self::camel2snake()
    */
-  public static function kebab2camel(string $value): string {
+  public static function snake2camel(string $value): string {
     return lcfirst(str_replace('_', '', ucwords($value, '_')));
   }
 
   /**
-   * Convert camelCase to kebab_case.
+   * Convert camelCase to snake_case.
    *
+   * @see self::snake2camel()
    * @see https://stackoverflow.com/a/40514305/2502647
    */
-  public static function camel2kebab(string $value): string {
+  public static function camel2snake(string $value): string {
     return strtolower((string) preg_replace('/(?<=\d)(?=[A-Za-z])|(?<=[A-Za-z])(?=\d)|(?<=[a-z])(?=[A-Z])/', '_', $value));
   }
 
