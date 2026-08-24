@@ -151,7 +151,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             '#markup' => $matter,
           ];
         }
-        catch (\Throwable $e) {
+        catch (\Throwable) {
           // Ignore all errors.
         }
       }
