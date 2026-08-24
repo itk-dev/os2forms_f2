@@ -77,44 +77,50 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $settings = $this->settingsService->getArchiveSettings((array) ($this->getSetting(ArchiveSettings::NAME)));
 
-    $form[ArchiveSettings::NAME] = [
-      ArchiveSettings::ATTACHMENT_ELEMENT => [
-        '#type' => 'select',
-        '#required' => TRUE,
-        '#title' => $this->t('Attachment element'),
-        '#default_value' => $settings->attachmentElement,
-        '#options' => $this->getAttachmentElements(),
-      ],
-
-      ArchiveSettings::DOCUMENT_TITLE => [
-        '#type' => 'textfield',
-        '#required' => TRUE,
-        '#title' => $this->t('Document title'),
-        '#default_value' => $settings->documentTitle,
-        '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.'),
-      ],
-
-      ArchiveSettings::ARCHIVE_TARGET => [
-        '#type' => 'select',
-        '#required' => TRUE,
-        '#title' => $this->t('Archive target'),
-        '#default_value' => $settings->archiveTarget?->value,
-        '#options' => [
-          ArchiveTarget::MatterID->value => $this->t('Matter ID'),
+    // We have to wrap all handler setting fields in a container to show them on
+    // the "General" page only.
+    $form[self::ID] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('F2 archive settings'),
+      ArchiveSettings::NAME => [
+        ArchiveSettings::ATTACHMENT_ELEMENT => [
+          '#type' => 'select',
+          '#required' => TRUE,
+          '#title' => $this->t('Attachment element'),
+          '#default_value' => $settings->attachmentElement,
+          '#options' => $this->getAttachmentElements(),
         ],
-      ],
 
-      ArchiveTargetMatter::NAME => [
-        ArchiveTargetMatter::MATTER_ID => [
+        ArchiveSettings::DOCUMENT_TITLE => [
           '#type' => 'textfield',
           '#required' => TRUE,
-          '#title' => $this->t('Matter ID'),
-          '#default_value' => $settings->archiveTargetMatter?->matterId,
+          '#title' => $this->t('Document title'),
+          '#default_value' => $settings->documentTitle,
+          '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.'),
+        ],
 
-          '#states' => [
-            'visible' => [
-              ':input[name="settings[' . ArchiveSettings::NAME . '][' . ArchiveSettings::ARCHIVE_TARGET . ']"]' => [
-                'value' => ArchiveTarget::MatterID->value,
+        ArchiveSettings::ARCHIVE_TARGET => [
+          '#type' => 'select',
+          '#required' => TRUE,
+          '#title' => $this->t('Archive target'),
+          '#default_value' => $settings->archiveTarget?->value,
+          '#options' => [
+            ArchiveTarget::MatterID->value => $this->t('Matter ID'),
+          ],
+        ],
+
+        ArchiveTargetMatter::NAME => [
+          ArchiveTargetMatter::MATTER_ID => [
+            '#type' => 'textfield',
+            '#required' => TRUE,
+            '#title' => $this->t('Matter ID'),
+            '#default_value' => $settings->archiveTargetMatter?->matterId,
+
+            '#states' => [
+              'visible' => [
+                ':input[name="settings[' . implode('][', [self::ID, ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET]) . ']"]' => [
+                  'value' => ArchiveTarget::MatterID->value,
+                ],
               ],
             ],
           ],
@@ -128,7 +134,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         try {
           $matter = $this->f2->client()->matterById($matterId);
 
-          $form[ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
+          $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
             '#type' => 'details',
             '#open' => TRUE,
             '#title' => $this->t('Matter'),
@@ -152,9 +158,9 @@ final class WebformHandlerF2 extends WebformHandlerBase {
 
     $setError = static fn(string|array $path, TranslatableMarkup $message) => $form_state->setErrorByName(implode('][', (array) $path), $message);
 
-    $target = $form_state->getValue([ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET]);
+    $target = $form_state->getValue([self::ID, ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET]);
     if (ArchiveTarget::MatterID->value === $target) {
-      $key = [ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_ID];
+      $key = [self::ID, ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_ID];
       $matterId = trim((string) $form_state->getValue($key));
       $matterId = filter_var($matterId, FILTER_VALIDATE_INT);
       if (FALSE === $matterId) {
@@ -183,7 +189,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     foreach ([
       ArchiveSettings::NAME,
     ] as $name) {
-      $this->configuration[$name] = $form_state->getValue($name);
+      $this->configuration[$name] = $form_state->getValue([self::ID, $name]);
     }
   }
 
