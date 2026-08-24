@@ -113,7 +113,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
 
           '#states' => [
             'visible' => [
-              ':input[name="settings[' . ArchiveSettings::NAME . '][' . ArchiveTargetMatter::NAME . ']"]' => [
+              ':input[name="settings[' . ArchiveSettings::NAME . '][' . ArchiveSettings::ARCHIVE_TARGET . ']"]' => [
                 'value' => ArchiveTarget::MatterID->value,
               ],
             ],
