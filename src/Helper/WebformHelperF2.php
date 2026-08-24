@@ -248,7 +248,7 @@ final class WebformHelperF2 implements LoggerInterface {
    *
    * @see WebformAttachmentController::download()
    */
-  protected function getAttachment(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): ?Attachment {
+  protected function getAttachment(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): Attachment {
     // Lifted from Drupal\webform_attachment\Controller\WebformAttachmentController::download.
     $element = $handlerSettings->archive->attachmentElement;
     if (NULL === $element) {
