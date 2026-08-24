@@ -31,6 +31,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class WebformHandlerF2 extends WebformHandlerBase {
   use StringTranslationTrait;
+  use WebformHandlerAdditionalStatesTrait;
 
   // This ID should match the one assigned in the @WebformHandlerBase incantation.
   public const string ID = 'os2forms_f2_f2';
@@ -61,6 +62,15 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     $instance->f2 = $container->get(F2Helper::class);
 
     return $instance;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @phpstan-return array<string, mixed>
+   */
+  public function defaultConfiguration() {
+    return $this->additionalStatesDefaultConfiguration();
   }
 
   /**
@@ -147,7 +157,9 @@ final class WebformHandlerF2 extends WebformHandlerBase {
       }
     }
 
-    return parent::buildConfigurationForm($form, $form_state);
+    $this->additionalStatesBuildConfigurationForm($form, $form_state);
+
+    return $this->setSettingsParents($form);
   }
 
   /**
@@ -191,15 +203,15 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     ] as $name) {
       $this->configuration[$name] = $form_state->getValue([self::ID, $name]);
     }
+
+    $this->additionalStatesSubmitConfigurationForm($form, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
   public function postSave(WebformSubmissionInterface $webform_submission, $update = TRUE) {
-    // Run only when submission is completed.
-    // @todo Run on update?
-    if (!$webform_submission->isCompleted()) {
+    if (!$this->additionalStatesRunOnPostSave($webform_submission)) {
       return;
     }
 
