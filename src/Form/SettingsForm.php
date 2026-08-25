@@ -51,6 +51,7 @@ final class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  #[\Override]
   public function getFormId(): string {
     return 'os2forms_f2_settings';
   }
@@ -58,6 +59,7 @@ final class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  #[\Override]
   protected function getEditableConfigNames(): array {
     return [Settings::CONFIG_NAME];
   }

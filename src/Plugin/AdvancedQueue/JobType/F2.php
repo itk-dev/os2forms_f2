@@ -56,6 +56,7 @@ final class F2 extends JobTypeBase implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
+  #[\Override]
   public function process(Job $job): JobResult {
     return $this->helper->processJob($job);
   }

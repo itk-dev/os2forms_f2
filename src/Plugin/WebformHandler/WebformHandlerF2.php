@@ -74,6 +74,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    *
    * @phpstan-return array<string, mixed>
    */
+  #[\Override]
   public function defaultConfiguration() {
     return $this->additionalStatesDefaultConfiguration();
   }
@@ -81,6 +82,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   /**
    * {@inheritdoc}
    */
+  #[\Override]
   public function getOffCanvasWidth(): string {
     return WebformDialogHelper::DIALOG_NONE;
   }
@@ -174,6 +176,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   /**
    * {@inheritdoc}
    */
+  #[\Override]
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::validateConfigurationForm($form, $form_state);
 
@@ -205,6 +208,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   /**
    * {@inheritdoc}
    */
+  #[\Override]
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
     foreach ([
@@ -219,6 +223,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   /**
    * {@inheritdoc}
    */
+  #[\Override]
   public function postSave(WebformSubmissionInterface $webform_submission, $update = TRUE) {
     if (!$this->additionalStatesRunOnPostSave($webform_submission)) {
       return;
