@@ -103,14 +103,6 @@ tasks:
         vars:
           TASK_ARGS: php vendor/bin/rector
 
-  test:
-    cmds:
-      - docker compose run --env PHP_XDEBUG_MODE --env PHP_XDEBUG_WITH_REQUEST --env PHP_IDE_CONFIG --rm phpfpm vendor/bin/phpunit {{.CLI_ARGS}}
-
-  xdebug:test:
-    cmds:
-      - PHP_XDEBUG_MODE=debug PHP_XDEBUG_WITH_REQUEST=yes PHP_IDE_CONFIG=serverName=localhost docker compose run --env PHP_XDEBUG_MODE --env PHP_XDEBUG_WITH_REQUEST --env PHP_IDE_CONFIG --rm phpfpm vendor/bin/phpunit {{.CLI_ARGS}}
-
   ddev:start:
     desc: Start DDEV setup (https://github.com/ddev/ddev-drupal-contrib)
     # https://github.com/ddev/ddev-drupal-contrib
