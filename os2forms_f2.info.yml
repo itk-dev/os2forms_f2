@@ -1,0 +1,16 @@
+name: "os2forms_f2"
+type: module
+description: "OS2Forms: F2 integration"
+package: OS2Forms
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal_psr6_cache:drupal_psr6_cache
+  - os2forms:os2forms
+
+configure: os2forms_f2.admin.settings
+
+"interface translation project": os2forms_f2
+# @todo Using module://%project/ here does not work …
+# @todo Set a proper URL when the module has been released for real
+# "interface translation server pattern": module://%project/translations/%project.%language.po
+"interface translation server pattern": https://github.com/itk-dev/os2forms_f2/blob/os2forms_f2/translations/os2forms_f2.da.po

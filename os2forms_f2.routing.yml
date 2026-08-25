@@ -1,0 +1,7 @@
+os2forms_f2.admin.settings:
+  path: "/admin/os2forms_f2/settings"
+  defaults:
+    _title: "F2 settings"
+    _form: 'Drupal\os2forms_f2\Form\SettingsForm'
+  requirements:
+    _permission: "administer site configuration"
