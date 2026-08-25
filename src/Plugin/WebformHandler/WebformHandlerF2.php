@@ -33,7 +33,12 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   use StringTranslationTrait;
   use WebformHandlerAdditionalStatesTrait;
 
-  // This ID should match the one assigned in the @WebformHandlerBase incantation.
+  /**
+   * Webform handler ID.
+   *
+   * This ID should match the one assigned in the @WebformHandlerBase
+   * incantation.
+   */
   public const string ID = 'os2forms_f2_f2';
 
   /**
@@ -128,7 +133,11 @@ final class WebformHandlerF2 extends WebformHandlerBase {
 
             '#states' => [
               'visible' => [
-                ':input[name="settings[' . implode('][', [self::ID, ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET]) . ']"]' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
                   'value' => ArchiveTarget::MatterID->value,
                 ],
               ],

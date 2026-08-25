@@ -68,7 +68,7 @@ final class WebformHelperF2 implements LoggerInterface {
     #[Autowire(service: 'logger.channel.os2forms_f2_submission')]
     private readonly LoggerChannelInterface $submissionLogger,
   ) {
-    /** @var WebformSubmissionStorageInterface $storage */
+    /** @var \Drupal\webform\WebformSubmissionStorageInterface $storage */
     $storage = $entityTypeManager->getStorage('webform_submission');
     $this->webformSubmissionStorage = $storage;
     $this->queueStorage = $entityTypeManager->getStorage('advancedqueue_queue');
@@ -112,6 +112,7 @@ final class WebformHelperF2 implements LoggerInterface {
    *
    * @phpstan-param array<string, mixed> $context
    */
+  #[\Override]
   public function log($level, $message, array $context = []): void {
     $this->logger->log($level, $message, $context);
     // @see https://www.drupal.org/node/3020595
@@ -190,7 +191,7 @@ final class WebformHelperF2 implements LoggerInterface {
       $target = $handlerSettings->archive?->archiveTarget;
       return match ($target) {
         ArchiveTarget::MatterID => $this->archiveOnMatter($submission, $handlerSettings),
-        default => throw new RuntimeException(sprintf('Invalid archive target: %s', $target->name)),
+        default => throw new RuntimeException('Invalid archive target'),
       };
     }
     catch (\Exception $exception) {
@@ -214,7 +215,7 @@ final class WebformHelperF2 implements LoggerInterface {
   }
 
   /**
-   *
+   * Archive on matter.
    */
   private function archiveOnMatter(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
     $matterId = $handlerSettings->archive?->archiveTargetMatter?->matterId;
@@ -225,7 +226,8 @@ final class WebformHelperF2 implements LoggerInterface {
     $attachment = $this->getAttachment($submission, $handlerSettings);
     $message = '';
     try {
-      // Apparently the F2 API inspects the filename extension to determine file type, i.e. we must keep the extension in the temporary filename.
+      // Apparently the F2 API inspects the filename extension to determine file
+      // type, i.e. we must keep the extension in the temporary filename.
       $filePath = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
       $document = new Document();
       $document->title = $handlerSettings->archive?->documentTitle ?? $attachment->filename;
@@ -244,21 +246,22 @@ final class WebformHelperF2 implements LoggerInterface {
   /**
    * Get main document.
    *
-   * @throws InvalidAttachmentElementException
-   *
    * @see WebformAttachmentController::download()
+   *
+   * @throws \Drupal\os2forms_f2\Exception\InvalidAttachmentElementException
+   *   If no attachment can be found.
    */
   protected function getAttachment(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): Attachment {
     // Lifted from Drupal\webform_attachment\Controller\WebformAttachmentController::download.
-    $element = $handlerSettings->archive->attachmentElement;
-    if (NULL === $element) {
+    $elementKey = $handlerSettings->archive->attachmentElement;
+    if (NULL === $elementKey) {
       throw new InvalidAttachmentElementException('Cannot get attachment element');
     }
-    $element = $submission->getWebform()->getElement($element) ?: [];
+    $element = $submission->getWebform()->getElement($elementKey) ?: [];
     if (!isset($element['#type'])) {
-      throw new InvalidAttachmentElementException(sprintf('Cannot get attachment element %s', $element));
+      throw new InvalidAttachmentElementException(sprintf('Cannot get attachment element %s', $elementKey));
     }
-    [$type] = explode(':', $element['#type']);
+    [$type] = explode(':', (string) $element['#type']);
     $instance = $this->elementInfoManager->createInstance($type);
 
     if (!$instance instanceof WebformAttachmentBase) {

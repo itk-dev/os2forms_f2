@@ -11,22 +11,19 @@
 
 ## Development
 
-We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for development.
+We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for development[^1].
 
-```shell name=ddev-install
-ddev config --project-type=drupal10 --docroot=web
+[^1]: The DDEV environment has been created by running
+
+      ```shell
+      ddev config --project-type=drupal10 --docroot=web
+      ddev dotenv set .ddev/.env.web --drupal-core '^10.5.10'
+      ```
+
+Start the show by running
+
+```shell
+task ddev:start
 ```
 
-```shell name=ddev-start
-ddev add-on get ddev/ddev-drupal-contrib
-ddev start
-ddev poser
-ddev symlink-project
-# Detect expected Drupal and PHP versions.
-ddev config --update
-```
-
-``` shell
-ddev phpcbf
-ddev phpcs
-```
+Run `task` to see other useful development tasks.

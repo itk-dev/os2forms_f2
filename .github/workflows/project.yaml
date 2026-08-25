@@ -16,15 +16,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: go-task/setup-task@v1
+      # https://github.com/ddev/github-action-setup-ddev
+      - uses: ddev/github-action-setup-ddev@v1
 
-      - run: |
-          ./scripts/code-analysis
+      - name: Start DDEV
+        run: task ddev:start
 
-  rector:
-    name: PHP - Rector
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
+      - name: Code analysis
+        run: task code-analysis:phpstan
 
-      - run: |
-          ./scripts/rector
+      - name: Rector
+        run: task rector -- --dry-run

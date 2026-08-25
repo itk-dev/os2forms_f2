@@ -10,7 +10,7 @@ use Drupal\webform\WebformSubmissionInterface;
  *
  * Usage:
  *
- * <code>
+ * @code
  * final class WebformHandlerExample extends WebformHandlerBase {
  *   …
  *   use WebformHandlerAdditionalStatesTrait;
@@ -47,7 +47,7 @@ use Drupal\webform\WebformSubmissionInterface;
  *     …
  *   }
  * }
- * </code>
+ * @endcode
  */
 trait WebformHandlerAdditionalStatesTrait {
   private const string ADDITIONAL = 'additional';
@@ -55,7 +55,7 @@ trait WebformHandlerAdditionalStatesTrait {
   private const string RESULTS_DISABLED = 'results_disabled';
 
   /**
-   * See usage in file docblock.
+   * See code example in file DocBlock.
    */
   private function additionalStatesDefaultConfiguration(): array {
     return [
@@ -66,7 +66,7 @@ trait WebformHandlerAdditionalStatesTrait {
   }
 
   /**
-   * See usage in file docblock.
+   * See code example in file DocBlock.
    */
   private function additionalStatesBuildConfigurationForm(array &$form, FormStateInterface $form_state): void {
     // Additional.
@@ -96,7 +96,7 @@ trait WebformHandlerAdditionalStatesTrait {
   }
 
   /**
-   * See usage in file docblock.
+   * See code example in file DocBlock.
    */
   private function additionalStatesSubmitConfigurationForm(array $form, FormStateInterface $formState): void {
     $additional = $formState->getValue(self::ADDITIONAL);
@@ -106,7 +106,7 @@ trait WebformHandlerAdditionalStatesTrait {
   }
 
   /**
-   * See usage in file docblock.
+   * See code example in file DocBlock.
    */
   private function additionalStatesRunOnPostSave(WebformSubmissionInterface $submission): bool {
     $submissionState = $submission->getWebform()->getSetting(self::RESULTS_DISABLED) ? WebformSubmissionInterface::STATE_COMPLETED : $submission->getState();

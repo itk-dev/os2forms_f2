@@ -20,10 +20,11 @@
         "drupal/coder": "^8.3",
         "ergebnis/composer-normalize": "^2.52",
         "mglaman/composer-drupal-lenient": "^1.0",
-        "mglaman/phpstan-drupal": "^2.1",
+        "mglaman/phpstan-drupal": "^1.1",
+        "palantirnet/drupal-rector": "0.x-dev",
         "phpstan/extension-installer": "^1.4",
-        "phpstan/phpstan": "^2.2",
-        "phpstan/phpstan-deprecation-rules": "^2.0"
+        "phpstan/phpstan": "^1.0",
+        "phpstan/phpstan-deprecation-rules": "^1.0"
     },
     "repositories": [
         {
@@ -35,16 +36,18 @@
     "minimum-stability": "dev",
     "config": {
         "allow-plugins": {
+            "composer/installers": true,
             "cweagans/composer-patches": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "drupal/core-composer-scaffold": false,
+            "drupal/core-composer-scaffold": true,
+            "drupal/core-project-message": true,
             "ergebnis/composer-normalize": true,
             "mglaman/composer-drupal-lenient": true,
+            "php-http/discovery": true,
             "phpstan/extension-installer": true,
-            "simplesamlphp/composer-module-installer": true,
-            "simplesamlphp/composer-xmlprovider-installer": true,
-            "symfony/runtime": false,
-            "vaimo/composer-patches": true,
+            "simplesamlphp/composer-module-installer": false,
+            "simplesamlphp/composer-xmlprovider-installer": false,
+            "tbachert/spi": true,
             "zaporylie/composer-drupal-optimizations": true
         },
         "policy": {

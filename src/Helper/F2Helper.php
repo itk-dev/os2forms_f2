@@ -19,6 +19,9 @@ class F2Helper {
   ) {
   }
 
+  /**
+   * The F2 API client.
+   */
   private ?ApiClient $apiClient = NULL;
 
   /**
@@ -40,7 +43,7 @@ class F2Helper {
   }
 
   /**
-   *
+   * Ping API.
    */
   public function pingApi(): void {
     $this->client()->matterSearch('ping');

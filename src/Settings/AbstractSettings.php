@@ -150,6 +150,7 @@ abstract class AbstractSettings implements \JsonSerializable {
   /**
    * {@inheritdoc}
    */
+  #[\Override]
   public function jsonSerialize(): array {
     return $this->toArray();
   }
