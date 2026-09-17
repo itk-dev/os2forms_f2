@@ -1,0 +1,368 @@
+# Danish translation of module os2forms_f2
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2026-09-25 12:27+0200\n"
+"PO-Revision-Date: 2026-09-25 12:27+0200\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: da\n"
+
+#, fuzzy
+msgid "F2 API"
+msgstr "__F2 API"
+
+#, fuzzy
+msgid "General"
+msgstr "__General"
+
+#, fuzzy
+msgid "Ping API"
+msgstr "__Ping API"
+
+#, fuzzy
+msgid "Note: Pinging the API will use saved config."
+msgstr "__Note: Pinging the API will use saved config."
+
+#, fuzzy
+msgid "URI"
+msgstr "__URI"
+
+#, fuzzy
+msgid "The F2 API base URI"
+msgstr "__The F2 API base URI"
+
+#, fuzzy
+msgid "Username"
+msgstr "__Username"
+
+#, fuzzy
+msgid "The F2 API username"
+msgstr "__The F2 API username"
+
+#, fuzzy
+msgid "Secret"
+msgstr "__Secret"
+
+#, fuzzy
+msgid "The F2 API secret"
+msgstr "__The F2 API secret"
+
+#, fuzzy
+msgid "F2 username"
+msgstr "__F2 username"
+
+#, fuzzy
+msgid "The F2 username to act on behalf of"
+msgstr "__The F2 username to act on behalf of"
+
+#, fuzzy
+msgid "Queue for F2 jobs."
+msgstr "__Queue for F2 jobs."
+
+#, fuzzy
+msgid ""
+"Queue for F2 jobs. <a href=':queue_url'>The queue</a> must be run via "
+"Drupal's cron or via <code>drush advancedqueue:queue:process "
+"@queue</code> (in a cron job)."
+msgstr ""
+"__Queue for F2 jobs. <a href=':queue_url'>The queue</a> must be run "
+"via Drupal's cron or via <code>drush advancedqueue:queue:process "
+"@queue</code> (in a cron job)."
+
+#, fuzzy
+msgid "Queue"
+msgstr "__Queue"
+
+#, fuzzy
+msgid "No queue"
+msgstr "__No queue"
+
+#, fuzzy
+msgid "Pinged API successfully."
+msgstr "__Pinged API successfully."
+
+#, fuzzy
+msgid "Pinging API failed: @message"
+msgstr "__Pinging API failed: @message"
+
+#, fuzzy
+msgid "Additional settings"
+msgstr "__Additional settings"
+
+#, fuzzy
+msgid "Run handler when …"
+msgstr "__Run handler when …"
+
+#, fuzzy
+msgid "<b>draft is created</b>."
+msgstr "__<b>draft is created</b>."
+
+#, fuzzy
+msgid "<b>draft is updated</b>."
+msgstr "__<b>draft is updated</b>."
+
+#, fuzzy
+msgid "anonymous <b>submission is converted</b> to authenticated."
+msgstr "__anonymous <b>submission is converted</b> to authenticated."
+
+#, fuzzy
+msgid "<b>submission is completed</b>."
+msgstr "__<b>submission is completed</b>."
+
+#, fuzzy
+msgid "<b>submission is updated</b>."
+msgstr "__<b>submission is updated</b>."
+
+#, fuzzy
+msgid "<b>submission is deleted</b>."
+msgstr "__<b>submission is deleted</b>."
+
+#, fuzzy
+msgid "<b>submission is locked</b>."
+msgstr "__<b>submission is locked</b>."
+
+#, fuzzy
+msgid "F2 archive settings"
+msgstr "__F2 archive settings"
+
+#, fuzzy
+msgid "Attachment element"
+msgstr "__Attachment element"
+
+#, fuzzy
+msgid "Document title"
+msgstr "__Document title"
+
+#, fuzzy
+msgid ""
+"The title of the document. Tokens can be used in the title, e.g. "
+"<code>[webform_submission:label]</code>."
+msgstr ""
+"__The title of the document. Tokens can be used in the title, e.g. "
+"<code>[webform_submission:label]</code>."
+
+#, fuzzy
+msgid "Archive target"
+msgstr "__Archive target"
+
+#, fuzzy
+msgid "Matter ID"
+msgstr "__Matter ID"
+
+#, fuzzy
+msgid "Matter"
+msgstr "__Matter"
+
+#, fuzzy
+msgid "Missing or invalid matter ID."
+msgstr "__Missing or invalid matter ID."
+
+#, fuzzy
+msgid "Cannot get matter by ID @matter_id (@message)."
+msgstr "__Cannot get matter by ID @matter_id (@message)."
+
+#, fuzzy
+msgid "Archive on matter @matter_id"
+msgstr "__Archive on matter @matter_id"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "F2 archive settings"
+msgstr "__F2 archive settings"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "F2 API"
+msgstr "__F2 API"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "General"
+msgstr "__General"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Ping API"
+msgstr "__Ping API"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Note: Pinging the API will use saved config."
+msgstr "__Note: Pinging the API will use saved config."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "URI"
+msgstr "__URI"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "The F2 API base URI"
+msgstr "__The F2 API base URI"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Username"
+msgstr "__Username"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "The F2 API username"
+msgstr "__The F2 API username"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Secret"
+msgstr "__Secret"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "The F2 API secret"
+msgstr "__The F2 API secret"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "F2 username"
+msgstr "__F2 username"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "The F2 username to act on behalf of"
+msgstr "__The F2 username to act on behalf of"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Queue for F2 jobs."
+msgstr "__Queue for F2 jobs."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid ""
+"Queue for F2 jobs. <a href=':queue_url'>The queue</a> must be run via "
+"Drupal's cron or via <code>drush advancedqueue:queue:process "
+"@queue</code> (in a cron job)."
+msgstr ""
+"__Queue for F2 jobs. <a href=':queue_url'>The queue</a> must be run "
+"via Drupal's cron or via <code>drush advancedqueue:queue:process "
+"@queue</code> (in a cron job)."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Queue"
+msgstr "__Queue"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "No queue"
+msgstr "__No queue"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Pinged API successfully."
+msgstr "__Pinged API successfully."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Pinging API failed: @message"
+msgstr "__Pinging API failed: @message"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Additional settings"
+msgstr "__Additional settings"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Run handler when …"
+msgstr "__Run handler when …"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "<b>draft is created</b>."
+msgstr "__<b>draft is created</b>."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "<b>draft is updated</b>."
+msgstr "__<b>draft is updated</b>."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "anonymous <b>submission is converted</b> to authenticated."
+msgstr "__anonymous <b>submission is converted</b> to authenticated."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "<b>submission is completed</b>."
+msgstr "__<b>submission is completed</b>."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "<b>submission is updated</b>."
+msgstr "__<b>submission is updated</b>."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "<b>submission is deleted</b>."
+msgstr "__<b>submission is deleted</b>."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "<b>submission is locked</b>."
+msgstr "__<b>submission is locked</b>."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Attachment element"
+msgstr "__Attachment element"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Document title"
+msgstr "__Document title"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid ""
+"The title of the document. Tokens can be used in the title, e.g. "
+"<code>[webform_submission:label]</code>."
+msgstr ""
+"__The title of the document. Tokens can be used in the title, e.g. "
+"<code>[webform_submission:label]</code>."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Archive target"
+msgstr "__Archive target"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Matter ID"
+msgstr "__Matter ID"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Matter"
+msgstr "__Matter"
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Missing or invalid matter ID."
+msgstr "__Missing or invalid matter ID."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Cannot get matter by ID @matter_id (@message)."
+msgstr "__Cannot get matter by ID @matter_id (@message)."
+
+#, fuzzy
+msgctxt "os2forms_f2"
+msgid "Archive on matter @matter_id"
+msgstr "__Archive on matter @matter_id"
+

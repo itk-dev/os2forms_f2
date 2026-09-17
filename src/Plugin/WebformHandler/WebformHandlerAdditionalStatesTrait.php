@@ -74,21 +74,21 @@ trait WebformHandlerAdditionalStatesTrait {
     $resultsDisabled = (bool) $this->getWebform()->getSetting(self::RESULTS_DISABLED);
     $form[self::ADDITIONAL] = [
       '#type' => 'fieldset',
-      '#title' => $this->t('Additional settings'),
+      '#title' => $this->t('Additional settings', options: ['context' => 'os2forms_f2']),
     ];
     // Settings: States.
     $states = (array) ($this->configuration[self::ADDITIONAL][self::STATES] ?? NULL);
     $form[self::ADDITIONAL][self::STATES] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Run handler when …'),
+      '#title' => $this->t('Run handler when …', options: ['context' => 'os2forms_f2']),
       '#options' => [
-        WebformSubmissionInterface::STATE_DRAFT_CREATED => $this->t('<b>draft is created</b>.'),
-        WebformSubmissionInterface::STATE_DRAFT_UPDATED => $this->t('<b>draft is updated</b>.'),
-        WebformSubmissionInterface::STATE_CONVERTED => $this->t('anonymous <b>submission is converted</b> to authenticated.'),
-        WebformSubmissionInterface::STATE_COMPLETED => $this->t('<b>submission is completed</b>.'),
-        WebformSubmissionInterface::STATE_UPDATED => $this->t('<b>submission is updated</b>.'),
-        WebformSubmissionInterface::STATE_DELETED => $this->t('<b>submission is deleted</b>.'),
-        WebformSubmissionInterface::STATE_LOCKED => $this->t('<b>submission is locked</b>.'),
+        WebformSubmissionInterface::STATE_DRAFT_CREATED => $this->t('<b>draft is created</b>.', options: ['context' => 'os2forms_f2']),
+        WebformSubmissionInterface::STATE_DRAFT_UPDATED => $this->t('<b>draft is updated</b>.', options: ['context' => 'os2forms_f2']),
+        WebformSubmissionInterface::STATE_CONVERTED => $this->t('anonymous <b>submission is converted</b> to authenticated.', options: ['context' => 'os2forms_f2']),
+        WebformSubmissionInterface::STATE_COMPLETED => $this->t('<b>submission is completed</b>.', options: ['context' => 'os2forms_f2']),
+        WebformSubmissionInterface::STATE_UPDATED => $this->t('<b>submission is updated</b>.', options: ['context' => 'os2forms_f2']),
+        WebformSubmissionInterface::STATE_DELETED => $this->t('<b>submission is deleted</b>.', options: ['context' => 'os2forms_f2']),
+        WebformSubmissionInterface::STATE_LOCKED => $this->t('<b>submission is locked</b>.', options: ['context' => 'os2forms_f2']),
       ],
       '#access' => !$resultsDisabled,
       '#default_value' => $resultsDisabled ? [WebformSubmissionInterface::STATE_COMPLETED] : $states,

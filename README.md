@@ -27,3 +27,14 @@ task ddev:start
 ```
 
 Run `task` to see other useful development tasks.
+
+## Translations
+
+Run
+
+``` shell
+task translations:extract
+```
+
+to extract translations.
+```

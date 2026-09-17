@@ -98,12 +98,12 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     // the "General" page only.
     $form[self::ID] = [
       '#type' => 'fieldset',
-      '#title' => $this->t('F2 archive settings'),
+      '#title' => $this->t('F2 archive settings', options: ['context' => 'os2forms_f2']),
       ArchiveSettings::NAME => [
         ArchiveSettings::ATTACHMENT_ELEMENT => [
           '#type' => 'select',
           '#required' => TRUE,
-          '#title' => $this->t('Attachment element'),
+          '#title' => $this->t('Attachment element', options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->attachmentElement,
           '#options' => $this->getAttachmentElements(),
         ],
@@ -111,18 +111,18 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         ArchiveSettings::DOCUMENT_TITLE => [
           '#type' => 'textfield',
           '#required' => TRUE,
-          '#title' => $this->t('Document title'),
+          '#title' => $this->t('Document title', options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->documentTitle,
-          '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.'),
+          '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.', options: ['context' => 'os2forms_f2']),
         ],
 
         ArchiveSettings::ARCHIVE_TARGET => [
           '#type' => 'select',
           '#required' => TRUE,
-          '#title' => $this->t('Archive target'),
+          '#title' => $this->t('Archive target', options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->archiveTarget?->value,
           '#options' => [
-            ArchiveTarget::MatterID->value => $this->t('Matter ID'),
+            ArchiveTarget::MatterID->value => $this->t('Matter ID', options: ['context' => 'os2forms_f2']),
           ],
         ],
 
@@ -130,7 +130,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           ArchiveTargetMatter::MATTER_ID => [
             '#type' => 'textfield',
             '#required' => TRUE,
-            '#title' => $this->t('Matter ID'),
+            '#title' => $this->t('Matter ID', options: ['context' => 'os2forms_f2']),
             '#default_value' => $settings->archiveTargetMatter?->matterId,
 
             '#states' => [
@@ -158,7 +158,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
             '#type' => 'details',
             '#open' => TRUE,
-            '#title' => $this->t('Matter'),
+            '#title' => $this->t('Matter', options: ['context' => 'os2forms_f2']),
             '#markup' => $matter,
           ];
         }
@@ -188,7 +188,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
       $matterId = trim((string) $form_state->getValue($key));
       $matterId = filter_var($matterId, FILTER_VALIDATE_INT);
       if (FALSE === $matterId) {
-        $setError($key, t('Missing or invalid matter ID.'));
+        $setError($key, t('Missing or invalid matter ID.', options: ['context' => 'os2forms_f2']));
       }
       else {
         try {
@@ -198,7 +198,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           $setError($key, t('Cannot get matter by ID @matter_id (@message).', [
             '@matter_id' => $matterId,
             '@message' => $throwable->getMessage(),
-          ]));
+          ], options: ['context' => 'os2forms_f2']));
         }
       }
     }
@@ -251,7 +251,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         $matterId = $settings->archive->archiveTargetMatter?->matterId;
         if ($matterId) {
           $build['info'][ArchiveTargetMatter::NAME] = [
-            '#markup' => $this->t('Archive on matter @matter_id', ['@matter_id' => $matterId]),
+            '#markup' => $this->t('Archive on matter @matter_id', ['@matter_id' => $matterId], options: ['context' => 'os2forms_f2']),
           ];
         }
         break;
