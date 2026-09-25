@@ -21,9 +21,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @WebformHandler(
  *   id = "os2forms_f2_f2",
- *   label = @Translation("F2"),
- *   category = @Translation("Web services"),
- *   description = @Translation("Sends webform submission to F2."),
+ *   label = @Translation("F2", context="os2forms_f2"),
+ *   category = @Translation("Web services", context="os2forms_f2"),
+ *   description = @Translation("Sends webform submission to F2.", context="os2forms_f2"),
  *   cardinality = \Drupal\webform\Plugin\WebformHandlerInterface::CARDINALITY_UNLIMITED,
  *   results = \Drupal\webform\Plugin\WebformHandlerInterface::RESULTS_IGNORED,
  *   submission = \Drupal\webform\Plugin\WebformHandlerInterface::SUBMISSION_REQUIRED,
