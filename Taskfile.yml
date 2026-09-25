@@ -3,10 +3,13 @@
 version: "3"
 
 tasks:
+  default:
+    cmd: task --list-all
+    silent: true
+
   ddev:
     desc: "Run DDEV command"
-    cmds:
-      - ddev {{.TASK_ARGS}} {{.CLI_ARGS}}
+    cmd: ddev {{.TASK_ARGS}} {{.CLI_ARGS}}
     internal: true
 
   coding-standards:apply:
@@ -87,6 +90,7 @@ tasks:
   code-analysis:
     desc: "Run static code analysis"
     cmds:
+      - task: code-analysis:rector
       - task: code-analysis:phpstan
 
   code-analysis:phpstan:
@@ -127,3 +131,12 @@ tasks:
       # Clean up
       - rm -f composer.lenient.*
     internal: true
+
+  translations:extract:
+    desc: Extract module translations
+    cmds:
+      - ddev drush --yes site:install minimal
+      - ddev drush --yes pm:install drupal_translation_extractor
+      - for:
+          - da
+        cmd: ddev drush --yes drupal_translation_extractor:translation:extract {{.ITEM}} --dump-messages --force --output=%source/translations/%module.%locale.po --require-context=os2forms_f2 module:os2forms_f2 --debug

@@ -1,0 +1,173 @@
+# Danish translation of module os2forms_f2
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2026-09-25 12:27+0200\n"
+"PO-Revision-Date: 2026-09-25 15:26+0200\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"Language: da\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+
+msgctxt "os2forms_f2"
+msgid "F2 API"
+msgstr "F2-api"
+
+msgctxt "os2forms_f2"
+msgid "General"
+msgstr "Generelt"
+
+msgctxt "os2forms_f2"
+msgid "Ping API"
+msgstr "Tjek forbindelse til api"
+
+msgctxt "os2forms_f2"
+msgid "Note: Pinging the API will use saved config."
+msgstr "Bemærk: Forbindelsen bliver tjekket med de gemte indstillinger."
+
+msgctxt "os2forms_f2"
+msgid "URI"
+msgstr "Url"
+
+msgctxt "os2forms_f2"
+msgid "The F2 API base URI"
+msgstr "F2-api'ets base-url"
+
+msgctxt "os2forms_f2"
+msgid "Username"
+msgstr "Bruger"
+
+msgctxt "os2forms_f2"
+msgid "The F2 API username"
+msgstr "F2-api-brugernavnet"
+
+msgctxt "os2forms_f2"
+msgid "Secret"
+msgstr "Hemmelighed (secret)"
+
+msgctxt "os2forms_f2"
+msgid "The F2 API secret"
+msgstr "F2-api-hemmeligheden"
+
+msgctxt "os2forms_f2"
+msgid "F2 username"
+msgstr "F2-brugernavn"
+
+msgctxt "os2forms_f2"
+msgid "The F2 username to act on behalf of"
+msgstr "F2-brugernavnet som der skal ageres på vegne af"
+
+msgctxt "os2forms_f2"
+msgid "Queue for F2 jobs."
+msgstr "Kø til F2-jobs."
+
+msgctxt "os2forms_f2"
+msgid ""
+"Queue for F2 jobs. <a href=':queue_url'>The queue</a> must be run via "
+"Drupal's cron or via <code>drush advancedqueue:queue:process @queue</"
+"code> (in a cron job)."
+msgstr ""
+"Kø til F2-jobs. <a href=':queue_url'>Køen</a> skal behandles via "
+"Drupals cron eller med <code>drush advancedqueue:queue:process "
+"@queue</code> (i et cron-job)."
+
+msgctxt "os2forms_f2"
+msgid "Queue"
+msgstr "Kø"
+
+msgctxt "os2forms_f2"
+msgid "No queue"
+msgstr "Ingen kø"
+
+msgctxt "os2forms_f2"
+msgid "Pinged API successfully."
+msgstr "Forbindelse opnået."
+
+msgctxt "os2forms_f2"
+msgid "Pinging API failed: @message"
+msgstr "Fejl under forbindelse til api: @message"
+
+msgctxt "os2forms_f2"
+msgid "Additional settings"
+msgstr "Yderligere indstillinger"
+
+msgctxt "os2forms_f2"
+msgid "Run handler when …"
+msgstr "Kør behandler (handler) når …"
+
+msgctxt "os2forms_f2"
+msgid "<b>draft is created</b>."
+msgstr "<b>kladde oprettes</b>."
+
+msgctxt "os2forms_f2"
+msgid "<b>draft is updated</b>."
+msgstr "<b>kladde opdateres</b>."
+
+msgctxt "os2forms_f2"
+msgid "anonymous <b>submission is converted</b> to authenticated."
+msgstr "anonym <b>besvarelse ændres</b> til \"authenticated\"."
+
+msgctxt "os2forms_f2"
+msgid "<b>submission is completed</b>."
+msgstr "<b>besvarelse afsluttes</b>."
+
+msgctxt "os2forms_f2"
+msgid "<b>submission is updated</b>."
+msgstr "<b>besvarelse opdateres</b>."
+
+msgctxt "os2forms_f2"
+msgid "<b>submission is deleted</b>."
+msgstr "<b>submission is deleted</b>."
+
+msgctxt "os2forms_f2"
+msgid "<b>submission is locked</b>."
+msgstr "<b>submission is locked</b>."
+
+msgctxt "os2forms_f2"
+msgid "F2 archive settings"
+msgstr "F2-arkiveringsindstilinger"
+
+msgctxt "os2forms_f2"
+msgid "Attachment element"
+msgstr "Vedhæftningselement"
+
+msgctxt "os2forms_f2"
+msgid "Document title"
+msgstr "Dokumenttitel"
+
+msgctxt "os2forms_f2"
+msgid ""
+"The title of the document. Tokens can be used in the title, e.g. "
+"<code>[webform_submission:label]</code>."
+msgstr ""
+"Titlen på dokumentet. Understøtter \"tokens\", fx "
+"<code>[webform_submission:label]</code>."
+
+msgctxt "os2forms_f2"
+msgid "Archive target"
+msgstr "Arkivér på"
+
+msgctxt "os2forms_f2"
+msgid "Matter ID"
+msgstr "Akt-id"
+
+msgctxt "os2forms_f2"
+msgid "Matter"
+msgstr "Akt"
+
+msgctxt "os2forms_f2"
+msgid "Missing or invalid matter ID."
+msgstr "Manglende eller ugyldigt akt-id."
+
+msgctxt "os2forms_f2"
+msgid "Cannot get matter by ID @matter_id (@message)."
+msgstr "Akt med id @matter_id findes ikke (@message)."
+
+msgctxt "os2forms_f2"
+msgid "Archive on matter @matter_id"
+msgstr "Arkivér på akt @matter_id"

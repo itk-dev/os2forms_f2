@@ -9,6 +9,9 @@
 2. Go to `/admin/os2forms_f2/settings` and define settings.
 3. Add a "F2" handler to a webform.
 
+See the [user manual for administrators](docs/user-manual/da/administrator.md) and [for form
+builders](docs/user-manual/da/form-builder.md) for more details (both are in Danish).
+
 ## Development
 
 We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for development[^1].
@@ -27,3 +30,13 @@ task ddev:start
 ```
 
 Run `task` to see other useful development tasks.
+
+## Translations
+
+Run
+
+``` shell
+task translations:extract
+```
+
+to extract translations.

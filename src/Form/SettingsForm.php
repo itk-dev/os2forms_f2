@@ -73,13 +73,13 @@ final class SettingsForm extends ConfigFormBase {
 
     $form[F2ApiSettings::NAME] = [
       '#type' => 'fieldset',
-      '#title' => $this->t('F2 API'),
+      '#title' => $this->t('F2 API', options: ['context' => 'os2forms_f2']),
       '#tree' => TRUE,
     ] + $this->buildFormF2Api();
 
     $form[GeneralSettings::NAME] = [
       '#type' => 'fieldset',
-      '#title' => $this->t('General'),
+      '#title' => $this->t('General', options: ['context' => 'os2forms_f2']),
       '#tree' => TRUE,
     ] + $this->buildFormGeneral();
 
@@ -90,11 +90,11 @@ final class SettingsForm extends ConfigFormBase {
       self::ACTION_PING_API => [
         '#type' => 'submit',
         '#name' => self::ACTION_PING_API,
-        '#value' => $this->t('Ping API'),
+        '#value' => $this->t('Ping API', options: ['context' => 'os2forms_f2']),
       ],
 
       'message' => [
-        '#markup' => $this->t('Note: Pinging the API will use saved config.'),
+        '#markup' => $this->t('Note: Pinging the API will use saved config.', options: ['context' => 'os2forms_f2']),
       ],
     ];
 
@@ -110,33 +110,33 @@ final class SettingsForm extends ConfigFormBase {
     $section[F2ApiSettings::URI] = [
       '#type' => 'url',
       '#required' => TRUE,
-      '#title' => $this->t('URI'),
+      '#title' => $this->t('URI', options: ['context' => 'os2forms_f2']),
       '#default_value' => $settings->uri,
-      '#description' => $this->t('The F2 API base URI'),
+      '#description' => $this->t('The F2 API base URI', options: ['context' => 'os2forms_f2']),
     ];
 
     $section[F2ApiSettings::USERNAME] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => $this->t('Username'),
+      '#title' => $this->t('Username', options: ['context' => 'os2forms_f2']),
       '#default_value' => $settings->username,
-      '#description' => $this->t('The F2 API username'),
+      '#description' => $this->t('The F2 API username', options: ['context' => 'os2forms_f2']),
     ];
 
     $section[F2ApiSettings::SECRET] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => $this->t('Secret'),
+      '#title' => $this->t('Secret', options: ['context' => 'os2forms_f2']),
       '#default_value' => $settings->secret,
-      '#description' => $this->t('The F2 API secret'),
+      '#description' => $this->t('The F2 API secret', options: ['context' => 'os2forms_f2']),
     ];
 
     $section[F2ApiSettings::F2_USERNAME] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => $this->t('F2 username'),
+      '#title' => $this->t('F2 username', options: ['context' => 'os2forms_f2']),
       '#default_value' => $settings->f2Username,
-      '#description' => $this->t('The F2 username to act on behalf of'),
+      '#description' => $this->t('The F2 username to act on behalf of', options: ['context' => 'os2forms_f2']),
     ];
 
     return $section;
@@ -149,21 +149,21 @@ final class SettingsForm extends ConfigFormBase {
     $settings = $this->settings->getGeneralSettings();
 
     $description = empty($settings->queue)
-      ? $this->t('Queue for F2 jobs.')
+      ? $this->t('Queue for F2 jobs.', options: ['context' => 'os2forms_f2'])
       : $this->t("Queue for F2 jobs. <a href=':queue_url'>The queue</a> must be run via Drupal's cron or via <code>drush advancedqueue:queue:process @queue</code> (in a cron job).",
         [
           '@queue' => $settings->queue,
           ':queue_url' => '/admin/config/system/queues/jobs/' . urlencode((string) $settings->queue),
-        ]);
+        ], options: ['context' => 'os2forms_f2']);
     $section[GeneralSettings::QUEUE] = [
       '#type' => 'select',
       '#required' => TRUE,
-      '#title' => $this->t('Queue'),
+      '#title' => $this->t('Queue', options: ['context' => 'os2forms_f2']),
       '#options' => array_map(
         static fn(EntityInterface $queue) => $queue->label(),
         $this->queueStorage->loadMultiple()
       ),
-      '#empty_option' => $this->t('No queue'),
+      '#empty_option' => $this->t('No queue', options: ['context' => 'os2forms_f2']),
       '#default_value' => $settings->queue,
       '#description' => $description,
     ];
@@ -191,10 +191,10 @@ final class SettingsForm extends ConfigFormBase {
     if (self::ACTION_PING_API === ($form_state->getTriggeringElement()['#name'] ?? NULL)) {
       try {
         $this->f2->pingApi();
-        $this->messenger()->addStatus($this->t('Pinged API successfully.'));
+        $this->messenger()->addStatus($this->t('Pinged API successfully.', options: ['context' => 'os2forms_f2']));
       }
       catch (\Throwable $t) {
-        $this->messenger()->addError($this->t('Pinging API failed: @message', ['@message' => $t->getMessage()]));
+        $this->messenger()->addError($this->t('Pinging API failed: @message', ['@message' => $t->getMessage()], options: ['context' => 'os2forms_f2']));
       }
       return;
     }
