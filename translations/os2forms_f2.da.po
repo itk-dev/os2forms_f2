@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2026-09-28 09:20+0200\n"
-"PO-Revision-Date: 2026-09-28 09:20+0200\n"
+"POT-Creation-Date: 2026-09-28 10:24+0200\n"
+"PO-Revision-Date: 2026-09-28 10:24+0200\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -109,7 +109,7 @@ msgstr "<b>kladde opdateres</b>."
 
 msgctxt "os2forms_f2"
 msgid "anonymous <b>submission is converted</b> to authenticated."
-msgstr "anonym <b>besvarelse ændres</b> til \"authenticated\"."
+msgstr "anonym <b>besvarelse ændres</b> til ikke-anonym."
 
 msgctxt "os2forms_f2"
 msgid "<b>submission is completed</b>."
@@ -121,11 +121,11 @@ msgstr "<b>besvarelse opdateres</b>."
 
 msgctxt "os2forms_f2"
 msgid "<b>submission is deleted</b>."
-msgstr "<b>submission is deleted</b>."
+msgstr "<b>besvarelse slettes</b>."
 
 msgctxt "os2forms_f2"
 msgid "<b>submission is locked</b>."
-msgstr "<b>submission is locked</b>."
+msgstr "<b>besvarelse låses</b>."
 
 msgctxt "os2forms_f2"
 msgid "F2 archive settings"
