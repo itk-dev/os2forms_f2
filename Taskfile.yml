@@ -143,18 +143,15 @@ tasks:
 
   translations:git:diff:
     desc: "`git diff` all translation files ignoring timestamp changes"
-    cmds:
-      # Ignore some PO metadata when git diff'ing, e.g.
-      #
-      # "POT-Creation-Date: 2025-03-12 18:18+0100\n"
-      # "PO-Revision-Date: 2025-03-12 18:18+0100\n"
-      - git diff --exit-code --ignore-blank-lines --ignore-matching-lines='^"PO.*-Date' '*.po'
+    # Ignore some PO metadata when git diff'ing, e.g.
+    #
+    # "POT-Creation-Date: 2025-03-12 18:18+0100\n"
+    # "PO-Revision-Date: 2025-03-12 18:18+0100\n"
+    cmd: git diff --exit-code --ignore-blank-lines --ignore-matching-lines='^"PO.*-Date' '*.po'
 
   translations:git:restore:
     desc: '`git restore` all translation file changes if only timestamps are changed (cf. `task {{.TASK | replace ":restore" ":diff" }}`)'
-    cmds:
-      - git restore '*.po'
-    # https://taskfile.dev/reference/schema#precondition
+    # https://taskfile.dev/reference/schema#preconditions
     preconditions:
       - sh: task {{.TASK | replace ":restore" ":diff" }}
         msg: |
@@ -165,3 +162,4 @@ tasks:
               task {{.TASK | replace ":restore" ":diff" }}
 
           to check.
+    cmd: git restore '*.po'
