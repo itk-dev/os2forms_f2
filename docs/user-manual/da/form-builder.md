@@ -1,7 +1,7 @@
 # Formularbygger
 
 F2-behandleren kan arkivere indholdet i et vedhæftningselement (OS2Forms Attachment) i F2. Behandleren indsættes ligesom
-andre handles og konfigureres på passende vis.
+andre behandlere og konfigureres på passende vis.
 
 ![F2-behandler](./images/f2-handler.png)
 
