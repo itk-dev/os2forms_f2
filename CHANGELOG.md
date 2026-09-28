@@ -7,11 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-28
+
 * [PR-7](https://github.com/itk-dev/os2forms_f2/pull/7)
   Added translations and user manual
-
-## [1.0.0] - 2026-08-25
-
 * [PR-3](https://github.com/itk-dev/os2forms_f2/pull/3)
   Added DDEV based development setup
 
