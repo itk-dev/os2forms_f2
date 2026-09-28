@@ -140,3 +140,28 @@ tasks:
       - for:
           - da
         cmd: ddev drush --yes drupal_translation_extractor:translation:extract {{.ITEM}} --dump-messages --force --output=%source/translations/%module.%locale.po --require-context=os2forms_f2 module:os2forms_f2 --debug
+
+  translations:git:diff:
+    desc: "`git diff` all translation files ignoring timestamp changes"
+    cmds:
+      # Ignore some PO metadata when git diff'ing, e.g.
+      #
+      # "POT-Creation-Date: 2025-03-12 18:18+0100\n"
+      # "PO-Revision-Date: 2025-03-12 18:18+0100\n"
+      - git diff --exit-code --ignore-blank-lines --ignore-matching-lines='^"PO.*-Date' '*.po'
+
+  translations:git:restore:
+    desc: '`git restore` all translation file changes if only timestamps are changed (cf. `task {{.TASK | replace ":restore" ":diff" }}`)'
+    cmds:
+      - git restore '*.po'
+    # https://taskfile.dev/reference/schema#precondition
+    preconditions:
+      - sh: task {{.TASK | replace ":restore" ":diff" }}
+        msg: |
+          Translations seem to have changed.
+
+          Run
+
+              task {{.TASK | replace ":restore" ":diff" }}
+
+          to check.

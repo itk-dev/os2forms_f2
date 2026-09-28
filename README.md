@@ -44,5 +44,14 @@ to extract translations.
 [Poedit](https://poedit.com/) (or similar tools) can be used to edit the generated `po` files.
 
 > [!IMPORTANT]
-> After editing a `po` file, you should run `task translations:extract` to reformat the file as the translation
-> extractor does it.
+> After editing a `po` file, you should run `task translations:extract` to format the translation file as the
+> translation extractor does it.
+
+Run
+
+``` shell
+task translations:git:restore
+```
+
+to discard any non-essential changes to translation files (e.g. timestamps being updated without any actual translation
+changes).

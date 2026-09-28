@@ -60,4 +60,4 @@ jobs:
         run: task translations:extract
 
       - name: Check that translation files have not changed
-        run: git diff --exit-code --ignore-blank-lines --ignore-matching-lines='^"PO.*-Date' '*.po'
+        run: task translations:git:diff
