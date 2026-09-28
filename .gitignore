@@ -1,6 +1,7 @@
 .idea
 composer.lock
 vendor/
+translations/*.mo
 
 # DDEV stuff
 web/
