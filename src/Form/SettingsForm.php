@@ -194,8 +194,26 @@ final class SettingsForm extends ConfigFormBase {
         $this->messenger()->addStatus($this->t('Pinged API successfully.', options: ['context' => 'os2forms_f2']));
       }
       catch (\Throwable $t) {
-        $this->messenger()->addError($this->t('Pinging API failed: @message', ['@message' => $t->getMessage()], options: ['context' => 'os2forms_f2']));
+        $previous = $t->getPrevious();
+        $message = null !== $previous
+          ? $this->t(
+            'Pinging API failed: @message (@previous_message)',
+            [
+              '@message' => $t->getMessage(),
+              '@previous_message' => $previous->getMessage(),
+            ],
+            options: ['context' => 'os2forms_f2']
+          )
+        : $this->t(
+            'Pinging API failed: @message',
+            [
+              '@message' => $t->getMessage(),
+            ],
+            options: ['context' => 'os2forms_f2']
+          );
+        $this->messenger()->addError($message);
       }
+
       return;
     }
 
