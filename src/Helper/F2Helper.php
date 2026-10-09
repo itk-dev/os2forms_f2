@@ -2,8 +2,11 @@
 
 namespace Drupal\os2forms_f2\Helper;
 
+use Drupal\Core\Logger\LoggerChannel;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\os2forms_f2\Settings;
 use ItkDev\F2ApiClient\ApiClient;
+use ItkDev\F2ApiClient\Model\Matter;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -16,6 +19,8 @@ class F2Helper {
     private readonly Settings $settings,
     #[Autowire(service: 'drupal_psr6_cache.cache_item_pool')]
     private readonly CacheItemPoolInterface $cacheItemPool,
+    #[Autowire(service: 'logger.channel.os2forms_f2')]
+    private readonly LoggerChannelInterface $logger,
   ) {
   }
 
@@ -37,6 +42,7 @@ class F2Helper {
         'f2_username' => $settings->f2Username,
         'cache_item_pool' => $this->cacheItemPool,
       ]);
+      $this->apiClient->setLogger($this->logger);
     }
 
     return $this->apiClient;
@@ -47,6 +53,23 @@ class F2Helper {
    */
   public function pingApi(): void {
     $this->client()->matterSearch('ping');
+  }
+
+  /**
+   * Fetch matter by ID or number.
+   *
+   * @param string $matterIdentifier
+   * @return Matter
+   * @throws \ItkDev\F2ApiClient\Exception\ApiException
+   */
+  public function fetchMatterByIdentifier(string $matterIdentifier): Matter
+  {
+    $client = $this->client();
+    try {
+      return $client->matterById((int)$matterIdentifier);
+    } catch (\Throwable) {
+      return $client->matterByMatterNumber($matterIdentifier);
+    }
   }
 
 }

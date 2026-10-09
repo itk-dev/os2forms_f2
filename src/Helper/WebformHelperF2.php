@@ -190,7 +190,7 @@ final class WebformHelperF2 implements LoggerInterface {
 
       $target = $handlerSettings->archive?->archiveTarget;
       return match ($target) {
-        ArchiveTarget::MatterID => $this->archiveOnMatter($submission, $handlerSettings),
+        ArchiveTarget::Matter => $this->archiveOnMatter($submission, $handlerSettings),
         default => throw new RuntimeException('Invalid archive target'),
       };
     }
@@ -218,7 +218,7 @@ final class WebformHelperF2 implements LoggerInterface {
    * Archive on matter.
    */
   private function archiveOnMatter(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
-    $matterId = $handlerSettings->archive?->archiveTargetMatter?->matterId;
+    $matterId = $handlerSettings->archive?->archiveTargetMatter?->matterIdentifier;
     if (NULL === $matterId) {
       throw new RuntimeException('Cannot get matter ID');
     }

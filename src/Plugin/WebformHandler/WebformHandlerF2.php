@@ -122,16 +122,18 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#title' => $this->t('Archive target', options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->archiveTarget?->value,
           '#options' => [
-            ArchiveTarget::MatterID->value => $this->t('Matter ID', options: ['context' => 'os2forms_f2']),
+            ArchiveTarget::Case->value => $this->t('Case', options: ['context' => 'os2forms_f2']),
+            ArchiveTarget::Matter->value => $this->t('Matter', options: ['context' => 'os2forms_f2']),
           ],
         ],
 
         ArchiveTargetMatter::NAME => [
-          ArchiveTargetMatter::MATTER_ID => [
+          ArchiveTargetMatter::MATTER_IDENTIFIER => [
             '#type' => 'textfield',
             '#required' => TRUE,
-            '#title' => $this->t('Matter ID', options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetMatter?->matterId,
+            '#title' => $this->t('Matter identifier', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('Matter number or ID that uniquely identifies a single matter.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetMatter?->matterIdentifier,
 
             '#states' => [
               'visible' => [
@@ -140,7 +142,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
                   ArchiveSettings::NAME,
                   ArchiveSettings::ARCHIVE_TARGET,
                 ]) . ']"]' => [
-                  'value' => ArchiveTarget::MatterID->value,
+                  'value' => ArchiveTarget::Matter->value,
                 ],
               ],
             ],
@@ -149,8 +151,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
       ],
     ];
 
-    if (ArchiveTarget::MatterID === $settings->archiveTarget) {
-      $matterId = $settings->archiveTargetMatter?->matterId;
+    if (ArchiveTarget::Matter === $settings->archiveTarget) {
+      $matterId = $settings->archiveTargetMatter?->matterIdentifier;
       if (NULL !== $matterId) {
         try {
           $matter = $this->f2->client()->matterById($matterId);
@@ -183,20 +185,19 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     $setError = static fn(string|array $path, TranslatableMarkup $message) => $form_state->setErrorByName(implode('][', (array) $path), $message);
 
     $target = $form_state->getValue([self::ID, ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET]);
-    if (ArchiveTarget::MatterID->value === $target) {
-      $key = [self::ID, ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_ID];
-      $matterId = trim((string) $form_state->getValue($key));
-      $matterId = filter_var($matterId, FILTER_VALIDATE_INT);
-      if (FALSE === $matterId) {
-        $setError($key, t('Missing or invalid matter ID.', options: ['context' => 'os2forms_f2']));
+    if (ArchiveTarget::Matter->value === $target) {
+      $key = [self::ID, ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_IDENTIFIER];
+      $matterIdentifier = trim((string) $form_state->getValue($key));
+      if ('' === $matterIdentifier) {
+        $setError($key, t('Missing matter identifier.', options: ['context' => 'os2forms_f2']));
       }
       else {
         try {
-          $this->f2->client()->matterById($matterId);
+          $this->f2->fetchMatterByIdentifier($matterIdentifier);
         }
         catch (\Throwable $throwable) {
           $setError($key, t('Cannot get matter by ID @matter_id (@message).', [
-            '@matter_id' => $matterId,
+            '@matter_id' => $matterIdentifier,
             '@message' => $throwable->getMessage(),
           ], options: ['context' => 'os2forms_f2']));
         }
@@ -247,8 +248,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     ];
 
     switch ($settings->archive?->archiveTarget) {
-      case ArchiveTarget::MatterID:
-        $matterId = $settings->archive->archiveTargetMatter?->matterId;
+      case ArchiveTarget::Matter:
+        $matterId = $settings->archive->archiveTargetMatter?->matterIdentifier;
         if ($matterId) {
           $build['info'][ArchiveTargetMatter::NAME] = [
             '#markup' => $this->t('Archive on matter @matter_id', ['@matter_id' => $matterId], options: ['context' => 'os2forms_f2']),

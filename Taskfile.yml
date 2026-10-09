@@ -100,7 +100,7 @@ tasks:
         vars:
           TASK_ARGS: phpstan
 
-  rector:
+  code-analysis:rector:
     desc: "Run rector"
     cmds:
       - task: ddev
