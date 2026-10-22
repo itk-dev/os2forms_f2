@@ -21,8 +21,14 @@ We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for de
       ```shell
       ddev config --project-type=drupal10 --docroot=Drupal
       ddev add-on get ddev/ddev-drupal-contrib
-      ddev dotenv set .ddev/.env.web --drupal-core '^10.5.10'
+      ddev start
+      ddev poser --no-interaction
+      ddev symlink-project
+      # Detect expected Drupal and PHP versions.
+      ddev config --update
       ```
+
+      (cf. <https://github.com/ddev/ddev-drupal-contrib#install>)
 
 Start the show by running
 

@@ -112,11 +112,9 @@ tasks:
     deps:
       - composer:install:lenient
     cmds:
-      - ddev restart
+      - ddev start
       - ddev poser --no-interaction
       - ddev symlink-project
-      # Detect expected Drupal and PHP versions.
-      - ddev config --update
 
   ddev:update:
     desc: Update DDEV Drupal Contrib setup (https://github.com/ddev/ddev-drupal-contrib#update)
