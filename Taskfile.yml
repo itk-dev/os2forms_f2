@@ -139,7 +139,7 @@ tasks:
       - ddev drush --yes pm:install drupal_translation_extractor
       - for:
           - da
-        cmd: ddev drush --yes drupal_translation_extractor:translation:extract {{.ITEM}} --dump-messages --force --output=%source/translations/%module.%locale.po --require-context=os2forms_f2 module:os2forms_f2 --debug
+        cmd: ddev drush --yes drupal_translation_extractor:translation:extract {{.ITEM}} --dump-messages --force --output=%source/translations/%module.%locale.po --require-context=os2forms_f2 module:os2forms_f2 --clean --debug
 
   translations:git:diff:
     desc: "`git diff` all translation files ignoring timestamp changes"

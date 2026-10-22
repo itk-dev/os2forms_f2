@@ -12,6 +12,6 @@ final class ArchiveTargetMatter extends AbstractSettings {
   const string NAME = ArchiveSettings::ARCHIVE_TARGET_MATTER;
 
   const string MATTER_IDENTIFIER = 'matter_identifier';
-  public ?int $matterIdentifier = NULL;
+  public ?string $matterIdentifier = NULL;
 
 }
