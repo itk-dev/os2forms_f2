@@ -108,17 +108,21 @@ tasks:
           TASK_ARGS: php vendor/bin/rector
 
   ddev:start:
-    desc: Start DDEV setup (https://github.com/ddev/ddev-drupal-contrib)
-    # https://github.com/ddev/ddev-drupal-contrib
+    desc: Start DDEV Drupal Contrib setup (https://github.com/ddev/ddev-drupal-contrib)
     deps:
       - composer:install:lenient
     cmds:
-      - ddev add-on get ddev/ddev-drupal-contrib
       - ddev restart
       - ddev poser --no-interaction
       - ddev symlink-project
       # Detect expected Drupal and PHP versions.
       - ddev config --update
+
+  ddev:update:
+    desc: Update DDEV Drupal Contrib setup (https://github.com/ddev/ddev-drupal-contrib#update)
+    cmds:
+      - ddev add-on get ddev/ddev-drupal-contrib
+      - ddev restart
 
   composer:install:lenient:
     cmds:

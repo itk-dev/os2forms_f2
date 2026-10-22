@@ -7,5 +7,5 @@ node_modules/
 LICENSE.md
 
 # DDEV stuff
-web/
-recipes/
+/Drupal/
+/recipes/

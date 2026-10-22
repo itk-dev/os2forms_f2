@@ -19,7 +19,8 @@ We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for de
 [^1]: The DDEV environment has been created by running
 
       ```shell
-      ddev config --project-type=drupal10 --docroot=web
+      ddev config --project-type=drupal10 --docroot=Drupal
+      ddev add-on get ddev/ddev-drupal-contrib
       ddev dotenv set .ddev/.env.web --drupal-core '^10.5.10'
       ```
 
