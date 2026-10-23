@@ -18,6 +18,7 @@ use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetMatter;
 use Drupal\webform\Plugin\WebformHandlerBase;
 use Drupal\webform\Utility\WebformDialogHelper;
 use Drupal\webform\WebformSubmissionInterface;
+use ItkDev\F2ApiClient\Model\Matter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -183,8 +184,21 @@ final class WebformHandlerF2 extends WebformHandlerBase {
                 ],
               ],
             ],
+          ],
 
-          ]
+          ArchiveTargetCase::MATTER_TYPE => [
+            '#type' => 'select',
+            '#options' => [
+              Matter::TYPE_INBOUND => $this->t('Inbound', options: ['context' => 'os2forms_f2']),
+              Matter::TYPE_INTERNAL => $this->t('Internal', options: ['context' => 'os2forms_f2']),
+              Matter::TYPE_OUTBOUND => $this->t('Outbound', options: ['context' => 'os2forms_f2']),
+            ],
+            '#title' => $this->t('Matter type', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The type of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase?->matterType,
+            '#required' => TRUE,
+          ],
+
         ],
 
         ArchiveTargetMatter::NAME => [

@@ -210,7 +210,6 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
     if (NULL === $caseIdentifier) {
       throw new RuntimeException('Cannot get case identifier');
     }
-    $matterTitle = $handlerSettings->archive?->archiveTargetCase?->matterTitle;
     $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
 
     $itemType = Type::Matter;
@@ -220,8 +219,8 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
       $matter = $this->f2->client()->matterById($id);
     } else{
       $matter = new Matter();
-      $matter->title = $matterTitle;
-      $matter->type = Matter::TYPE_INTERNAL;
+      $matter->title = $handlerSettings->archive->archiveTargetCase->matterTitle;
+      $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
 
       $item = new F2Item(
