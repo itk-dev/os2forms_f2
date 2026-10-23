@@ -17,7 +17,7 @@ final class ArchiveSettings extends AbstractSettings {
   ];
 
   protected static array $settingsProperties = [
-    self::ARCHIVE_TARGET_CASE=> ArchiveTargetCase::class,
+    self::ARCHIVE_TARGET_CASE => ArchiveTargetCase::class,
     self::ARCHIVE_TARGET_MATTER => ArchiveTargetMatter::class,
   ];
 

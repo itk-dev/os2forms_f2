@@ -195,7 +195,7 @@ final class SettingsForm extends ConfigFormBase {
       }
       catch (\Throwable $t) {
         $previous = $t->getPrevious();
-        $message = null !== $previous
+        $message = NULL !== $previous
           ? $this->t(
             'Pinging API failed: @message (@previous_message)',
             [

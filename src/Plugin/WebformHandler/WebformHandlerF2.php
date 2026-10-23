@@ -117,8 +117,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#type' => 'textfield',
           '#required' => TRUE,
           '#title' => $this->t('Document title', options: ['context' => 'os2forms_f2']),
-          '#default_value' => $settings->documentTitle,
           '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.', options: ['context' => 'os2forms_f2']),
+          '#default_value' => $settings->documentTitle,
         ],
 
         ArchiveSettings::ARCHIVE_TARGET => [
@@ -151,6 +151,25 @@ final class WebformHandlerF2 extends WebformHandlerBase {
               ],
             ],
           ],
+
+          ArchiveTargetCase::MATTER_TITLE => [
+            '#type' => 'textfield',
+            '#title' => $this->t('Matter title', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The title of the matter that will be created for the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase?->matterTitle,
+
+            '#states' => [
+              'visible' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
+                  'value' => ArchiveTarget::Case->value,
+                ],
+              ],
+            ],
+          ]
         ],
 
         ArchiveTargetMatter::NAME => [
@@ -178,8 +197,10 @@ final class WebformHandlerF2 extends WebformHandlerBase {
 
     // Copy 'visible' states to 'required'
     $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::CASE_IDENTIFIER]['#states']['required'] = $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::CASE_IDENTIFIER]['#states']['visible'];
+    $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::MATTER_TITLE]['#states']['required'] = $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::MATTER_TITLE]['#states']['visible'];
     $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME][ArchiveTargetMatter::MATTER_IDENTIFIER]['#states']['required'] = $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME][ArchiveTargetMatter::MATTER_IDENTIFIER]['#states']['visible'];
 
+    // Show some details in the archive target.
     switch ($settings->archiveTarget) {
       case ArchiveTarget::Case:
         $caseIdentifier = $settings->archiveTargetCase?->caseIdentifier;
@@ -187,16 +208,26 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           try {
             $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
 
-            $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME]['details'] = [
-              '#type' => 'details',
-              '#attributes' => ['id' => 'archive-details'],
-              '#open' => TRUE,
-              '#title' => $this->t('Case', options: ['context' => 'os2forms_f2']),
-              '#markup' => $case,
+            $details = [
+              '#markup' => (string)$case,
             ];
-          } catch (\Throwable) {
-            // Ignore all errors.
+          } catch (\Throwable $t) {
+            $details = [
+              '#theme' => 'status_messages',
+              '#message_list' => [
+                'error' => [
+                  $t->getMessage(),
+                ],
+              ],
+            ];
           }
+
+          $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME]['details'] = [
+            '#type' => 'details',
+            '#attributes' => ['id' => 'archive-details'],
+            '#open' => TRUE,
+            '#title' => $this->t('Case', options: ['context' => 'os2forms_f2']),
+            ] + $details;
         }
         break;
 
@@ -205,17 +236,26 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         if (NULL !== $matterIdentifier) {
           try {
             $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
+            $details = [
+              '#markup' => (string)$matter,
+            ];
+          } catch (\Throwable $t) {
+            $details = [
+              '#theme' => 'status_messages',
+              '#message_list' => [
+                'error' => [
+                  $t->getMessage(),
+                ],
+              ],
+            ];
+          }
 
-            $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
+          $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
               '#type' => 'details',
               '#attributes' => ['id' => 'archive-details'],
               '#open' => TRUE,
               '#title' => $this->t('Matter', options: ['context' => 'os2forms_f2']),
-              '#markup' => $matter,
-            ];
-          } catch (\Throwable) {
-            // Ignore all errors.
-          }
+            ]+ $details;
         }
         break;
 

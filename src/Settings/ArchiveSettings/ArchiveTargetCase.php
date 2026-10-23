@@ -14,4 +14,7 @@ final class ArchiveTargetCase extends AbstractSettings {
   const string CASE_IDENTIFIER = 'case_identifier';
   public ?string $caseIdentifier = NULL;
 
+  const string MATTER_TITLE = 'matter_title';
+  public ?string $matterTitle = NULL;
+
 }

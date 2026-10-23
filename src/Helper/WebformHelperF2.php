@@ -25,6 +25,7 @@ use Drupal\webform\WebformSubmissionStorageInterface;
 use Drupal\webform\WebformTokenManagerInterface;
 use Drupal\webform_attachment\Element\WebformAttachmentBase;
 use ItkDev\F2ApiClient\Model\Document;
+use ItkDev\F2ApiClient\Model\Matter;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -209,8 +210,10 @@ final class WebformHelperF2 implements LoggerInterface {
    * Replace tokens in handler settings supporting tokens.
    */
   private function replaceTokens(HandlerSettings $handlerSettings, WebformSubmissionInterface $submission): HandlerSettings {
-    // @todo Should we clone the settings before making changes?
     $handlerSettings->archive->documentTitle = $this->webformTokenManager->replace((string) $handlerSettings->archive->documentTitle, $submission);
+    if ($handlerSettings->archive->archiveTargetCase?->matterTitle) {
+      $handlerSettings->archive->archiveTargetCase->matterTitle = $this->webformTokenManager->replace($handlerSettings->archive->archiveTargetCase->matterTitle, $submission);
+    }
 
     return $handlerSettings;
   }
@@ -219,7 +222,22 @@ final class WebformHelperF2 implements LoggerInterface {
    * Archive on case.
    */
   private function archiveOnCase(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
-throw new \RuntimeException(__METHOD__);
+    $caseIdentifier = $handlerSettings->archive?->archiveTargetCase?->caseIdentifier;
+    if (NULL === $caseIdentifier) {
+      throw new RuntimeException('Cannot get case identifier');
+    }
+    $matterTitle = $handlerSettings->archive?->archiveTargetCase?->matterTitle;
+    $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
+
+    $matter = new Matter();
+    $matter->title = $matterTitle;
+    $matter->type = Matter::TYPE_INTERNAL;
+    $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
+    // @todo Store matter data in database
+
+    $message = $this->createDocument($matter, $submission, $handlerSettings);
+
+    return JobResult::success($message);
 }
 
   /**
@@ -231,6 +249,12 @@ throw new \RuntimeException(__METHOD__);
       throw new RuntimeException('Cannot get matter identifier');
     }
     $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
+    $message = $this->createDocument($matter, $submission, $handlerSettings);
+
+    return JobResult::success($message);
+  }
+
+  private function createDocument(Matter $matter, WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): string {
     $attachment = $this->getAttachment($submission, $handlerSettings);
     $message = '';
     try {
@@ -241,6 +265,7 @@ throw new \RuntimeException(__METHOD__);
       $document->title = $handlerSettings->archive?->documentTitle ?? $attachment->filename;
       $document = $this->f2->client()->documentCreate($document, $filePath, $matter);
       $message = sprintf('Document %s created on matter %s', $document, $matter);
+      // @todo Store data on document
     }
     finally {
       if (isset($filePath) && file_exists($filePath)) {
@@ -248,7 +273,7 @@ throw new \RuntimeException(__METHOD__);
       }
     }
 
-    return JobResult::success($message);
+    return $message;
   }
 
   /**

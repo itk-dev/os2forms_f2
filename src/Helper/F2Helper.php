@@ -2,21 +2,15 @@
 
 namespace Drupal\os2forms_f2\Helper;
 
-use Drupal\Core\Logger\LoggerChannel;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\os2forms_f2\Exception\F2Exception;
 use Drupal\os2forms_f2\Exception\F2NonUniqueCaseException;
 use Drupal\os2forms_f2\Settings;
 use ItkDev\F2ApiClient\ApiClient;
-use ItkDev\F2ApiClient\Exception\ApiException;
 use ItkDev\F2ApiClient\Model\CaseFile;
 use ItkDev\F2ApiClient\Model\Matter;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * Helper for talking to F2.
@@ -64,54 +58,47 @@ class F2Helper {
   }
 
   /**
-   * Fetch case by ID or number.
+   * Fetch case by ID or number (by searching and expecting one result).
    *
-   * @param string $caseIdentifier
-   * @return CaseFile
-   * @throws F2Exception
-   * @throws F2NonUniqueCaseException
+   * @throws \Drupal\os2forms_f2\Exception\F2NonUniqueCaseException
+   *   If search does not return a single result.
    */
-  public function fetchCaseByIdentifier(string $caseIdentifier): CaseFile
-  {
+  public function fetchCaseByIdentifier(string $identifier): CaseFile {
     $client = $this->client();
-    try {
-      return $client->caseById((int)$caseIdentifier);
-    } catch (\Throwable) {
-      $cases = $client->caseSearch($caseIdentifier);
-      if (1 !== count($cases)) {
-        throw new F2NonUniqueCaseException($caseIdentifier);
-      }
-      $case = reset($cases);
-
-      return $client->caseById($this->getId($case->id));
+    if (filter_var($identifier, FILTER_VALIDATE_INT)) {
+      return $client->caseById((int) $identifier);
     }
+
+    $cases = $client->caseSearch($identifier);
+    if (1 !== count($cases)) {
+      throw new F2NonUniqueCaseException($identifier);
+    }
+    $case = reset($cases);
+
+    return $client->caseById($this->getId($case->id));
   }
 
   /**
    * Fetch matter by ID or number.
-   *
-   * @param string $matterIdentifier
-   * @return Matter
-   * @throws \ItkDev\F2ApiClient\Exception\ApiException
    */
-  public function fetchMatterByIdentifier(string $matterIdentifier): Matter
-  {
+  public function fetchMatterByIdentifier(string $identifier): Matter {
     $client = $this->client();
-    try {
-      return $client->matterById((int)$matterIdentifier);
-    } catch (\Throwable) {
-      return $client->matterByMatterNumber($matterIdentifier);
+    if (filter_var($identifier, FILTER_VALIDATE_INT)) {
+      return $client->matterById((int) $identifier);
     }
+
+    return $client->matterByMatterNumber($identifier);
   }
 
-  private function getId(string $url): int
-  {
+  /**
+   * Get integer ID from F2 item URL.
+   */
+  private function getId(string $url): int {
     if (preg_match('@/cases/(?<id>\d+)$@', $url, $matches)) {
-      return (int)$matches['id'];
+      return (int) $matches['id'];
     }
 
-    throw new F2Exception('Cannot get ID from '.$url);
+    throw new F2Exception('Cannot get ID from ' . $url);
   }
-
 
 }
