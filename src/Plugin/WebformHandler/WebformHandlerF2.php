@@ -133,6 +133,20 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         ],
 
         ArchiveTargetCase::NAME => [
+          '#type' => 'fieldset',
+          '#title' => $this->t('Case'),
+          '#states' => [
+            'visible' => [
+              ':input[name="settings[' . implode('][', [
+                self::ID,
+                ArchiveSettings::NAME,
+                ArchiveSettings::ARCHIVE_TARGET,
+              ]) . ']"]' => [
+                'value' => ArchiveTarget::Case->value,
+              ],
+            ],
+          ],
+
           ArchiveTargetCase::CASE_IDENTIFIER => [
             '#type' => 'textfield',
             '#title' => $this->t('Case identifier', options: ['context' => 'os2forms_f2']),
@@ -140,7 +154,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             '#default_value' => $settings->archiveTargetCase?->caseIdentifier,
 
             '#states' => [
-              'visible' => [
+              'required' => [
                 ':input[name="settings[' . implode('][', [
                   self::ID,
                   ArchiveSettings::NAME,
@@ -159,7 +173,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             '#default_value' => $settings->archiveTargetCase?->matterTitle,
 
             '#states' => [
-              'visible' => [
+              'required' => [
                 ':input[name="settings[' . implode('][', [
                   self::ID,
                   ArchiveSettings::NAME,
@@ -169,10 +183,25 @@ final class WebformHandlerF2 extends WebformHandlerBase {
                 ],
               ],
             ],
+
           ]
         ],
 
         ArchiveTargetMatter::NAME => [
+          '#type' => 'fieldset',
+          '#title' => $this->t('Matter'),
+          '#states' => [
+            'visible' => [
+              ':input[name="settings[' . implode('][', [
+                self::ID,
+                ArchiveSettings::NAME,
+                ArchiveSettings::ARCHIVE_TARGET,
+              ]) . ']"]' => [
+                'value' => ArchiveTarget::Matter->value,
+              ],
+            ],
+          ],
+
           ArchiveTargetMatter::MATTER_IDENTIFIER => [
             '#type' => 'textfield',
             '#title' => $this->t('Matter identifier', options: ['context' => 'os2forms_f2']),
@@ -180,7 +209,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             '#default_value' => $settings->archiveTargetMatter?->matterIdentifier,
 
             '#states' => [
-              'visible' => [
+              'required' => [
                 ':input[name="settings[' . implode('][', [
                   self::ID,
                   ArchiveSettings::NAME,
@@ -194,11 +223,6 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         ],
       ],
     ];
-
-    // Copy 'visible' states to 'required'
-    $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::CASE_IDENTIFIER]['#states']['required'] = $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::CASE_IDENTIFIER]['#states']['visible'];
-    $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::MATTER_TITLE]['#states']['required'] = $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::MATTER_TITLE]['#states']['visible'];
-    $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME][ArchiveTargetMatter::MATTER_IDENTIFIER]['#states']['required'] = $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME][ArchiveTargetMatter::MATTER_IDENTIFIER]['#states']['visible'];
 
     // Show some details in the archive target.
     switch ($settings->archiveTarget) {
@@ -226,7 +250,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             '#type' => 'details',
             '#attributes' => ['id' => 'archive-details'],
             '#open' => TRUE,
-            '#title' => $this->t('Case', options: ['context' => 'os2forms_f2']),
+            '#title' => $this->t('Case details', options: ['context' => 'os2forms_f2']),
             ] + $details;
         }
         break;
@@ -254,7 +278,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
               '#type' => 'details',
               '#attributes' => ['id' => 'archive-details'],
               '#open' => TRUE,
-              '#title' => $this->t('Matter', options: ['context' => 'os2forms_f2']),
+              '#title' => $this->t('Matter details', options: ['context' => 'os2forms_f2']),
             ]+ $details;
         }
         break;
