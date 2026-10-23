@@ -3,102 +3,19 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2026-10-22 17:25+0200\n"
-"PO-Revision-Date: 2026-10-22 17:25+0200\n"
+"POT-Creation-Date: 2026-10-24 08:22+0200\n"
+"PO-Revision-Date: 2026-10-24 08:22+0200\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
-"Language: da\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.10\n"
+"Language: da\n"
 
 msgctxt "os2forms_f2"
-msgid "F2 API"
-msgstr "F2-api"
-
-msgctxt "os2forms_f2"
-msgid "General"
-msgstr "Generelt"
-
-msgctxt "os2forms_f2"
-msgid "Ping API"
-msgstr "Tjek forbindelse til api"
-
-msgctxt "os2forms_f2"
-msgid "Note: Pinging the API will use saved config."
-msgstr "Bemærk: Forbindelsen bliver tjekket med de gemte indstillinger."
-
-msgctxt "os2forms_f2"
-msgid "URI"
-msgstr "Url"
-
-msgctxt "os2forms_f2"
-msgid "The F2 API base URI"
-msgstr "F2-api'ets base-url"
-
-msgctxt "os2forms_f2"
-msgid "Username"
-msgstr "Bruger"
-
-msgctxt "os2forms_f2"
-msgid "The F2 API username"
-msgstr "F2-api-brugernavnet"
-
-msgctxt "os2forms_f2"
-msgid "Secret"
-msgstr "Hemmelighed (secret)"
-
-msgctxt "os2forms_f2"
-msgid "The F2 API secret"
-msgstr "F2-api-hemmeligheden"
-
-msgctxt "os2forms_f2"
-msgid "F2 username"
-msgstr "F2-brugernavn"
-
-msgctxt "os2forms_f2"
-msgid "The F2 username to act on behalf of"
-msgstr "F2-brugernavnet som der skal ageres på vegne af"
-
-msgctxt "os2forms_f2"
-msgid "Queue for F2 jobs."
-msgstr "Kø til F2-jobs."
-
-msgctxt "os2forms_f2"
-msgid ""
-"Queue for F2 jobs. <a href=':queue_url'>The queue</a> must be run via "
-"Drupal's cron or via <code>drush advancedqueue:queue:process @queue</"
-"code> (in a cron job)."
-msgstr ""
-"Kø til F2-jobs. <a href=':queue_url'>Køen</a> skal behandles via Drupals "
-"cron eller med <code>drush advancedqueue:queue:process @queue</code> (i "
-"et cron-job)."
-
-msgctxt "os2forms_f2"
-msgid "Queue"
-msgstr "Kø"
-
-msgctxt "os2forms_f2"
-msgid "No queue"
-msgstr "Ingen kø"
-
-msgctxt "os2forms_f2"
-msgid "Pinged API successfully."
-msgstr "Forbindelse opnået."
-
-msgctxt "os2forms_f2"
-msgid "Pinging API failed: @message"
-msgstr "Kan ikke oprette forbindelse til api: @message"
-
-msgctxt "os2forms_f2"
-msgid "Additional settings"
-msgstr "Yderligere indstillinger"
-
-msgctxt "os2forms_f2"
-msgid "Run handler when …"
-msgstr "Kør behandler (handler) når …"
+msgid "<a href=\":edit_url\">Edit</a> to see details."
+msgstr "<a href=\":edit_url\">Rediger</a> for at se detaljer."
 
 msgctxt "os2forms_f2"
 msgid "<b>draft is created</b>."
@@ -109,16 +26,8 @@ msgid "<b>draft is updated</b>."
 msgstr "<b>kladde opdateres</b>."
 
 msgctxt "os2forms_f2"
-msgid "anonymous <b>submission is converted</b> to authenticated."
-msgstr "anonym <b>besvarelse ændres</b> til ikke-anonym."
-
-msgctxt "os2forms_f2"
 msgid "<b>submission is completed</b>."
 msgstr "<b>besvarelse afsluttes</b>."
-
-msgctxt "os2forms_f2"
-msgid "<b>submission is updated</b>."
-msgstr "<b>besvarelse opdateres</b>."
 
 msgctxt "os2forms_f2"
 msgid "<b>submission is deleted</b>."
@@ -129,92 +38,12 @@ msgid "<b>submission is locked</b>."
 msgstr "<b>besvarelse låses</b>."
 
 msgctxt "os2forms_f2"
-msgid "F2 archive settings"
-msgstr "F2-arkiveringsindstilinger"
+msgid "<b>submission is updated</b>."
+msgstr "<b>besvarelse opdateres</b>."
 
 msgctxt "os2forms_f2"
-msgid "Attachment element"
-msgstr "Vedhæftningselement"
-
-msgctxt "os2forms_f2"
-msgid "Document title"
-msgstr "Dokumenttitel"
-
-msgctxt "os2forms_f2"
-msgid ""
-"The title of the document. Tokens can be used in the title, e.g. "
-"<code>[webform_submission:label]</code>."
-msgstr ""
-"Titlen på dokumentet. Understøtter \"tokens\", fx "
-"<code>[webform_submission:label]</code>."
-
-msgctxt "os2forms_f2"
-msgid "Archive target"
-msgstr "Arkivér på"
-
-msgctxt "os2forms_f2"
-msgid "Matter"
-msgstr "Akt"
-
-msgctxt "os2forms_f2"
-msgid "F2"
-msgstr "F2"
-
-msgctxt "os2forms_f2"
-msgid "Web services"
-msgstr "Webservices"
-
-msgctxt "os2forms_f2"
-msgid "Sends webform submission to F2."
-msgstr "Sender formularbesvarelser til F2."
-
-msgctxt "os2forms_f2"
-msgid "Pinging API failed: @message (@previous_message)"
-msgstr "Kan ikke oprette forbindelse til api: @message (@previous_message)"
-
-msgctxt "os2forms_f2"
-msgid "Case"
-msgstr "Sag"
-
-msgctxt "os2forms_f2"
-msgid "Case identifier"
-msgstr "Sags-id"
-
-msgctxt "os2forms_f2"
-msgid "Case number or ID that uniquely identifies a single case."
-msgstr "Sagsnummer eller -id der entydigt identificerer en enkelt sag."
-
-msgctxt "os2forms_f2"
-msgid "Matter identifier"
-msgstr "Akt-id"
-
-msgctxt "os2forms_f2"
-msgid "Matter number or ID that uniquely identifies a single matter."
-msgstr "Aktnummer eller -id der entydigt identificerer en enkelt akt."
-
-msgctxt "os2forms_f2"
-msgid "Missing case identifier."
-msgstr "Manglende sags-id."
-
-msgctxt "os2forms_f2"
-msgid "Identifier \"@case_identifier\" does not uniquely identify a case."
-msgstr "Id'et \"@case_identifier\" identificerer ikke entydigt en sag."
-
-msgctxt "os2forms_f2"
-msgid "Cannot get case by identifier \"@case_identifier\" (@message)."
-msgstr "Sag med id \"@case_identifier\" ikke fundet (@message)."
-
-msgctxt "os2forms_f2"
-msgid "Missing matter identifier."
-msgstr "Manglende akt-id."
-
-msgctxt "os2forms_f2"
-msgid "Cannot get matter by identifier \"@matter_identifier\" (@message)."
-msgstr "Akt med id \"@matter_identifier\" ikke fundet (@message)."
-
-msgctxt "os2forms_f2"
-msgid "Invalid archive target: @target"
-msgstr "Ugyldig arkivering: @target"
+msgid "Additional settings"
+msgstr "Yderligere indstillinger"
 
 msgctxt "os2forms_f2"
 msgid "Archive on case \"@case_identifier\"."
@@ -225,5 +54,217 @@ msgid "Archive on matter \"@matter_identifier\"."
 msgstr "Arkivér på akt \"@matter_identifier\"."
 
 msgctxt "os2forms_f2"
-msgid "<a href=\":edit_url\">Edit</a> to see details."
-msgstr "<a href=\":edit_url\">Rediger</a> for at se detaljer."
+msgid "Archive target"
+msgstr "Arkivér på"
+
+msgctxt "os2forms_f2"
+msgid "Attachment element"
+msgstr "Vedhæftningselement"
+
+msgctxt "os2forms_f2"
+msgid "Cannot get case by identifier \"@case_identifier\" (@message)."
+msgstr "Sag med id \"@case_identifier\" ikke fundet (@message)."
+
+msgctxt "os2forms_f2"
+msgid "Cannot get matter by identifier \"@matter_identifier\" (@message)."
+msgstr "Akt med id \"@matter_identifier\" ikke fundet (@message)."
+
+msgctxt "os2forms_f2"
+msgid "Case"
+msgstr "Sag"
+
+msgctxt "os2forms_f2"
+msgid "Case details"
+msgstr "Sagsdetaljer"
+
+msgctxt "os2forms_f2"
+msgid "Case identifier"
+msgstr "Sags-id"
+
+msgctxt "os2forms_f2"
+msgid "Case number or ID that uniquely identifies a single case."
+msgstr "Sagsnummer eller -id der entydigt identificerer en enkelt sag."
+
+msgctxt "os2forms_f2"
+msgid "Document title"
+msgstr "Dokumenttitel"
+
+msgctxt "os2forms_f2"
+msgid "F2"
+msgstr "F2"
+
+msgctxt "os2forms_f2"
+msgid "F2 API"
+msgstr "F2-api"
+
+msgctxt "os2forms_f2"
+msgid "F2 archive settings"
+msgstr "F2-arkiveringsindstilinger"
+
+msgctxt "os2forms_f2"
+msgid "F2 username"
+msgstr "F2-brugernavn"
+
+msgctxt "os2forms_f2"
+msgid "General"
+msgstr "Generelt"
+
+msgctxt "os2forms_f2"
+msgid "Identifier \"@case_identifier\" does not uniquely identify a case."
+msgstr "Id'et \"@case_identifier\" identificerer ikke entydigt en sag."
+
+msgctxt "os2forms_f2"
+msgid "Inbound"
+msgstr "Indgående"
+
+msgctxt "os2forms_f2"
+msgid "Internal"
+msgstr "Intern"
+
+msgctxt "os2forms_f2"
+msgid "Invalid archive target: @target"
+msgstr "Ugyldig arkivering: @target"
+
+msgctxt "os2forms_f2"
+msgid "Matter"
+msgstr "Akt"
+
+msgctxt "os2forms_f2"
+msgid "Matter details"
+msgstr "Aktdetaljer"
+
+msgctxt "os2forms_f2"
+msgid "Matter identifier"
+msgstr "Akt-id"
+
+msgctxt "os2forms_f2"
+msgid "Matter number or ID that uniquely identifies a single matter."
+msgstr "Aktnummer eller -id der entydigt identificerer en enkelt akt."
+
+msgctxt "os2forms_f2"
+msgid "Matter title"
+msgstr "Akttitel"
+
+msgctxt "os2forms_f2"
+msgid "Matter type"
+msgstr "Akttype"
+
+msgctxt "os2forms_f2"
+msgid "Missing case identifier."
+msgstr "Manglende sags-id."
+
+msgctxt "os2forms_f2"
+msgid "Missing matter identifier."
+msgstr "Manglende akt-id."
+
+msgctxt "os2forms_f2"
+msgid "No queue"
+msgstr "Ingen kø"
+
+msgctxt "os2forms_f2"
+msgid "Note: Pinging the API will use saved config."
+msgstr "Bemærk: Forbindelsen bliver tjekket med de gemte indstillinger."
+
+msgctxt "os2forms_f2"
+msgid "Outbound"
+msgstr "Udgående"
+
+msgctxt "os2forms_f2"
+msgid "Ping API"
+msgstr "Tjek forbindelse til api"
+
+msgctxt "os2forms_f2"
+msgid "Pinged API successfully."
+msgstr "Forbindelse opnået."
+
+msgctxt "os2forms_f2"
+msgid "Pinging API failed: @message"
+msgstr "Kan ikke oprette forbindelse til api: @message"
+
+msgctxt "os2forms_f2"
+msgid "Pinging API failed: @message (@previous_message)"
+msgstr "Kan ikke oprette forbindelse til api: @message (@previous_message)"
+
+msgctxt "os2forms_f2"
+msgid "Queue"
+msgstr "Kø"
+
+msgctxt "os2forms_f2"
+msgid "Queue for F2 jobs."
+msgstr "Kø til F2-jobs."
+
+msgctxt "os2forms_f2"
+msgid ""
+"Queue for F2 jobs. <a href=':queue_url'>The queue</a> must be run via "
+"Drupal's cron or via <code>drush advancedqueue:queue:process "
+"@queue</code> (in a cron job)."
+msgstr ""
+"Kø til F2-jobs. <a href=':queue_url'>Køen</a> skal behandles via "
+"Drupals cron eller med <code>drush advancedqueue:queue:process "
+"@queue</code> (i et cron-job)."
+
+msgctxt "os2forms_f2"
+msgid "Run handler when …"
+msgstr "Kør behandler (handler) når …"
+
+msgctxt "os2forms_f2"
+msgid "Secret"
+msgstr "Hemmelighed (secret)"
+
+msgctxt "os2forms_f2"
+msgid "Sends webform submission to F2."
+msgstr "Sender formularbesvarelser til F2."
+
+msgctxt "os2forms_f2"
+msgid "The F2 API base URI"
+msgstr "F2-api'ets base-url"
+
+msgctxt "os2forms_f2"
+msgid "The F2 API secret"
+msgstr "F2-api-hemmeligheden"
+
+msgctxt "os2forms_f2"
+msgid "The F2 API username"
+msgstr "F2-api-brugernavnet"
+
+msgctxt "os2forms_f2"
+msgid "The F2 username to act on behalf of"
+msgstr "F2-brugernavnet som der skal ageres på vegne af"
+
+msgctxt "os2forms_f2"
+msgid ""
+"The title of the document. Tokens can be used in the title, e.g. "
+"<code>[webform_submission:label]</code>."
+msgstr ""
+"Titlen på dokumentet. Understøtter \"tokens\", fx "
+"<code>[webform_submission:label]</code>."
+
+msgctxt "os2forms_f2"
+msgid ""
+"The title of the matter that will be created for the document. Tokens "
+"can be used in the title, e.g. "
+"<code>[webform_submission:label]</code>."
+msgstr ""
+"Titlen på akten der bliver oprettet til dokumentet. Understøtter "
+"\"tokens\", fx <code>[webform_submission:label]</code>."
+
+msgctxt "os2forms_f2"
+msgid "The type of the matter that will be created for the document."
+msgstr "Typen på akten der bliver oprettet for dokumentet."
+
+msgctxt "os2forms_f2"
+msgid "URI"
+msgstr "Url"
+
+msgctxt "os2forms_f2"
+msgid "Username"
+msgstr "Bruger"
+
+msgctxt "os2forms_f2"
+msgid "Web services"
+msgstr "Webservices"
+
+msgctxt "os2forms_f2"
+msgid "anonymous <b>submission is converted</b> to authenticated."
+msgstr "anonym <b>besvarelse ændres</b> til ikke-anonym."
+

@@ -135,7 +135,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
 
         ArchiveTargetCase::NAME => [
           '#type' => 'fieldset',
-          '#title' => $this->t('Case'),
+          '#title' => $this->t('Case', options: ['context' => 'os2forms_f2']),
           '#states' => [
             'visible' => [
               ':input[name="settings[' . implode('][', [
@@ -203,7 +203,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
 
         ArchiveTargetMatter::NAME => [
           '#type' => 'fieldset',
-          '#title' => $this->t('Matter'),
+          '#title' => $this->t('Matter', options: ['context' => 'os2forms_f2']),
           '#states' => [
             'visible' => [
               ':input[name="settings[' . implode('][', [
