@@ -1,6 +1,6 @@
 name: os2forms-f2
 type: drupal10
-docroot: web
+docroot: Drupal
 php_version: "8.3"
 webserver_type: nginx-fpm
 xdebug_enabled: false

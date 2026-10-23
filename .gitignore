@@ -4,5 +4,5 @@ vendor/
 translations/*.mo
 
 # DDEV stuff
-web/
-recipes/
+/Drupal/
+/recipes/
