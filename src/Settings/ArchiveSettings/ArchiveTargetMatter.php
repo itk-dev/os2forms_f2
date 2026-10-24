@@ -11,7 +11,7 @@ use Drupal\os2forms_f2\Settings\ArchiveSettings;
 final class ArchiveTargetMatter extends AbstractSettings {
   const string NAME = ArchiveSettings::ARCHIVE_TARGET_MATTER;
 
-  const string MATTER_ID = 'matter_id';
-  public ?int $matterId = NULL;
+  const string MATTER_IDENTIFIER = 'matter_identifier';
+  public ?string $matterIdentifier = NULL;
 
 }

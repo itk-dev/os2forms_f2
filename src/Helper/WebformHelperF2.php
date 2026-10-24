@@ -5,7 +5,6 @@ namespace Drupal\os2forms_f2\Helper;
 use Drupal\advancedqueue\Entity\QueueInterface;
 use Drupal\advancedqueue\Job;
 use Drupal\advancedqueue\JobResult;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
@@ -14,17 +13,20 @@ use Drupal\os2forms_f2\Exception\InvalidAttachmentElementException;
 use Drupal\os2forms_f2\Exception\RuntimeException;
 use Drupal\os2forms_f2\Exception\SubmissionNotFoundException;
 use Drupal\os2forms_f2\Model\Attachment;
+use Drupal\os2forms_f2\Model\F2Item;
+use Drupal\os2forms_f2\Model\F2Item\Type;
 use Drupal\os2forms_f2\Plugin\AdvancedQueue\JobType\F2;
 use Drupal\os2forms_f2\Plugin\WebformHandler\WebformHandlerF2;
+use Drupal\os2forms_f2\Repository\F2ItemRepository;
 use Drupal\os2forms_f2\Settings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget;
 use Drupal\os2forms_f2\Settings\HandlerSettings;
 use Drupal\webform\WebformSubmissionInterface;
-use Drupal\webform\WebformSubmissionStorageInterface;
 use Drupal\webform\WebformTokenManagerInterface;
 use Drupal\webform_attachment\Element\WebformAttachmentBase;
 use ItkDev\F2ApiClient\Model\Document;
+use ItkDev\F2ApiClient\Model\Matter;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -32,46 +34,29 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * Webform helper.
  */
-final class WebformHelperF2 implements LoggerInterface {
+final readonly class WebformHelperF2 implements LoggerInterface {
   use LoggerTrait;
 
   private const string PDF_MIME_TYPE = 'application/pdf';
 
   /**
-   * The webform submission storage.
-   *
-   * @var \Drupal\webform\WebformSubmissionStorageInterface
-   */
-  protected WebformSubmissionStorageInterface $webformSubmissionStorage;
-
-  /**
-   * The queue storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected EntityStorageInterface $queueStorage;
-
-  /**
    * Constructor.
    */
   public function __construct(
-    EntityTypeManagerInterface $entityTypeManager,
-    private readonly Settings $settings,
-    private readonly F2Helper $f2,
-    private readonly FileSystemInterface $fileSystem,
+    private EntityTypeManagerInterface $entityTypeManager,
+    private Settings $settings,
+    private F2Helper $f2,
+    private FileSystemInterface $fileSystem,
     #[Autowire(service: 'plugin.manager.element_info')]
-    private readonly ElementInfoManager $elementInfoManager,
+    private ElementInfoManager $elementInfoManager,
     #[Autowire(service: 'webform.token_manager')]
-    private readonly WebformTokenManagerInterface $webformTokenManager,
+    private WebformTokenManagerInterface $webformTokenManager,
+    private F2ItemRepository $itemRepository,
     #[Autowire(service: 'logger.channel.os2forms_f2')]
-    private readonly LoggerChannelInterface $logger,
+    private LoggerChannelInterface $logger,
     #[Autowire(service: 'logger.channel.os2forms_f2_submission')]
-    private readonly LoggerChannelInterface $submissionLogger,
+    private LoggerChannelInterface $submissionLogger,
   ) {
-    /** @var \Drupal\webform\WebformSubmissionStorageInterface $storage */
-    $storage = $entityTypeManager->getStorage('webform_submission');
-    $this->webformSubmissionStorage = $storage;
-    $this->queueStorage = $entityTypeManager->getStorage('advancedqueue_queue');
   }
 
   /**
@@ -79,7 +64,7 @@ final class WebformHelperF2 implements LoggerInterface {
    */
   public function loadSubmission(int $id): ?WebformSubmissionInterface {
     /** @var ?WebformSubmissionInterface $submission */
-    $submission = $this->webformSubmissionStorage->load($id);
+    $submission = $this->entityTypeManager->getStorage('webform_submission')->load($id);
 
     return $submission;
   }
@@ -91,7 +76,7 @@ final class WebformHelperF2 implements LoggerInterface {
     $id = $this->settings->getGeneralSettings()->queue ?? NULL;
 
     /** @var ?\Drupal\advancedqueue\Entity\QueueInterface $queue */
-    $queue = $this->queueStorage->load($id);
+$queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
 
     if (NULL === $queue) {
       throw new RuntimeException(sprintf('Cannot load queue %s', $id));
@@ -150,8 +135,8 @@ final class WebformHelperF2 implements LoggerInterface {
       return $job;
     }
     catch (\Exception $exception) {
-      $this->error('Error creating job for F2 archive: %message', $context + [
-        '%message' => $exception->getMessage(),
+      $this->error('Error creating job for F2 archive: @message', $context + [
+        '@message' => $exception->getMessage(),
         'operation' => 'F2 failed',
         'exception' => $exception,
       ]);
@@ -190,7 +175,8 @@ final class WebformHelperF2 implements LoggerInterface {
 
       $target = $handlerSettings->archive?->archiveTarget;
       return match ($target) {
-        ArchiveTarget::MatterID => $this->archiveOnMatter($submission, $handlerSettings),
+        ArchiveTarget::Case => $this->archiveOnCase($submission, $handlerSettings),
+        ArchiveTarget::Matter => $this->archiveOnMatter($submission, $handlerSettings),
         default => throw new RuntimeException('Invalid archive target'),
       };
     }
@@ -208,31 +194,141 @@ final class WebformHelperF2 implements LoggerInterface {
    * Replace tokens in handler settings supporting tokens.
    */
   private function replaceTokens(HandlerSettings $handlerSettings, WebformSubmissionInterface $submission): HandlerSettings {
-    // @todo Should we clone the settings before making changes?
     $handlerSettings->archive->documentTitle = $this->webformTokenManager->replace((string) $handlerSettings->archive->documentTitle, $submission);
+    if ($handlerSettings->archive->archiveTargetCase?->matterTitle) {
+      $handlerSettings->archive->archiveTargetCase->matterTitle = $this->webformTokenManager->replace($handlerSettings->archive->archiveTargetCase->matterTitle, $submission);
+    }
 
     return $handlerSettings;
   }
 
   /**
+   * Archive on case.
+   */
+  private function archiveOnCase(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
+    $context = [
+      'handler_id' => WebformHandlerF2::ID,
+      'webform_submission' => $submission,
+      'operation' => 'archive on case',
+    ];
+    $caseIdentifier = $handlerSettings->archive?->archiveTargetCase?->caseIdentifier;
+    if (NULL === $caseIdentifier) {
+      throw new RuntimeException('Cannot get case identifier');
+    }
+    $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
+
+    $this->info('Achiving document for submission @submission on case @case ', $context + [
+      '@submission' => $submission->label(),
+      '@case' => (string)$case,
+    ]);
+
+    $itemType = Type::Matter;
+    $item = $this->itemRepository->loadOneBySubmissionAndHandlerAndType($submission, $handlerSettings->handlerId, $itemType);
+    if (NULL !== $item) {
+      $id = $item->data['id'];
+      $matter = $this->f2->client()->matterById($id);
+      $this->info('Matter for submission @submission already exists: @matter', $context + [
+          '@submission' => $submission->label(),
+          '@matter' => (string)$matter,
+        ]);
+    } else {
+      $this->info('Creating matter for submission @submission', $context + [
+          '@submission' => $submission->label(),
+        ]);
+      $matter = new Matter();
+      $matter->title = $handlerSettings->archive->archiveTargetCase->matterTitle;
+      $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
+      $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
+
+      $this->info('Matter for submission @submission created: @matter', $context + [
+          '@submission' => $submission->label(),
+          '@matter' => (string)$matter,
+        ]);
+
+      $item = new F2Item(
+        webformId: $submission->getWebform()->id(),
+        webformHandlerId: $handlerSettings->handlerId,
+        webformSubmissionId: $submission->id(),
+        type: $itemType,
+        data: $matter->toArray(),
+      );
+    }
+
+    $this->itemRepository->save($item);
+    $message = $this->createDocument($matter, $submission, $handlerSettings);
+
+    return JobResult::success($message);
+}
+
+  /**
    * Archive on matter.
    */
   private function archiveOnMatter(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
-    $matterId = $handlerSettings->archive?->archiveTargetMatter?->matterId;
-    if (NULL === $matterId) {
-      throw new RuntimeException('Cannot get matter ID');
+    $context = [
+      'handler_id' => WebformHandlerF2::ID,
+      'webform_submission' => $submission,
+      'operation' => 'archive on matter',
+    ];
+    $matterIdentifier = $handlerSettings->archive?->archiveTargetMatter?->matterIdentifier;
+    if (NULL === $matterIdentifier) {
+      throw new RuntimeException('Cannot get matter identifier');
     }
-    $matter = $this->f2->client()->matterById($matterId);
+    $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
+
+    $this->info('Achiving document for submission @submission on matter @matter ', $context + [
+      '@submission' => $submission->label(),
+      '@matter' => (string)$matter,
+    ]);
+
+    $message = $this->createDocument($matter, $submission, $handlerSettings);
+
+    return JobResult::success($message);
+  }
+
+  private function createDocument(Matter $matter, WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): string {
+    $context = [
+      'handler_id' => WebformHandlerF2::ID,
+      'webform_submission' => $submission,
+      'operation' => 'create document',
+    ];
     $attachment = $this->getAttachment($submission, $handlerSettings);
-    $message = '';
     try {
-      // Apparently the F2 API inspects the filename extension to determine file
-      // type, i.e. we must keep the extension in the temporary filename.
-      $filePath = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
-      $document = new Document();
-      $document->title = $handlerSettings->archive?->documentTitle ?? $attachment->filename;
-      $document = $this->f2->client()->documentCreate($document, $filePath, $matter);
-      $message = sprintf('Document %s created on matter %s', $document, $matter);
+      $itemType = Type::Document;
+      $item = $this->itemRepository->loadOneBySubmissionAndHandlerAndType($submission, $handlerSettings->handlerId, $itemType);
+      if (NULL !== $item) {
+        // Document already exists. What to do?
+        $id = $item->data['id'];
+        $document = $this->f2->client()->documentById($id);
+        $this->info('Document on matter @matter for submission @submission already exists: @document', $context + [
+          '@submission' => $submission->label(),
+          '@matter' => (string)$matter,
+          '@document' => (string)$document,
+        ]);
+        $message = sprintf('Document %s already exists on matter %s', $document, $matter);
+      } else {
+        // Apparently the F2 API inspects the filename extension to determine file
+        // type, i.e. we must keep the extension in the temporary filename.
+        $filePath = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
+        $document = new Document();
+        $document->title = $handlerSettings->archive?->documentTitle ?? $attachment->filename;
+        $document = $this->f2->client()->documentCreate($document, $filePath, $matter);
+        $this->info('Document on matter @matter for submission @submission created: @document', $context + [
+          '@submission' => $submission->label(),
+          '@matter' => (string)$matter,
+          '@document' => (string)$document,
+        ]);
+        $message = sprintf('Document %s created on matter %s', $document, $matter);
+
+        $item = new F2Item(
+          webformId: $submission->getWebform()->id(),
+          webformHandlerId: $handlerSettings->handlerId,
+          webformSubmissionId: $submission->id(),
+          type: $itemType,
+          data: $document->toArray(),
+        );
+      }
+
+      $this->itemRepository->save($item);
     }
     finally {
       if (isset($filePath) && file_exists($filePath)) {
@@ -240,7 +336,7 @@ final class WebformHelperF2 implements LoggerInterface {
       }
     }
 
-    return JobResult::success($message);
+    return $message;
   }
 
   /**

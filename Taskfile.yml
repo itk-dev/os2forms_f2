@@ -100,7 +100,7 @@ tasks:
         vars:
           TASK_ARGS: phpstan
 
-  rector:
+  code-analysis:rector:
     desc: "Run rector"
     cmds:
       - task: ddev
@@ -108,17 +108,19 @@ tasks:
           TASK_ARGS: php vendor/bin/rector
 
   ddev:start:
-    desc: Start DDEV setup (https://github.com/ddev/ddev-drupal-contrib)
-    # https://github.com/ddev/ddev-drupal-contrib
+    desc: Start DDEV Drupal Contrib setup (https://github.com/ddev/ddev-drupal-contrib)
     deps:
       - composer:install:lenient
     cmds:
-      - ddev add-on get ddev/ddev-drupal-contrib
-      - ddev restart
+      - ddev start
       - ddev poser --no-interaction
       - ddev symlink-project
-      # Detect expected Drupal and PHP versions.
-      - ddev config --update
+
+  ddev:update:
+    desc: Update DDEV Drupal Contrib setup (https://github.com/ddev/ddev-drupal-contrib#update)
+    cmds:
+      - ddev add-on get ddev/ddev-drupal-contrib
+      - ddev restart
 
   composer:install:lenient:
     cmds:
@@ -139,7 +141,11 @@ tasks:
       - ddev drush --yes pm:install drupal_translation_extractor
       - for:
           - da
-        cmd: ddev drush --yes drupal_translation_extractor:translation:extract {{.ITEM}} --dump-messages --force --output=%source/translations/%module.%locale.po --require-context=os2forms_f2 module:os2forms_f2 --debug
+        cmd: >-
+          ddev drush --yes drupal_translation_extractor:translation:extract {{.ITEM}}
+          --dump-messages --force --output=%source/translations/%module.%locale.po
+          --require-context=os2forms_f2 module:os2forms_f2
+          --sort=asc --clean --debug
 
   translations:git:diff:
     desc: "`git diff` all translation files ignoring timestamp changes"

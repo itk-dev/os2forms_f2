@@ -17,6 +17,7 @@ use Drupal\os2forms_f2\Helper\F2Helper;
 use Drupal\os2forms_f2\Settings;
 use Drupal\os2forms_f2\Settings\F2ApiSettings;
 use Drupal\os2forms_f2\Settings\GeneralSettings;
+use Psr\Log\LogLevel;
 
 /**
  * Configure F2 settings for this site.
@@ -139,6 +140,23 @@ final class SettingsForm extends ConfigFormBase {
       '#description' => $this->t('The F2 username to act on behalf of', options: ['context' => 'os2forms_f2']),
     ];
 
+    $section[F2ApiSettings::LOG_LEVEL] = [
+      '#type' => 'select',
+      '#options' => [
+        LogLevel::EMERGENCY => $this->t('Emergency', options: ['context' => 'os2forms_f2']),
+        LogLevel::ALERT     => $this->t('Alert', options: ['context' => 'os2forms_f2']),
+        LogLevel::CRITICAL  => $this->t('Critical', options: ['context' => 'os2forms_f2']),
+        LogLevel::ERROR     => $this->t('Error', options: ['context' => 'os2forms_f2']),
+        LogLevel::WARNING   => $this->t('Warning', options: ['context' => 'os2forms_f2']),
+        LogLevel::NOTICE    => $this->t('Notice', options: ['context' => 'os2forms_f2']),
+        LogLevel::INFO      => $this->t('Info', options: ['context' => 'os2forms_f2']),
+        LogLevel::DEBUG     => $this->t('Debug', options: ['context' => 'os2forms_f2']),
+      ],
+      '#required' => TRUE,
+      '#title' => $this->t('API log level', options: ['context' => 'os2forms_f2']),
+      '#default_value' => $settings->logLevel,
+    ];
+
     return $section;
   }
 
@@ -194,8 +212,26 @@ final class SettingsForm extends ConfigFormBase {
         $this->messenger()->addStatus($this->t('Pinged API successfully.', options: ['context' => 'os2forms_f2']));
       }
       catch (\Throwable $t) {
-        $this->messenger()->addError($this->t('Pinging API failed: @message', ['@message' => $t->getMessage()], options: ['context' => 'os2forms_f2']));
+        $previous = $t->getPrevious();
+        $message = NULL !== $previous
+          ? $this->t(
+            'Pinging API failed: @message (@previous_message)',
+            [
+              '@message' => $t->getMessage(),
+              '@previous_message' => $previous->getMessage(),
+            ],
+            options: ['context' => 'os2forms_f2']
+          )
+        : $this->t(
+            'Pinging API failed: @message',
+            [
+              '@message' => $t->getMessage(),
+            ],
+            options: ['context' => 'os2forms_f2']
+          );
+        $this->messenger()->addError($message);
       }
+
       return;
     }
 

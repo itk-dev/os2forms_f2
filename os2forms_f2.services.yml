@@ -14,4 +14,8 @@ services:
 
   Drupal\os2forms_f2\Helper\WebformHelperF2:
 
+  Drupal\os2forms_f2\Hook\InstallHooks:
+
   Drupal\os2forms_f2\Settings:
+
+  Drupal\os2forms_f2\Repository\F2ItemRepository:

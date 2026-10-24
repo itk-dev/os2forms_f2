@@ -14,14 +14,40 @@ builders](docs/user-manual/da/form-builder.md) for more details (both are in Dan
 
 ## Development
 
-We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for development[^1].
+We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for development.
 
-[^1]: The DDEV environment has been created by running
+<details>
+<summary>Details on the DDEV setup</summary>
 
-      ```shell
-      ddev config --project-type=drupal10 --docroot=web
-      ddev dotenv set .ddev/.env.web --drupal-core '^10.5.10'
-      ```
+The DDEV environment has been created by following the template on <https://github.com/ddev/ddev-drupal-contrib#install>:
+
+```shell
+ddev config --project-type=drupal10 --docroot=Drupal
+ddev add-on get ddev/ddev-drupal-contrib
+ddev start
+ddev poser --no-interaction
+ddev symlink-project
+# Detect expected Drupal and PHP versions.
+ddev config --update
+```
+
+We have a dependency on [OS2Forms](https://github.com/OS2Forms/os2forms) which requires [Drupal
+Lenient](https://github.com/mglaman/composer-drupal-lenient) to install some outdated modules, and therefore we use [a
+DDEV hook](https://docs.ddev.com/en/stable/users/configuration/hooks/) to make sure that Drupal Lenient is installed
+before we run any actual `composer install` commands:
+
+``` yaml
+# .ddev/config.yaml
+hooks:
+  post-start:
+    # Install Drupal Lenient (https://github.com/mglaman/composer-drupal-lenient)
+    - exec: COMPOSER=composer.lenient.json composer init --no-interaction
+    - exec: COMPOSER=composer.lenient.json composer config --no-plugins allow-plugins.mglaman/composer-drupal-lenient true
+    - exec: COMPOSER=composer.lenient.json composer require mglaman/composer-drupal-lenient:^1.0
+    - exec: rm -f composer.lenient.*
+```
+
+</details>
 
 Start the show by running
 
