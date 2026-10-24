@@ -43,6 +43,7 @@ class F2Helper {
         'api_secret' => $settings->secret,
         'f2_username' => $settings->f2Username,
         'cache_item_pool' => $this->cacheItemPool,
+        'log_level' => $settings->logLevel,
       ]);
       $this->apiClient->setLogger($this->logger);
     }

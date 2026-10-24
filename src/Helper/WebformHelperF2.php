@@ -135,8 +135,8 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
       return $job;
     }
     catch (\Exception $exception) {
-      $this->error('Error creating job for F2 archive: %message', $context + [
-        '%message' => $exception->getMessage(),
+      $this->error('Error creating job for F2 archive: @message', $context + [
+        '@message' => $exception->getMessage(),
         'operation' => 'F2 failed',
         'exception' => $exception,
       ]);
@@ -206,22 +206,44 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
    * Archive on case.
    */
   private function archiveOnCase(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
+    $context = [
+      'handler_id' => WebformHandlerF2::ID,
+      'webform_submission' => $submission,
+      'operation' => 'archive on case',
+    ];
     $caseIdentifier = $handlerSettings->archive?->archiveTargetCase?->caseIdentifier;
     if (NULL === $caseIdentifier) {
       throw new RuntimeException('Cannot get case identifier');
     }
     $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
 
+    $this->info('Achiving document for submission @submission on case @case ', $context + [
+      '@submission' => $submission->label(),
+      '@case' => (string)$case,
+    ]);
+
     $itemType = Type::Matter;
     $item = $this->itemRepository->loadOneBySubmissionAndHandlerAndType($submission, $handlerSettings->handlerId, $itemType);
     if (NULL !== $item) {
       $id = $item->data['id'];
       $matter = $this->f2->client()->matterById($id);
-    } else{
+      $this->info('Matter for submission @submission already exists: @matter', $context + [
+          '@submission' => $submission->label(),
+          '@matter' => (string)$matter,
+        ]);
+    } else {
+      $this->info('Creating matter for submission @submission', $context + [
+          '@submission' => $submission->label(),
+        ]);
       $matter = new Matter();
       $matter->title = $handlerSettings->archive->archiveTargetCase->matterTitle;
       $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
+
+      $this->info('Matter for submission @submission created: @matter', $context + [
+          '@submission' => $submission->label(),
+          '@matter' => (string)$matter,
+        ]);
 
       $item = new F2Item(
         webformId: $submission->getWebform()->id(),
@@ -242,17 +264,33 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
    * Archive on matter.
    */
   private function archiveOnMatter(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
+    $context = [
+      'handler_id' => WebformHandlerF2::ID,
+      'webform_submission' => $submission,
+      'operation' => 'archive on matter',
+    ];
     $matterIdentifier = $handlerSettings->archive?->archiveTargetMatter?->matterIdentifier;
     if (NULL === $matterIdentifier) {
       throw new RuntimeException('Cannot get matter identifier');
     }
     $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
+
+    $this->info('Achiving document for submission @submission on matter @matter ', $context + [
+      '@submission' => $submission->label(),
+      '@matter' => (string)$matter,
+    ]);
+
     $message = $this->createDocument($matter, $submission, $handlerSettings);
 
     return JobResult::success($message);
   }
 
   private function createDocument(Matter $matter, WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): string {
+    $context = [
+      'handler_id' => WebformHandlerF2::ID,
+      'webform_submission' => $submission,
+      'operation' => 'create document',
+    ];
     $attachment = $this->getAttachment($submission, $handlerSettings);
     try {
       $itemType = Type::Document;
@@ -261,7 +299,12 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
         // Document already exists. What to do?
         $id = $item->data['id'];
         $document = $this->f2->client()->documentById($id);
-        $message = sprintf('Document %s already created on matter %s', $document, $matter);
+        $this->info('Document on matter @matter for submission @submission already exists: @document', $context + [
+          '@submission' => $submission->label(),
+          '@matter' => (string)$matter,
+          '@document' => (string)$document,
+        ]);
+        $message = sprintf('Document %s already exists on matter %s', $document, $matter);
       } else {
         // Apparently the F2 API inspects the filename extension to determine file
         // type, i.e. we must keep the extension in the temporary filename.
@@ -269,6 +312,11 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
         $document = new Document();
         $document->title = $handlerSettings->archive?->documentTitle ?? $attachment->filename;
         $document = $this->f2->client()->documentCreate($document, $filePath, $matter);
+        $this->info('Document on matter @matter for submission @submission created: @document', $context + [
+          '@submission' => $submission->label(),
+          '@matter' => (string)$matter,
+          '@document' => (string)$document,
+        ]);
         $message = sprintf('Document %s created on matter %s', $document, $matter);
 
         $item = new F2Item(

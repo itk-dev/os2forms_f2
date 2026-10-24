@@ -2,6 +2,8 @@
 
 namespace Drupal\os2forms_f2\Settings;
 
+use Psr\Log\LogLevel;
+
 /**
  * F2 API settings.
  */
@@ -19,5 +21,8 @@ final class F2ApiSettings extends AbstractSettings {
 
   const string F2_USERNAME = 'f2_username';
   public ?string $f2Username = NULL;
+
+  const string LOG_LEVEL = 'log_level';
+  public ?string $logLevel = LogLevel::DEBUG;
 
 }
