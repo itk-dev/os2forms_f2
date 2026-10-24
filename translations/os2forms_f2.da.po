@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2026-10-24 08:22+0200\n"
-"PO-Revision-Date: 2026-10-24 08:22+0200\n"
+"POT-Creation-Date: 2026-10-25 08:29+0100\n"
+"PO-Revision-Date: 2026-10-25 08:29+0100\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -42,8 +42,16 @@ msgid "<b>submission is updated</b>."
 msgstr "<b>besvarelse opdateres</b>."
 
 msgctxt "os2forms_f2"
+msgid "API log level"
+msgstr "Api-logniveau"
+
+msgctxt "os2forms_f2"
 msgid "Additional settings"
 msgstr "Yderligere indstillinger"
+
+msgctxt "os2forms_f2"
+msgid "Alert"
+msgstr "Advarsel"
 
 msgctxt "os2forms_f2"
 msgid "Archive on case \"@case_identifier\"."
@@ -86,8 +94,24 @@ msgid "Case number or ID that uniquely identifies a single case."
 msgstr "Sagsnummer eller -id der entydigt identificerer en enkelt sag."
 
 msgctxt "os2forms_f2"
+msgid "Critical"
+msgstr "Kritisk"
+
+msgctxt "os2forms_f2"
+msgid "Debug"
+msgstr "Fejlsøgning"
+
+msgctxt "os2forms_f2"
 msgid "Document title"
 msgstr "Dokumenttitel"
+
+msgctxt "os2forms_f2"
+msgid "Emergency"
+msgstr "Nødsituation"
+
+msgctxt "os2forms_f2"
+msgid "Error"
+msgstr "Fejl"
 
 msgctxt "os2forms_f2"
 msgid "F2"
@@ -116,6 +140,10 @@ msgstr "Id'et \"@case_identifier\" identificerer ikke entydigt en sag."
 msgctxt "os2forms_f2"
 msgid "Inbound"
 msgstr "Indgående"
+
+msgctxt "os2forms_f2"
+msgid "Info"
+msgstr "Info"
 
 msgctxt "os2forms_f2"
 msgid "Internal"
@@ -164,6 +192,10 @@ msgstr "Ingen kø"
 msgctxt "os2forms_f2"
 msgid "Note: Pinging the API will use saved config."
 msgstr "Bemærk: Forbindelsen bliver tjekket med de gemte indstillinger."
+
+msgctxt "os2forms_f2"
+msgid "Notice"
+msgstr "Bemærkning"
 
 msgctxt "os2forms_f2"
 msgid "Outbound"
@@ -261,10 +293,13 @@ msgid "Username"
 msgstr "Bruger"
 
 msgctxt "os2forms_f2"
+msgid "Warning"
+msgstr "Advarsel"
+
+msgctxt "os2forms_f2"
 msgid "Web services"
 msgstr "Webservices"
 
 msgctxt "os2forms_f2"
 msgid "anonymous <b>submission is converted</b> to authenticated."
 msgstr "anonym <b>besvarelse ændres</b> til ikke-anonym."
-
