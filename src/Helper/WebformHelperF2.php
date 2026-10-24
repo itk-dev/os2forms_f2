@@ -34,7 +34,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * Webform helper.
  */
-final class WebformHelperF2 implements LoggerInterface {
+final readonly class WebformHelperF2 implements LoggerInterface {
   use LoggerTrait;
 
   private const string PDF_MIME_TYPE = 'application/pdf';
@@ -43,19 +43,19 @@ final class WebformHelperF2 implements LoggerInterface {
    * Constructor.
    */
   public function __construct(
-    private readonly EntityTypeManagerInterface $entityTypeManager,
-    private readonly Settings $settings,
-    private readonly F2Helper $f2,
-    private readonly FileSystemInterface $fileSystem,
+    private EntityTypeManagerInterface $entityTypeManager,
+    private Settings $settings,
+    private F2Helper $f2,
+    private FileSystemInterface $fileSystem,
     #[Autowire(service: 'plugin.manager.element_info')]
-    private readonly ElementInfoManager $elementInfoManager,
+    private ElementInfoManager $elementInfoManager,
     #[Autowire(service: 'webform.token_manager')]
-    private readonly WebformTokenManagerInterface $webformTokenManager,
-    private readonly F2ItemRepository $itemRepository,
+    private WebformTokenManagerInterface $webformTokenManager,
+    private F2ItemRepository $itemRepository,
     #[Autowire(service: 'logger.channel.os2forms_f2')]
-    private readonly LoggerChannelInterface $logger,
+    private LoggerChannelInterface $logger,
     #[Autowire(service: 'logger.channel.os2forms_f2_submission')]
-    private readonly LoggerChannelInterface $submissionLogger,
+    private LoggerChannelInterface $submissionLogger,
   ) {
   }
 
