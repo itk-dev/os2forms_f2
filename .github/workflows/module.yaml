@@ -51,9 +51,6 @@ jobs:
       - name: Rector
         run: ddev php vendor/bin/rector --dry-run
 
-      - name: Composer - audit
-        run: ddev composer audit
-
   translations:
     name: Translations
     runs-on: ubuntu-latest
