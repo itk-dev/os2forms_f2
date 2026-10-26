@@ -6,7 +6,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\os2forms_f2\Exception\F2Exception;
 use Drupal\os2forms_f2\Exception\F2NonUniqueCaseException;
 use Drupal\os2forms_f2\Helper\F2Helper;
 use Drupal\os2forms_f2\Helper\WebformHelperF2;
@@ -51,19 +50,22 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   /**
    * The settings.
    */
-  private Settings $settingsService;
+  protected Settings $settingsService;
 
   /**
    * The webform helper.
    */
-  private WebformHelperF2 $helper;
+  protected WebformHelperF2 $helper;
 
   /**
    * The F2 helper.
    */
-  private F2Helper $f2;
+  protected F2Helper $f2;
 
-  private RequestStack $requestStack;
+  /**
+   * The request stack.
+   */
+  protected RequestStack $requestStack;
 
   /**
    * {@inheritdoc}
@@ -74,7 +76,9 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     $instance->settingsService = $container->get(Settings::class);
     $instance->helper = $container->get(WebformHelperF2::class);
     $instance->f2 = $container->get(F2Helper::class);
-    $instance->requestStack = $container->get('request_stack');
+    /** @var RequestStack $requestStack */
+    $requestStack = $container->get('request_stack');
+    $instance->requestStack = $requestStack;
 
     return $instance;
   }
@@ -101,9 +105,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   #[\Override]
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array
-  {
-    $settings = $this->settingsService->getArchiveSettings((array)($this->getSetting(ArchiveSettings::NAME)));
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
+    $settings = $this->settingsService->getArchiveSettings((array) ($this->getSetting(ArchiveSettings::NAME)));
 
     // We have to wrap all handler setting fields in a container to show them on
     // the "General" page only.
@@ -264,20 +267,21 @@ final class WebformHandlerF2 extends WebformHandlerBase {
               $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
 
               $details = [
-                '#markup' => (string)$case,
+                '#markup' => (string) $case,
               ];
-            } catch (\Throwable $t) {
+            }
+            catch (\Throwable $t) {
               $details = [
                 '#markup' => $this->t('Error: @error', ['@error' => $t->getMessage()], options: ['context' => 'os2forms_f2']),
               ];
             }
 
             $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME]['details'] = [
-                '#type' => 'details',
-                '#attributes' => ['id' => 'archive-details'],
-                '#open' => TRUE,
-                '#title' => $this->t('Case details', options: ['context' => 'os2forms_f2']),
-              ] + $details;
+              '#type' => 'details',
+              '#attributes' => ['id' => 'archive-details'],
+              '#open' => TRUE,
+              '#title' => $this->t('Case details', options: ['context' => 'os2forms_f2']),
+            ] + $details;
           }
           break;
 
@@ -287,20 +291,21 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             try {
               $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
               $details = [
-                '#markup' => (string)$matter,
+                '#markup' => (string) $matter,
               ];
-            } catch (\Throwable $t) {
+            }
+            catch (\Throwable $t) {
               $details = [
                 '#markup' => $this->t('Error: @error', ['@error' => $t->getMessage()], options: ['context' => 'os2forms_f2']),
               ];
             }
 
             $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
-                '#type' => 'details',
-                '#attributes' => ['id' => 'archive-details'],
-                '#open' => TRUE,
-                '#title' => $this->t('Matter details', options: ['context' => 'os2forms_f2']),
-              ] + $details;
+              '#type' => 'details',
+              '#attributes' => ['id' => 'archive-details'],
+              '#open' => TRUE,
+              '#title' => $this->t('Matter details', options: ['context' => 'os2forms_f2']),
+            ] + $details;
           }
           break;
 
@@ -316,11 +321,10 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   #[\Override]
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void
-  {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::validateConfigurationForm($form, $form_state);
 
-    $setError = static fn(string|array $path, TranslatableMarkup $message) => $form_state->setErrorByName(implode('][', (array)$path), $message);
+    $setError = static fn(string|array $path, TranslatableMarkup $message) => $form_state->setErrorByName(implode('][', (array) $path), $message);
 
     $targetKey = [self::ID, ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET];
     $target = $form_state->getValue($targetKey);
@@ -329,17 +333,20 @@ final class WebformHandlerF2 extends WebformHandlerBase {
       switch ($target) {
         case ArchiveTarget::Case:
           $key = [self::ID, ArchiveSettings::NAME, ArchiveTargetCase::NAME, ArchiveTargetCase::CASE_IDENTIFIER];
-          $caseIdentifier = trim((string)$form_state->getValue($key));
+          $caseIdentifier = trim((string) $form_state->getValue($key));
           if ('' === $caseIdentifier) {
             $setError($key, t('Missing case identifier.', options: ['context' => 'os2forms_f2']));
-          } else {
+          }
+          else {
             try {
               $this->f2->fetchCaseByIdentifier($caseIdentifier);
-            } catch (F2NonUniqueCaseException) {
+            }
+            catch (F2NonUniqueCaseException) {
               $setError($key, t('Identifier "@case_identifier" does not uniquely identify a case.', [
                 '@case_identifier' => $caseIdentifier,
               ], options: ['context' => 'os2forms_f2']));
-            } catch (\Throwable $throwable) {
+            }
+            catch (\Throwable $throwable) {
               $setError($key, t('Cannot get case by identifier "@case_identifier" (@message).', [
                 '@case_identifier' => $caseIdentifier,
                 '@message' => $throwable->getMessage(),
@@ -350,13 +357,15 @@ final class WebformHandlerF2 extends WebformHandlerBase {
 
         case ArchiveTarget::Matter:
           $key = [self::ID, ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_IDENTIFIER];
-          $matterIdentifier = trim((string)$form_state->getValue($key));
+          $matterIdentifier = trim((string) $form_state->getValue($key));
           if ('' === $matterIdentifier) {
             $setError($key, t('Missing matter identifier.', options: ['context' => 'os2forms_f2']));
-          } else {
+          }
+          else {
             try {
               $this->f2->fetchMatterByIdentifier($matterIdentifier);
-            } catch (\Throwable $throwable) {
+            }
+            catch (\Throwable $throwable) {
               $setError($key, t('Cannot get matter by identifier "@matter_identifier" (@message).', [
                 '@matter_identifier' => $matterIdentifier,
                 '@message' => $throwable->getMessage(),
@@ -365,7 +374,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           }
           break;
       }
-    } catch (\ValueError) {
+    }
+    catch (\ValueError) {
       $setError($targetKey, $this->t('Invalid archive target: @target', ['@target' => $target], options: ['context' => 'os2forms_f2']));
     }
   }
@@ -374,7 +384,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   #[\Override]
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::submitConfigurationForm($form, $form_state);
     foreach ([
       ArchiveSettings::NAME,
@@ -389,7 +399,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   #[\Override]
-  public function postSave(WebformSubmissionInterface $webform_submission, $update = TRUE) {
+  public function postSave(WebformSubmissionInterface $webform_submission, $update = TRUE): void {
     if (!$this->additionalStatesRunOnPostSave($webform_submission)) {
       return;
     }
@@ -401,11 +411,10 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   #[\Override]
-  public function getSummary() {
+  public function getSummary(): array {
     $settings = $this->settingsService->getHandlerSettings($this);
 
     $summary = [];
-    $linkToDetails = false;
 
     switch ($settings->archive?->archiveTarget) {
       case ArchiveTarget::Case:
@@ -415,7 +424,6 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             '#markup' => $this->t('Archive on case "@case_identifier".', ['@case_identifier' => $caseIdentifier], options: ['context' => 'os2forms_f2']),
           ];
         }
-        $linkToDetails = true;
         break;
 
       case ArchiveTarget::Matter:
@@ -425,28 +433,24 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             '#markup' => $this->t('Archive on matter "@matter_identifier".', ['@matter_identifier' => $matterIdentifier], options: ['context' => 'os2forms_f2']),
           ];
         }
-        $linkToDetails = true;
         break;
     }
-
 
     $build = [];
     if ($summary) {
       $build['summary'] = [
-          '#type' => 'container',
-        ] + $summary;
-      if ($linkToDetails) {
-        $build['see_details'] = [
-          '#type' => 'container',
-          '#markup' => ' '.$this->t('<a href=":edit_url">Edit</a> to see details.', [
-              ':edit_url' => Url::fromRoute('entity.webform.handler.edit_form', [
-                'webform' => $this->getWebform()->id(),
-                'webform_handler' => $this->getHandlerId(),
-              ])->toString(true)->getGeneratedUrl(),
-            ], options: ['context' => 'os2forms_f2']),
-          '#weight' => 999,
-        ];
-      }
+        '#type' => 'container',
+      ] + $summary;
+      $build['see_details'] = [
+        '#type' => 'container',
+        '#markup' => ' ' . $this->t('<a href=":edit_url">Edit</a> to see details.', [
+          ':edit_url' => Url::fromRoute('entity.webform.handler.edit_form', [
+            'webform' => $this->getWebform()->id(),
+            'webform_handler' => $this->getHandlerId(),
+          ])->toString(TRUE)->getGeneratedUrl(),
+        ], options: ['context' => 'os2forms_f2']),
+        '#weight' => 999,
+      ];
     }
 
     return $build;

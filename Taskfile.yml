@@ -69,6 +69,8 @@ tasks:
     desc: "Apply and check coding standards for PHP"
     cmds:
       - task: coding-standards:php:apply
+        # phpcbf has weird exit codes …
+        ignore_error: true
       # Cf. .github/workflows/php.yaml
       - task: ddev
         vars:
@@ -109,9 +111,9 @@ tasks:
 
   ddev:start:
     desc: Start DDEV Drupal Contrib setup (https://github.com/ddev/ddev-drupal-contrib)
-    deps:
-      - composer:install:lenient
     cmds:
+      # We want a clean slate
+      - rm -f composer.lock
       - ddev start
       - ddev poser --no-interaction
       - ddev symlink-project
@@ -121,18 +123,6 @@ tasks:
     cmds:
       - ddev add-on get ddev/ddev-drupal-contrib
       - ddev restart
-
-  composer:install:lenient:
-    cmds:
-      # Create a temporary composer file to install https://github.com/mglaman/composer-drupal-lenient before the real install needs it.
-      - for:
-          - init --no-interaction
-          - config --no-plugins allow-plugins.mglaman/composer-drupal-lenient true
-          - require mglaman/composer-drupal-lenient:^1.0
-        cmd: ddev exec -- COMPOSER=composer.lenient.json composer {{.ITEM}}
-      # Clean up
-      - rm -f composer.lenient.*
-    internal: true
 
   translations:extract:
     desc: Extract module translations

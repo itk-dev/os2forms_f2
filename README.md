@@ -22,7 +22,7 @@ We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for de
 The DDEV environment has been created by following the template on <https://github.com/ddev/ddev-drupal-contrib#install>:
 
 ```shell
-ddev config --project-type=drupal10 --docroot=Drupal
+ddev config --project-type=drupal11 --docroot=web
 ddev add-on get ddev/ddev-drupal-contrib
 ddev start
 ddev poser --no-interaction

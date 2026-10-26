@@ -10,22 +10,21 @@
         }
     ],
     "require": {
-        "php": "^8.3",
+        "php": "^8.4",
         "drush/drush": "^13.8",
         "itk-dev/drupal_psr6_cache": "^1.1",
-        "itk-dev/f2-api-client": "dev-f2-api-client as 1.0.0",
-        "os2forms/os2forms": "^5.1"
+        "itk-dev/f2-api-client": "^1.0",
+        "os2forms/os2forms": "^6.1"
     },
     "require-dev": {
-        "drupal/coder": "^8.3",
-        "ergebnis/composer-normalize": "^2.52",
-        "itk-dev/drupal_translation_extractor": "^1.4",
+        "drupal/coder": "^9.0",
+        "ergebnis/composer-normalize": "^2.54",
+        "itk-dev/drupal_translation_extractor": "^2.0",
         "mglaman/composer-drupal-lenient": "^1.0",
-        "mglaman/phpstan-drupal": "^1.1",
-        "palantirnet/drupal-rector": "0.x-dev",
+        "mglaman/phpstan-drupal": "^2.2",
+        "palantirnet/drupal-rector": "^1.1",
         "phpstan/extension-installer": "^1.4",
-        "phpstan/phpstan": "^1.0",
-        "phpstan/phpstan-deprecation-rules": "^1.0"
+        "phpstan/phpstan-deprecation-rules": "^2.0"
     },
     "repositories": [
         {
@@ -47,8 +46,9 @@
             "mglaman/composer-drupal-lenient": true,
             "php-http/discovery": true,
             "phpstan/extension-installer": true,
-            "simplesamlphp/composer-module-installer": false,
-            "simplesamlphp/composer-xmlprovider-installer": false,
+            "simplesamlphp/composer-module-installer": true,
+            "simplesamlphp/composer-xmlprovider-installer": true,
+            "symfony/runtime": true,
             "tbachert/spi": true,
             "zaporylie/composer-drupal-optimizations": true
         },
@@ -62,7 +62,9 @@
         "drupal-lenient": {
             "allowed-list": [
                 "drupal/coc_forms_auto_export",
-                "drupal/webform_node_element"
+                "drupal/webform_node_element",
+                "drupal/events_logging",
+                "drupal/switch_page_theme"
             ]
         }
     }
