@@ -76,7 +76,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     $id = $this->settings->getGeneralSettings()->queue ?? NULL;
 
     /** @var ?\Drupal\advancedqueue\Entity\QueueInterface $queue */
-$queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
+    $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
 
     if (NULL === $queue) {
       throw new RuntimeException(sprintf('Cannot load queue %s', $id));
@@ -219,7 +219,7 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
 
     $this->info('Achiving document for submission @submission on case @case ', $context + [
       '@submission' => $submission->label(),
-      '@case' => (string)$case,
+      '@case' => (string) $case,
     ]);
 
     $itemType = Type::Matter;
@@ -228,37 +228,38 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
       $id = $item->data['id'];
       $matter = $this->f2->client()->matterById($id);
       $this->info('Matter for submission @submission already exists: @matter', $context + [
-          '@submission' => $submission->label(),
-          '@matter' => (string)$matter,
-        ]);
-    } else {
+        '@submission' => $submission->label(),
+        '@matter' => (string) $matter,
+      ]);
+    }
+    else {
       $this->info('Creating matter for submission @submission', $context + [
-          '@submission' => $submission->label(),
-        ]);
+        '@submission' => $submission->label(),
+      ]);
       $matter = new Matter();
       $matter->title = $handlerSettings->archive->archiveTargetCase->matterTitle;
       $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
 
       $this->info('Matter for submission @submission created: @matter', $context + [
-          '@submission' => $submission->label(),
-          '@matter' => (string)$matter,
-        ]);
+        '@submission' => $submission->label(),
+        '@matter' => (string) $matter,
+      ]);
 
       $item = new F2Item(
-        webformId: $submission->getWebform()->id(),
-        webformHandlerId: $handlerSettings->handlerId,
-        webformSubmissionId: $submission->id(),
-        type: $itemType,
-        data: $matter->toArray(),
-      );
+            webformId: $submission->getWebform()->id(),
+            webformHandlerId: $handlerSettings->handlerId,
+            webformSubmissionId: $submission->id(),
+            type: $itemType,
+            data: $matter->toArray(),
+          );
     }
 
     $this->itemRepository->save($item);
     $message = $this->createDocument($matter, $submission, $handlerSettings);
 
     return JobResult::success($message);
-}
+  }
 
   /**
    * Archive on matter.
@@ -277,7 +278,7 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
 
     $this->info('Achiving document for submission @submission on matter @matter ', $context + [
       '@submission' => $submission->label(),
-      '@matter' => (string)$matter,
+      '@matter' => (string) $matter,
     ]);
 
     $message = $this->createDocument($matter, $submission, $handlerSettings);
@@ -285,6 +286,9 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
     return JobResult::success($message);
   }
 
+  /**
+   * Create document in F2.
+   */
   private function createDocument(Matter $matter, WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): string {
     $context = [
       'handler_id' => WebformHandlerF2::ID,
@@ -301,31 +305,32 @@ $queue = $this->entityTypeManager->getStorage('advancedqueue_queue')->load($id);
         $document = $this->f2->client()->documentById($id);
         $this->info('Document on matter @matter for submission @submission already exists: @document', $context + [
           '@submission' => $submission->label(),
-          '@matter' => (string)$matter,
-          '@document' => (string)$document,
+          '@matter' => (string) $matter,
+          '@document' => (string) $document,
         ]);
         $message = sprintf('Document %s already exists on matter %s', $document, $matter);
-      } else {
-        // Apparently the F2 API inspects the filename extension to determine file
-        // type, i.e. we must keep the extension in the temporary filename.
+      }
+      else {
+        // Apparently the F2 API inspects the filename extension to determine
+        // file type, i.e. we must keep the extension in the temporary filename.
         $filePath = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
         $document = new Document();
-        $document->title = $handlerSettings->archive?->documentTitle ?? $attachment->filename;
+        $document->title = $handlerSettings->archive->documentTitle ?? $attachment->filename;
         $document = $this->f2->client()->documentCreate($document, $filePath, $matter);
         $this->info('Document on matter @matter for submission @submission created: @document', $context + [
           '@submission' => $submission->label(),
-          '@matter' => (string)$matter,
-          '@document' => (string)$document,
+          '@matter' => (string) $matter,
+          '@document' => (string) $document,
         ]);
         $message = sprintf('Document %s created on matter %s', $document, $matter);
 
         $item = new F2Item(
-          webformId: $submission->getWebform()->id(),
-          webformHandlerId: $handlerSettings->handlerId,
-          webformSubmissionId: $submission->id(),
-          type: $itemType,
-          data: $document->toArray(),
-        );
+                webformId: $submission->getWebform()->id(),
+                webformHandlerId: $handlerSettings->handlerId,
+                webformSubmissionId: $submission->id(),
+                type: $itemType,
+                data: $document->toArray(),
+              );
       }
 
       $this->itemRepository->save($item);

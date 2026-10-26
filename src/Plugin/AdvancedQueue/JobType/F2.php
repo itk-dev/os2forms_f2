@@ -26,6 +26,23 @@ final class F2 extends JobTypeBase implements ContainerFactoryPluginInterface {
    *
    * @phpstan-param array<string, mixed> $configuration
    */
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    /**
+     * The webform helper.
+     */
+    protected WebformHelperF2 $helper,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @phpstan-param array<string, mixed> $configuration
+   */
   #[\Override]
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
@@ -34,23 +51,6 @@ final class F2 extends JobTypeBase implements ContainerFactoryPluginInterface {
       $plugin_definition,
       $container->get(WebformHelperF2::class)
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @phpstan-param array<string, mixed> $configuration
-   */
-  public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    /**
-     * The webform helper.
-     */
-    private readonly WebformHelperF2 $helper,
-  ) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
   /**

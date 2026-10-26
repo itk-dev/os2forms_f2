@@ -1,6 +1,6 @@
 name: os2forms-f2
-type: drupal10
-docroot: Drupal
+type: drupal11
+docroot: web
 php_version: "8.3"
 webserver_type: nginx-fpm
 xdebug_enabled: false
@@ -9,11 +9,17 @@ additional_fqdns: []
 database:
     type: mariadb
     version: "11.8"
+hooks:
+    post-start:
+        - exec: COMPOSER=composer.lenient.json composer init --no-interaction
+        - exec: COMPOSER=composer.lenient.json composer config --no-plugins allow-plugins.mglaman/composer-drupal-lenient true
+        - exec: COMPOSER=composer.lenient.json composer require mglaman/composer-drupal-lenient:^1.0
+        - exec: rm -f composer.lenient.*
 use_dns_when_possible: true
 composer_version: "2"
 web_environment: []
 nodejs_version: "24"
-corepack_enable: false
+corepack_enable: true
 
 # Key features of DDEV's config.yaml:
 
@@ -28,7 +34,7 @@ corepack_enable: false
 
 # docroot: <relative_path> # Relative path to the directory containing index.php.
 
-# php_version: "8.4"  # PHP version to use, "5.6" through "8.5"
+# php_version: "8.4"  # PHP version to use; see https://docs.ddev.com/en/stable/users/configuration/config/#php_version.
 
 # You can explicitly specify the webimage but this
 # is not recommended, as the images are often closely tied to DDEV's behavior,
@@ -301,14 +307,7 @@ corepack_enable: false
 # See https://docs.ddev.com/en/stable/users/extend/custom-commands/ for more
 # information on the commands that can be extended and the tasks you can define
 # for them. Example:
-hooks:
-  post-start:
-    # Install Drupal Lenient (https://github.com/mglaman/composer-drupal-lenient)
-    - exec: COMPOSER=composer.lenient.json composer init --no-interaction
-    - exec: COMPOSER=composer.lenient.json composer config --no-plugins allow-plugins.mglaman/composer-drupal-lenient true
-    - exec: COMPOSER=composer.lenient.json composer require mglaman/composer-drupal-lenient:^1.0
-    - exec: rm -f composer.lenient.*
-
+#hooks:
 # post-import-db:
 #   - exec: drush sql:sanitize
 #   - exec: drush updatedb

@@ -5,8 +5,6 @@ namespace Drupal\os2forms_f2\Repository;
 use Drupal\os2forms_f2\Hook\InstallHooks;
 use Drupal\os2forms_f2\Model\F2Item;
 use Drupal\os2forms_f2\Model\F2Item\Type;
-use Drupal\os2forms_f2\Plugin\WebformHandler\WebformHandlerF2;
-use Drupal\webform\WebformInterface;
 use Drupal\webform\WebformSubmissionInterface;
 
 /**
@@ -84,16 +82,6 @@ final class F2ItemRepository extends AbstractRepository {
   }
 
   /**
-   * Load by ...
-   */
-  public function loadByWebformAndHandler(WebformInterface $webform, WebformHandlerF2 $handler) {
-    return $this->loadBy([
-      ['webform_id', $webform->id()],
-      ['webform_handler_id', $handler->gethandlerId()],
-    ]);
-  }
-
-  /**
    * Delete by submission.
    *
    * @param \Drupal\webform\WebformSubmissionInterface[] $submissions
@@ -112,7 +100,7 @@ final class F2ItemRepository extends AbstractRepository {
     }
     catch (\Exception $exception) {
       $this->logger->error('Error deleting F2 items for submissions @submissions: @message', [
-        '@submissions' => implode(', ', $ids),
+        '@submissions' => implode(', ', $ids ?? []),
         '@message' => $exception->getMessage(),
         'exception' => $exception,
       ]);
@@ -177,7 +165,7 @@ final class F2ItemRepository extends AbstractRepository {
   /**
    * Serialize data.
    */
-  private function serializeData(array $data) {
+  private function serializeData(array $data): string {
     return json_encode($data, JSON_THROW_ON_ERROR);
   }
 

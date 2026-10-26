@@ -5,5 +5,5 @@ translations/*.mo
 *.local
 
 # DDEV stuff
-/Drupal/
+/web/
 /recipes/

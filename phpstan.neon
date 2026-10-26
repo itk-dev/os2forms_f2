@@ -1,14 +1,14 @@
 parameters:
-  paths:
-    - .
-  level: 5
-  customRulesetUsed: true
-  reportUnmatchedIgnoredErrors: false
-  excludePaths:
-      - rector.php
-      # Ignore any vendor folder (https://phpstan.org/user-guide/ignoring-errors#excluding-whole-files)
-      - vendor (?)
+    level: 6
+    paths:
+     - src
+    ignoreErrors:
+        - message: '#Constructor of class Drupal\\os2forms_f2\\Exception\\F2NonUniqueCaseException has an unused parameter \$message.#'
+          path: src/Exception/F2NonUniqueCaseException.php
+        - message: '#Method Drupal\\os2forms_f2\\.+\(\) return type has no value type specified in iterable type array.#'
+        - message: '#Method Drupal\\os2forms_f2\\.+\(\) has parameter \$.+ with no value type specified in iterable type array.#'
+        - message: '#Function .+\(\) return type has no value type specified in iterable type array.#'
 
-  ignoreErrors:
-      - '#Call to method Drupal\\Core\\Entity\\Query\\QueryInterface::accessCheck\(\) will always evaluate to true.#'
-      - '#Call to method PHPUnit\\Framework\\Assert::assertTrue\(\) with true will always evaluate to true.#'
+# Local Variables:
+# mode: yaml
+# End:

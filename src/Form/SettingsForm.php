@@ -8,7 +8,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -29,24 +28,16 @@ final class SettingsForm extends ConfigFormBase {
   private const string ACTION_PING_API = 'action_ping_api';
 
   /**
-   * The queue storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  private readonly EntityStorageInterface $queueStorage;
-
-  /**
    * Constructor.
    */
   public function __construct(
     ConfigFactoryInterface $config_factory,
     TypedConfigManagerInterface $typedConfigManager,
-    EntityTypeManagerInterface $entityTypeManager,
-    private readonly Settings $settings,
-    private readonly F2Helper $f2,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected Settings $settings,
+    protected F2Helper $f2,
   ) {
     parent::__construct($config_factory, $typedConfigManager);
-    $this->queueStorage = $entityTypeManager->getStorage('advancedqueue_queue');
   }
 
   /**
@@ -173,13 +164,14 @@ final class SettingsForm extends ConfigFormBase {
           '@queue' => $settings->queue,
           ':queue_url' => '/admin/config/system/queues/jobs/' . urlencode((string) $settings->queue),
         ], options: ['context' => 'os2forms_f2']);
+    $storage = $this->entityTypeManager->getStorage('advancedqueue_queue');
     $section[GeneralSettings::QUEUE] = [
       '#type' => 'select',
       '#required' => TRUE,
       '#title' => $this->t('Queue', options: ['context' => 'os2forms_f2']),
       '#options' => array_map(
         static fn(EntityInterface $queue) => $queue->label(),
-        $this->queueStorage->loadMultiple()
+        $storage->loadMultiple()
       ),
       '#empty_option' => $this->t('No queue', options: ['context' => 'os2forms_f2']),
       '#default_value' => $settings->queue,
