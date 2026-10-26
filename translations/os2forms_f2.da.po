@@ -123,7 +123,7 @@ msgstr "F2-api"
 
 msgctxt "os2forms_f2"
 msgid "F2 archive settings"
-msgstr "F2-arkiveringsindstilinger"
+msgstr "F2-arkiveringsindstillinger"
 
 msgctxt "os2forms_f2"
 msgid "F2 username"

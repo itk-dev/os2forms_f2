@@ -20,6 +20,8 @@ use Drupal\webform\Utility\WebformDialogHelper;
 use Drupal\webform\WebformSubmissionInterface;
 use ItkDev\F2ApiClient\Model\Matter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * F2 Webform Handler.
@@ -61,6 +63,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    */
   private F2Helper $f2;
 
+  private RequestStack $requestStack;
+
   /**
    * {@inheritdoc}
    */
@@ -70,6 +74,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     $instance->settingsService = $container->get(Settings::class);
     $instance->helper = $container->get(WebformHelperF2::class);
     $instance->f2 = $container->get(F2Helper::class);
+    $instance->requestStack = $container->get('request_stack');
 
     return $instance;
   }
@@ -196,7 +201,18 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             '#title' => $this->t('Matter type', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The type of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
             '#default_value' => $settings->archiveTargetCase?->matterType,
-            '#required' => TRUE,
+
+            '#states' => [
+              'required' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
+                  'value' => ArchiveTarget::Case->value,
+                ],
+              ],
+            ],
           ],
 
         ],
@@ -239,64 +255,56 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     ];
 
     // Show some details in the archive target.
-    switch ($settings->archiveTarget) {
-      case ArchiveTarget::Case:
-        $caseIdentifier = $settings->archiveTargetCase?->caseIdentifier;
-        if (NULL !== $caseIdentifier) {
-          try {
-            $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
+    if (Request::METHOD_GET === $this->requestStack->getMainRequest()->getRealMethod()) {
+      switch ($settings->archiveTarget) {
+        case ArchiveTarget::Case:
+          $caseIdentifier = $settings->archiveTargetCase?->caseIdentifier;
+          if (NULL !== $caseIdentifier) {
+            try {
+              $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
 
-            $details = [
-              '#markup' => (string)$case,
-            ];
-          } catch (\Throwable $t) {
-            $details = [
-              '#theme' => 'status_messages',
-              '#message_list' => [
-                'error' => [
-                  $t->getMessage(),
-                ],
-              ],
-            ];
+              $details = [
+                '#markup' => (string)$case,
+              ];
+            } catch (\Throwable $t) {
+              $details = [
+                '#markup' => $this->t('Error: @error', ['@error' => $t->getMessage()], options: ['context' => 'os2forms_f2']),
+              ];
+            }
+
+            $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME]['details'] = [
+                '#type' => 'details',
+                '#attributes' => ['id' => 'archive-details'],
+                '#open' => TRUE,
+                '#title' => $this->t('Case details', options: ['context' => 'os2forms_f2']),
+              ] + $details;
           }
+          break;
 
-          $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME]['details'] = [
-            '#type' => 'details',
-            '#attributes' => ['id' => 'archive-details'],
-            '#open' => TRUE,
-            '#title' => $this->t('Case details', options: ['context' => 'os2forms_f2']),
-            ] + $details;
-        }
-        break;
+        case ArchiveTarget::Matter:
+          $matterIdentifier = $settings->archiveTargetMatter?->matterIdentifier;
+          if (NULL !== $matterIdentifier) {
+            try {
+              $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
+              $details = [
+                '#markup' => (string)$matter,
+              ];
+            } catch (\Throwable $t) {
+              $details = [
+                '#markup' => $this->t('Error: @error', ['@error' => $t->getMessage()], options: ['context' => 'os2forms_f2']),
+              ];
+            }
 
-      case ArchiveTarget::Matter:
-        $matterIdentifier = $settings->archiveTargetMatter?->matterIdentifier;
-        if (NULL !== $matterIdentifier) {
-          try {
-            $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
-            $details = [
-              '#markup' => (string)$matter,
-            ];
-          } catch (\Throwable $t) {
-            $details = [
-              '#theme' => 'status_messages',
-              '#message_list' => [
-                'error' => [
-                  $t->getMessage(),
-                ],
-              ],
-            ];
+            $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
+                '#type' => 'details',
+                '#attributes' => ['id' => 'archive-details'],
+                '#open' => TRUE,
+                '#title' => $this->t('Matter details', options: ['context' => 'os2forms_f2']),
+              ] + $details;
           }
+          break;
 
-          $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
-              '#type' => 'details',
-              '#attributes' => ['id' => 'archive-details'],
-              '#open' => TRUE,
-              '#title' => $this->t('Matter details', options: ['context' => 'os2forms_f2']),
-            ]+ $details;
-        }
-        break;
-
+      }
     }
 
     $this->additionalStatesBuildConfigurationForm($form, $form_state);

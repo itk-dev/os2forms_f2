@@ -84,10 +84,13 @@ class F2Helper {
    */
   public function fetchMatterByIdentifier(string $identifier): Matter {
     $client = $this->client();
-    if (filter_var($identifier, FILTER_VALIDATE_INT)) {
-      return $client->matterById((int) $identifier);
-    }
 
+    // @todo Both matter ID and number are integers …
+    // @code
+    // if (filter_var($identifier, FILTER_VALIDATE_INT)) {
+    //   return $client->matterById((int) $identifier);
+    // }
+    // @endcode
     return $client->matterByMatterNumber($identifier);
   }
 

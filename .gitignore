@@ -2,6 +2,7 @@
 composer.lock
 vendor/
 translations/*.mo
+*.local
 
 # DDEV stuff
 /Drupal/
