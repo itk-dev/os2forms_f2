@@ -1,16 +1,40 @@
 # OS2Forms: F2 integration
 
+This module add a F2 webform handler that can archive content from a OS2Forms Attachment webform element in
+[F2](https://www.cbrain.com/software-pages/the-f2-platform).
+
+The handler can achive on a case and on a matter. Documents in F2 can only be attached to matters, so when archiving on
+a case, the handler first creates a matter before attaching a document to it.
+
+## Installation
+
 1. Install the module
 
    ``` shell
    drush pm:install os2forms_f2
    ```
 
-2. Go to `/admin/os2forms_f2/settings` and define settings.
-3. Add a "F2" handler to a webform.
+2. Go to `/admin/os2forms_f2/settings` and define settings for connecting to the F2 API
+
+> [!TIP]
+> Use the `os2forms-f2:api-client` Drush command to check that the API connection works as expected. Run
+>
+> ```shell
+> drush os2forms-f2:api-client --help
+> ```
+>
+> for some help and examples on how to use the command.
+
+## Usage
+
+When the F2 module has been installed and configured, an F2 handler can be added to a webform.
 
 See the [user manual for administrators](docs/user-manual/da/administrator.md) and [for form
-builders](docs/user-manual/da/form-builder.md) for more details (both are in Danish).
+builders](docs/user-manual/da/form-builder.md) for more details on how to use the handler (both are in Danish).
+
+### Examples
+
+Install the F2 form examples module (`os2forms_f2_examples`) to load an example webform with F2 handlers.
 
 ## Development
 
@@ -22,7 +46,7 @@ We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for de
 The DDEV environment has been created by following the template on <https://github.com/ddev/ddev-drupal-contrib#install>:
 
 ```shell
-ddev config --project-type=drupal11 --docroot=web
+ddev config --project-type=drupal11 --docroot=Drupal
 ddev add-on get ddev/ddev-drupal-contrib
 ddev start
 ddev poser --no-interaction
@@ -30,6 +54,11 @@ ddev symlink-project
 # Detect expected Drupal and PHP versions.
 ddev config --update
 ```
+
+During development, we often have the Drupal modules cloned into `web/sites/default/modules` in a Drupal project. Using
+`Drupal` as docroot affectively hides the DDEV site from the Drupal project during extension discovery (`Drupal` is
+ignored by the [`RecursiveExtensionFilterCallback`
+class](https://git.drupalcode.org/project/drupal/-/blob/11.4.11/core/lib/Drupal/Core/Extension/Discovery/RecursiveExtensionFilterCallback.php?ref_type=tags&plain=1#L46-74)).
 
 We have a dependency on [OS2Forms](https://github.com/OS2Forms/os2forms) which requires [Drupal
 Lenient](https://github.com/mglaman/composer-drupal-lenient) to install some outdated modules, and therefore we use [a
