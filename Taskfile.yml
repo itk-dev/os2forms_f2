@@ -127,8 +127,12 @@ tasks:
   translations:extract:
     desc: Extract module translations
     cmds:
+      # Patch https://github.com/OS2Forms/os2forms/blob/develop/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
+      - |
+        ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' */modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
       - ddev drush --yes site:install minimal
       - ddev drush --yes pm:install drupal_translation_extractor
+      - ddev drush --yes pm:install os2forms_f2
       - for:
           - da
         cmd: >-
@@ -136,6 +140,7 @@ tasks:
           --dump-messages --force --output=%source/translations/%module.%locale.po
           --require-context=os2forms_f2 module:os2forms_f2
           --sort=asc --clean --debug
+          --finder-do-not-ignore-vcs-ignored
 
   translations:git:diff:
     desc: "`git diff` all translation files ignoring timestamp changes"

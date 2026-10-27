@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2026-10-27 10:28+0100\n"
-"PO-Revision-Date: 2026-10-27 10:28+0100\n"
+"POT-Creation-Date: 2026-10-27 23:57+0100\n"
+"PO-Revision-Date: 2026-10-27 23:57+0100\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -94,6 +94,10 @@ msgid "Case number or ID that uniquely identifies a single case."
 msgstr "Sagsnummer eller -id der entydigt identificerer en enkelt sag."
 
 msgctxt "os2forms_f2"
+msgid "Configure the OS2Forms F2 module"
+msgstr "Konfigurer F2-modulet"
+
+msgctxt "os2forms_f2"
 msgid "Critical"
 msgstr "Kritisk"
 
@@ -128,6 +132,10 @@ msgstr "F2-api"
 msgctxt "os2forms_f2"
 msgid "F2 archive settings"
 msgstr "F2-arkiveringsindstillinger"
+
+msgctxt "os2forms_f2"
+msgid "F2 settings"
+msgstr "F2-indstillinger"
 
 msgctxt "os2forms_f2"
 msgid "F2 username"
@@ -200,6 +208,10 @@ msgstr "Bemærk: Forbindelsen bliver tjekket med de gemte indstillinger."
 msgctxt "os2forms_f2"
 msgid "Notice"
 msgstr "Bemærkning"
+
+msgctxt "os2forms_f2"
+msgid "OS2Forms F2"
+msgstr "F2"
 
 msgctxt "os2forms_f2"
 msgid "Outbound"
