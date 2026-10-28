@@ -2,6 +2,11 @@
 
 version: "3"
 
+vars:
+  JAVASCRIPT_GLOBS:
+    # - 'js/**/*.js'
+    - "tests/**/*.ts"
+
 tasks:
   default:
     cmd: task --list-all
@@ -16,6 +21,7 @@ tasks:
     desc: "Apply coding standards"
     cmds:
       - task: coding-standards:composer:apply
+      - task: coding-standards:javascript:apply
       - task: coding-standards:markdown:apply
       - task: coding-standards:php:apply
       - task: coding-standards:yaml:apply
@@ -24,6 +30,7 @@ tasks:
     desc: "Check coding standards"
     cmds:
       - task: coding-standards:composer:check
+      - task: coding-standards:javascript:check
       - task: coding-standards:markdown:check
       - task: coding-standards:php:check
       - task: coding-standards:yaml:check
@@ -43,6 +50,22 @@ tasks:
     - task: ddev
       vars:
         TASK_ARGS: composer validate
+
+  coding-standards:javascript:apply:
+    desc: "Apply coding standards for JavaScript and TypeScript"
+    vars:
+      GLOBS: "{{range .JAVASCRIPT_GLOBS }} '{{ . }}'{{end}}"
+    cmds:
+      # Cf. .github/workflows/javascript.yaml
+      - docker compose run --rm prettier {{.GLOBS}} --write
+
+  coding-standards:javascript:check:
+    desc: "Apply and check coding standards for JavaScript and TypeScript"
+    vars:
+      GLOBS: "{{range .JAVASCRIPT_GLOBS }} '{{ . }}'{{end}}"
+    cmds:
+      - task: coding-standards:javascript:apply
+      - docker compose run --rm prettier {{.GLOBS}} --check
 
   coding-standards:markdown:apply:
     desc: "Apply coding standards for Markdown"
