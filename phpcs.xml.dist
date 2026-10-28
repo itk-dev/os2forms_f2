@@ -10,6 +10,7 @@
   <!-- Exclude generated files -->
   <exclude-pattern>vendor</exclude-pattern>
   <exclude-pattern>rector.php</exclude-pattern>
+  <exclude-pattern>node_modules</exclude-pattern>
 
   <arg value="p"/>
 

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-09-28
 
+* [PR-10](https://github.com/itk-dev/os2forms_f2/pull/10)
+  Updated user manual
 * [PR-8](https://github.com/itk-dev/os2forms_f2/pull/8)
   Added "Archive on case"
 * [PR-7](https://github.com/itk-dev/os2forms_f2/pull/7)

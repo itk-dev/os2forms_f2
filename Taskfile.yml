@@ -164,3 +164,110 @@ tasks:
 
           to check.
     cmd: git restore '*.po'
+
+  drupal:os2forms:install:
+    desc: Install OS2Forms F2 module and configure Drupal for testing
+    prompt: Really reset Drupal site?
+    cmds:
+      - ddev drush --yes site:install
+      - ddev drush --yes user:password admin password
+      - ddev drush --yes pm:uninstall update
+
+      # Patch https://github.com/OS2Forms/os2forms/blob/develop/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
+      - |
+        ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' Drupal/modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
+
+      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples
+
+      # Gin theme
+      - ddev drush --yes theme:install gin
+      - ddev drush --yes config:set system.theme default gin
+      - ddev drush --yes config:set system.theme admin gin
+      - ddev drush --yes pm:uninstall navigation
+      # - ddev drush --yes config:set gin.settings classic_toolbar horizontal
+
+      - ddev drush --yes config:set webform.settings ui.description_help false --input-format yaml
+
+      # Languages and locales
+      - ddev drush --yes pm:install language locale
+      - ddev drush --yes language:add da
+
+      # - ddev drush --yes locale:check
+      # - ddev drush --yes locale:update
+      # Import our module translations
+      - ddev drush --yes locale:import da modules/custom/os2forms_f2/translations/os2forms_f2.da.po
+
+      - task: drupal:os2forms:configure
+
+  drupal:os2forms:configure:
+    decs: Create settings for os2forms_f2 module
+    cmds:
+      # Some defaults
+      - ddev drush --yes config:set os2forms_f2.settings f2_api.log_level debug
+      - ddev drush --yes config:set os2forms_f2.settings general.queue os2forms_f2
+
+  playwright:install:
+    desc: Install Playwright stuff
+    cmd: ddev playwright-install --pm npm
+
+  user-manual:images:generate:
+    desc: Generate user manual images
+    cmds:
+      - ddev playwright test user-manual-images.spec.ts
+      - task user-manual:images:trim
+      - task user-manual:images:restore
+
+  user-manual:images:trim:
+    desc: "Trim docs images"
+    vars:
+      BORDER_WIDTH: 0
+    # Trim and add top and bottom border
+    cmd:
+      cmd: |
+        docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm mogrify \
+          -strip \
+          -background white \
+          -trim \
+          -gravity north -splice 0x{{.BORDER_WIDTH}}+0+0 \
+          -gravity south -splice 0x{{.BORDER_WIDTH}}+0+0 \
+          docs/**/*.png
+      # https://taskfile.dev/docs/reference/schema#shopt
+      shopt: [globstar]
+
+  user-manual:images:restore:
+    desc: "Restore docs images that are not visually modified"
+    cmd:
+      cmd: |
+        # https://stackoverflow.com/a/949391
+        latest_commit=$(git rev-parse --verify HEAD)
+
+         # M docs/en/images/manager/006-entry-look-up.png
+        status_modified_pattern="^ M "
+
+        debug_output_filename=false
+        if [[ '{{.COMPARE_OUTPUT_FILENAME | default "-"}}' != '-' ]]; then
+          debug_output_filename=true
+        fi
+
+        shopt -s globstar nullglob
+        for file in docs/**/*.png; do
+            status=$(git status --porcelain "$file")
+            if [[ "$status" =~ $status_modified_pattern ]]; then
+                if git cat-file -p "$latest_commit":"$file" | \
+                    docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm compare \
+                    - \
+                    "$file" \
+                    {{.COMPARE_OUTPUT_FILENAME | default "-"}} > /dev/null 2>&1; then
+                    echo "Restoring $file"
+                    git restore "$file"
+                else
+                    echo "$file modified"
+                    if [ "$debug_output_filename" = true ]; then
+                      echo
+                      echo "Comparison image written to {{.COMPARE_OUTPUT_FILENAME | default "-"}}"
+                      echo
+                    fi
+                fi
+            fi
+        done
+      shopt: [globstar]

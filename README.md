@@ -34,11 +34,12 @@ builders](docs/user-manual/da/form-builder.md) for more details on how to use th
 
 ### Examples
 
-Install the F2 form examples module (`os2forms_f2_examples`) to load an example webform with F2 handlers.
+Install the F2 form examples module (`drush pm:install os2forms_f2_examples`) to load an example webform with F2
+handlers.
 
 ## Development
 
-We use [DDEV Drupal Contrib](https://github.com/ddev/ddev-drupal-contrib) for development.
+We use [DDEV Drupal Contrib](https://addons.ddev.com/addons/ddev/ddev-drupal-contrib) for development.
 
 <details>
 <summary>Details on the DDEV setup</summary>
@@ -48,6 +49,7 @@ The DDEV environment has been created by following the template on <https://gith
 ```shell
 ddev config --project-type=drupal11 --docroot=Drupal
 ddev add-on get ddev/ddev-drupal-contrib
+ddev add-on get julienloizelet/ddev-playwright
 ddev start
 ddev poser --no-interaction
 ddev symlink-project
@@ -110,3 +112,70 @@ task translations:git:restore
 
 to discard any non-essential changes to translation files (e.g. timestamps being updated without any actual translation
 changes).
+
+## Testing
+
+``` shell
+task drupal:os2forms:install
+```
+
+## User manual
+
+The Danish user manual for the F2 module sits in [`docs/user-manual/da/`](docs/user-manual/da/).
+
+We use [Playwright](https://playwright.dev/) to generate images for the user manual – and perform some testing along the
+way – and we use [ddev-playwright](https://addons.ddev.com/addons/julienloizelet/ddev-playwright) to run Playwright in
+the DDEV environment.
+
+Before generating the images a
+little setup must be added in `tests/Playwright/.env.local`:
+
+``` dotenv
+# Settings used to connect to a real F2 API
+F2_API_URI=
+F2_API_USERNAME=
+F2_API_SECRET=
+F2_API_F2_USERNAME=
+
+# An exiting case identifier
+F2_CASE_IDENTIFIER=
+
+# An exiting matter identifier
+F2_MATTER_IDENTIFIER='903'
+```
+
+With these in place, we can now generate images:
+
+``` shell
+task drupal:os2forms:install --yes
+task playwright:install --yes
+task user-manual:images:generate
+```
+
+> [!TIP]
+> If something fails, run
+>
+> ``` shell
+> open tests/Playwright/playwright-report/index.html
+> ```
+>
+> to see an error report.
+
+When editing the user manual and fooling around with Playwright to generate useful images, you can run
+
+``` shell
+task user-manual:images:generate
+```
+
+to quickly check that everything works as expected, but before committing anything you must run
+
+``` shell
+task drupal:os2forms:install --yes
+task user-manual:images:generate
+```
+
+reset Drupal before generating the images.
+
+> [!TIP]
+> See [Run a Playwright command](https://addons.ddev.com/addons/julienloizelet/ddev-playwright#run-a-playwright-command)
+> for other cool tricks supported by DDEV and the Playwright add-on.
