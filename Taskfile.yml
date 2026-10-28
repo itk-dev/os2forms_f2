@@ -200,7 +200,7 @@ tasks:
       - |
         ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' Drupal/modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
 
-      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples
+      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_f2_test
 
       # Gin theme
       - ddev drush --yes theme:install gin
@@ -210,6 +210,7 @@ tasks:
       # - ddev drush --yes config:set gin.settings classic_toolbar horizontal
 
       - ddev drush --yes config:set webform.settings ui.description_help false --input-format yaml
+      - ddev drush --yes config:set webform.settings settings.default_submission_log true --input-format=yaml
 
       # Languages and locales
       - ddev drush --yes pm:install language locale
