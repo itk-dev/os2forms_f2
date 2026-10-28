@@ -1,18 +1,18 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-import dotenv from "dotenv";
-import path from "path";
-dotenv.config({ path: path.resolve(__dirname, ".env") });
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: "./tests",
+  testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -30,24 +30,24 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "on-first-retry",
+    trace: 'on-first-retry',
 
-    screenshot: "only-on-failure",
+    screenshot: 'only-on-failure',
   },
 
   /* Configure projects for major browsers */
   projects: [
     // https://playwright.dev/docs/auth#basic-shared-account-in-all-tests
-    { name: "setup", testMatch: /.*\.setup\.ts/ },
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
 
     {
-      name: "chromium",
+      name: 'chromium',
       use: {
-        ...devices["Desktop Chrome"],
+        ...devices['Desktop Chrome'],
         // Use prepared auth state.
-        storageState: "playwright/.auth/user.json",
+        storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ["setup"],
+      dependencies: ['setup'],
     },
 
     // {
