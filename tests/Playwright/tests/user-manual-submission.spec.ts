@@ -9,7 +9,7 @@ import path from "path";
 import * as child_process from "node:child_process";
 dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
 
-test("run Drush command", async ({ page }) => {
+test("webform submission", async ({ page }) => {
   const locale = "da";
   const context = "webform-submission";
   let screenshotCounter = 0;
@@ -26,11 +26,9 @@ test("run Drush command", async ({ page }) => {
     await page.locator(selector).screenshot({ path: filePath });
   };
 
-  const drush = async (command: string) => {
-    return page.request.post("/os2forms-f2-test/exec/drush", {
-      form: {
-        arguments: command,
-      },
+  const drush = async (args: string[]) => {
+    return page.request.post("/os2forms-test-playwright/exec/drush", {
+      data: args,
       timeout: 4000,
     });
   };
@@ -41,9 +39,16 @@ test("run Drush command", async ({ page }) => {
     return page.goto(url);
   };
 
-  await drush(
-    'sql:query "TRUNCATE advancedqueue; TRUNCATE webform_submission_log; TRUNCATE webform_submission_data; TRUNCATE webform_submission; ALTER TABLE webform_submission AUTO_INCREMENT = 1; UPDATE webform SET next_serial = 1;"',
-  );
+  await drush([
+    'sql:query', [
+      "TRUNCATE advancedqueue",
+      "TRUNCATE webform_submission_log",
+      "TRUNCATE webform_submission_data",
+      "TRUNCATE webform_submission",
+      "ALTER TABLE webform_submission AUTO_INCREMENT = 1",
+      "UPDATE webform SET next_serial = 1",
+    ].join(';')
+  ]);
 
   await goto("webform/os2forms_f2_ex_001");
   await screenshot("form-empty");
@@ -61,7 +66,7 @@ test("run Drush command", async ({ page }) => {
   );
   await screenshot("submission-log");
 
-  await drush("advancedqueue:queue:process os2forms_f2");
+  await drush(["advancedqueue:queue:process", "os2forms_f2"]);
 
   await goto(
     "admin/structure/webform/manage/os2forms_f2_ex_001/submission/1/log",

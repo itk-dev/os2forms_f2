@@ -1,8 +1,0 @@
-os2forms_f2_test.exec:
-  path: '/os2forms-f2-test/exec/{command}'
-  defaults:
-    _title: 'Exec'
-    _controller: '\Drupal\os2forms_f2_test\Controller\Os2formsF2TestController'
-  requirements:
-    _permission: 'access content'
-  no_cache: TRUE

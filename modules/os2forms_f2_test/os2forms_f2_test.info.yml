@@ -1,5 +1,0 @@
-name: 'os2forms_f2_test'
-type: module
-description: 'Test module for os2forms_f2'
-package: Custom
-core_version_requirement: ^11
