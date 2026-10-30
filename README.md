@@ -123,7 +123,7 @@ changes).
 ## Testing
 
 ``` shell
-task drupal:os2forms:install
+task drupal:site:install
 ```
 
 ## User manual
@@ -177,11 +177,11 @@ task user-manual:images:generate
 to quickly check that everything works as expected, but before committing anything you must run
 
 ``` shell
-task drupal:os2forms:install --yes
+task drupal:site:reset --yes
 task user-manual:images:generate
 ```
 
-reset Drupal before generating the images.
+to reset Drupal before generating the images.
 
 > [!TIP]
 > See [Run a Playwright command](https://addons.ddev.com/addons/julienloizelet/ddev-playwright#run-a-playwright-command)

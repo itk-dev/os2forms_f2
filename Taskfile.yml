@@ -194,7 +194,7 @@ tasks:
 
   drupal:site:install:
     desc: Installs Drupal site, enables OS2Forms F2 module and configures Drupal for development and testing
-    prompt: Really reset Drupal site?
+    prompt: Really install (and reset) Drupal site?
     cmds:
       - ddev drush --yes site:install
       - ddev drush --yes user:password admin password
@@ -205,6 +205,10 @@ tasks:
         ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' */modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
 
       - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_test_playwright drupal_translation_extractor
+
+      # Some defaults
+      - ddev drush --yes config:set os2forms_f2.settings f2_api.log_level debug
+      - ddev drush --yes config:set os2forms_f2.settings general.queue os2forms_f2
 
       # Gin theme
       - ddev drush --yes theme:install gin
@@ -225,14 +229,22 @@ tasks:
       # Import our module translations
       - ddev drush --yes locale:import da modules/custom/os2forms_f2/translations/os2forms_f2.da.po
 
-      - task: drupal:os2forms:configure
+      - task: drupal:site:reset
 
-  drupal:os2forms:configure:
+  drupal:site:reset:
     decs: Create settings for os2forms_f2 module
+    prompt: Really reset Drupal site?
     cmds:
-      # Some defaults
-      - ddev drush --yes config:set os2forms_f2.settings f2_api.log_level debug
-      - ddev drush --yes config:set os2forms_f2.settings general.queue os2forms_f2
+      - ddev drush --yes config:import --partial --source modules/custom/os2forms_f2/modules/os2forms_f2_examples/config/install
+      - >-
+        ddev drush --yes sql:query "
+        TRUNCATE advancedqueue;
+        TRUNCATE webform_submission_log;
+        TRUNCATE webform_submission_data;
+        TRUNCATE webform_submission;
+        ALTER TABLE webform_submission AUTO_INCREMENT = 1;
+        UPDATE webform SET next_serial = 1;
+        "
 
   playwright:install:
     desc: Install Playwright stuff
@@ -242,6 +254,7 @@ tasks:
     desc: Generate user manual images
     deps:
       - drupal:site:is-installed
+      - playwright:install
     cmds:
       - cmd: ddev playwright test user-manual-images.spec.ts {{.CLI_ARGS}}
         # We want to postprocess any updated images even if something fails
@@ -251,6 +264,7 @@ tasks:
 
   user-manual:images:trim:
     desc: "Trim docs images"
+    silent: true
     vars:
       BORDER_WIDTH: 4
     # Trim and add border
@@ -270,6 +284,7 @@ tasks:
 
   user-manual:images:restore:
     desc: "Restore docs images that are not visually modified"
+    silent: true
     cmd:
       cmd: |
         # https://stackoverflow.com/a/949391
