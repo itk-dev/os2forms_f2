@@ -204,7 +204,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             ],
             '#title' => $this->t('Matter type', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The type of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetCase?->matterType,
+            '#default_value' => $settings->archiveTargetCase->matterType ?? Matter::TYPE_INTERNAL,
 
             '#states' => [
               'required' => [

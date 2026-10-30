@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2026-09-28
 
 * [PR-11](https://github.com/itk-dev/os2forms_f2/pull/11)
-  Cleaned up identification of cases and matters
+  * Cleaned up identification of cases and matters
+  * Set default matter type ("Internal")
 * [PR-10](https://github.com/itk-dev/os2forms_f2/pull/10)
   Updated user manual
 * [PR-8](https://github.com/itk-dev/os2forms_f2/pull/8)
