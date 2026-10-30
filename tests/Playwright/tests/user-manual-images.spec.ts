@@ -72,11 +72,10 @@ test("user manual images – administrator (da)", async ({ page }) => {
   await page.locator('[name="f2_api[uri]"]').focus();
   await page.locator('[name="f2_api[uri]"]').blur();
 
-  await redact('[name="f2_api[username]"]', 16);
-  await redact('[name="f2_api[secret]"]', 16);
+  // await redact('[name="f2_api[username]"]', 16);
+  // await redact('[name="f2_api[secret]"]', 16);
 
   await screenshot("f2-settings-filled");
-  return;
 
   await page.locator(submitSelector).click();
   await screenshot("f2-settings-saved");
@@ -239,7 +238,7 @@ screenshooting ${selector}
   );
   await screenshot(
     "webform-handler-archive-on-case-case-details",
-    // "#edit-settings-os2forms-f2-f2-archive-archive-target-case",
+    "#edit-settings-os2forms-f2-f2-archive-archive-target-case",
   );
 
   // Archive on matter
