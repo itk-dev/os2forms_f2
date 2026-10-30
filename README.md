@@ -39,6 +39,18 @@ handlers.
 
 ## Development
 
+> [!IMPORTANT]
+> 2026-10-30: We lock `phpstan/phpstan` to version `2.3.3` as a temporary workaround for the issue reported in
+> <https://github.com/rectorphp/rector/issues/9947>.
+>
+> We use [palantirnet/drupal-rector](https://github.com/palantirnet/drupal-rector) to run
+> [Rector](https://github.com/rectorphp/rector). `drupal-rector` pulls in `rectorphp/rector`, but [conflicts with
+> `"rector/rector":
+> ">=2.6.2"`](https://github.com/palantirnet/drupal-rector/blob/3c584968fc61d55fdfce4e88b4e95841a60f3ff9/composer.json#L15-L17)
+> and therefore we cannot (yet) upgrade to `rector/rector:^2.8.3`.
+>
+> See <https://github.com/rectorphp/rector/issues/9947#issuecomment-6485193529> for details.
+
 We use [DDEV Drupal Contrib](https://addons.ddev.com/addons/ddev/ddev-drupal-contrib) for development.
 
 <details>
