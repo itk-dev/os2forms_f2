@@ -2,11 +2,6 @@
 
 version: "3"
 
-vars:
-  JAVASCRIPT_GLOBS:
-    # - 'js/**/*.js'
-    - "tests/**/*.ts"
-
 tasks:
   default:
     cmd: task --list-all
@@ -52,13 +47,13 @@ tasks:
         TASK_ARGS: composer validate
 
   coding-standards:javascript:apply:
-    desc: "Apply coding standards for JAVASCRIPT"
+    desc: "Apply coding standards for JavaScript"
     cmds:
       # Cf. .github/workflows/javascript.yaml
       - docker compose run --rm prettier 'tests/**/*.{js,ts}' --write
 
   coding-standards:javascript:check:
-    desc: "Apply coding standards for JAVASCRIPT"
+    desc: "Apply coding standards for JavaScript"
     cmds:
       - task: coding-standards:javascript:apply
       # Cf. .github/workflows/javascript.yaml
@@ -234,9 +229,11 @@ tasks:
   user-manual:images:generate:
     desc: Generate user manual images
     cmds:
-      - ddev playwright test user-manual-images.spec.ts
-      - task user-manual:images:trim
-      - task user-manual:images:restore
+      - cmd: ddev playwright test user-manual-images.spec.ts {{.CLI_ARGS}}
+        # We want to postprocess any updated images even if something fails
+        ignore_error: true
+      - task: user-manual:images:trim
+      - task: user-manual:images:restore
 
   user-manual:images:trim:
     desc: "Trim docs images"

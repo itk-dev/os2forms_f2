@@ -19,7 +19,8 @@ test("user manual images – administrator (da)", async ({ page }) => {
     const filePath = path.join(
       `/docs/user-manual/${locale}/images/generated/`,
       context,
-      String(screenshotCounter++).padStart(3, "0") + "-" + name + ".png",
+      // String(screenshotCounter++).padStart(3, "0") + "-" +
+      name + ".png",
     );
     console.debug(filePath);
     await page.locator(selector).screenshot({ path: filePath });
@@ -109,12 +110,25 @@ test("user manual images – form-builder (da)", async ({ page }) => {
   const context = "form-builder";
   let screenshotCounter = 0;
 
+  const goto = async (url: string) => {
+    url = `/${locale}/${url}`;
+    console.debug(`
+going to ${url} …`);
+    return page.goto(url);
+  };
+
   const screenshot = async (name: string, selector: string = "main") => {
     const filePath = path.join(
       `/docs/user-manual/${locale}/images/generated/`,
       context,
-      String(screenshotCounter++).padStart(3, "0") + "-" + name + ".png",
+      // String(screenshotCounter++).padStart(3, "0") + "-" +
+      name + ".png",
     );
+    const pagePath = page.url().replace(process.env.BASEURL, '')
+    console.debug(`
+screenshooting ${selector}
+            on ${pagePath}
+          into ${filePath}`);
     await page.locator(selector).screenshot({ path: filePath });
   };
 
@@ -123,12 +137,6 @@ test("user manual images – form-builder (da)", async ({ page }) => {
       data: args,
       timeout: 4000,
     });
-  };
-
-  const goto = async (url: string) => {
-    url = `/${locale}/${url}`;
-    console.debug(`going to ${url} …`);
-    return page.goto(url);
   };
 
   // Add handler
@@ -141,14 +149,14 @@ test("user manual images – form-builder (da)", async ({ page }) => {
   await page.locator(".form-element--type-search").fill("F2");
   // Wait for the AJAX search
   await page.waitForTimeout(1000);
-  await screenshot("webform-handler-select-f2.png", ".webform-ui-dialog");
+  await screenshot("webform-handler-select-f2", ".webform-ui-dialog");
 
   await goto(
     "admin/structure/webform/manage/os2forms_f2_ex_000/handlers/add/os2forms_f2_f2",
   );
-  await screenshot("webform-handler-add-general.png", "#webform-handler-form");
+  await screenshot("webform-handler-add-general", "#webform-handler-form");
   await screenshot(
-    "webform-handler-add-general-archive-settings.png",
+    "webform-handler-add-general-archive-settings",
     "#edit-settings-os2forms-f2-f2",
   );
 
@@ -174,7 +182,7 @@ test("user manual images – form-builder (da)", async ({ page }) => {
     .focus();
 
   await screenshot(
-    "webform-handler-add-general-archive-settings-filled.png",
+    "webform-handler-add-general-archive-settings-filled",
     "#edit-settings-os2forms-f2-f2",
   );
 
@@ -182,7 +190,7 @@ test("user manual images – form-builder (da)", async ({ page }) => {
     .locator('[name="settings[os2forms_f2_f2][archive][archive_target]"]')
     .selectOption("case");
   await screenshot(
-    "webform-handler-add-archive-on-case.png",
+    "webform-handler-add-archive-on-case",
     "#edit-settings-os2forms-f2-f2-archive-archive-target-case",
   );
 
@@ -202,13 +210,13 @@ test("user manual images – form-builder (da)", async ({ page }) => {
     )
     .selectOption("Internal");
   await screenshot(
-    "webform-handler-add-archive-on-case-filled.png",
+    "webform-handler-add-archive-on-case-filled",
     "#edit-settings-os2forms-f2-f2-archive-archive-target-case",
   );
 
   await page.locator(submitSelector).click();
   await screenshot(
-    "webform-handler-add-archive-on-case-filled-invalid-case-identifier.png",
+    "webform-handler-add-archive-on-case-filled-invalid-case-identifier",
     ".messages__wrapper",
   );
 
@@ -219,19 +227,19 @@ test("user manual images – form-builder (da)", async ({ page }) => {
     .fill(process.env.F2_CASE_IDENTIFIER_VALID);
   await page.locator(submitSelector).click();
   await screenshot(
-    "webform-handler-add-archive-on-case-filled-valid-case-identifier.png",
+    "webform-handler-add-archive-on-case-filled-valid-case-identifier",
     ".messages__wrapper",
   );
 
   await goto("admin/structure/webform/manage/os2forms_f2_ex_000/handlers");
-  await screenshot("webform-handler-added.png", ".page-wrapper");
+  await screenshot("webform-handler-added", ".page-wrapper");
 
   await goto(
     "admin/structure/webform/manage/os2forms_f2_ex_000/handlers/f2_arkiver_paa_sag/edit",
   );
   await screenshot(
-    "webform-handler-archive-on-case-case-details.png",
-    "#edit-settings-os2forms-f2-f2-archive-archive-target-case",
+    "webform-handler-archive-on-case-case-details",
+    // "#edit-settings-os2forms-f2-f2-archive-archive-target-case",
   );
 
   // Archive on matter
@@ -261,7 +269,7 @@ test("user manual images – form-builder (da)", async ({ page }) => {
     .locator('[name="settings[os2forms_f2_f2][archive][archive_target]"]')
     .selectOption("matter");
   await screenshot(
-    "webform-handler-add-archive-on-matter.png",
+    "webform-handler-add-archive-on-matter",
     "#edit-settings-os2forms-f2-f2-archive-archive-target-matter",
   );
 
@@ -271,13 +279,13 @@ test("user manual images – form-builder (da)", async ({ page }) => {
     )
     .fill(process.env.F2_MATTER_IDENTIFIER_INVALID);
   await screenshot(
-    "webform-handler-add-archive-on-matter-filled.png",
+    "webform-handler-add-archive-on-matter-filled",
     "#edit-settings-os2forms-f2-f2-archive-archive-target-matter",
   );
 
   await page.locator(submitSelector).click();
   await screenshot(
-    "webform-handler-add-archive-on-matter-filled-invalid-matter-identifier.png",
+    "webform-handler-add-archive-on-matter-filled-invalid-matter-identifier",
     ".messages__wrapper",
   );
 
@@ -288,18 +296,18 @@ test("user manual images – form-builder (da)", async ({ page }) => {
     .fill(process.env.F2_MATTER_IDENTIFIER_VALID);
   await page.locator(submitSelector).click();
   await screenshot(
-    "webform-handler-add-archive-on-matter-filled-valid-matter-identifier.png",
+    "webform-handler-add-archive-on-matter-filled-valid-matter-identifier",
     ".messages__wrapper",
   );
 
   await goto("admin/structure/webform/manage/os2forms_f2_ex_000/handlers");
-  await screenshot("webform-handler-added-2.png", ".page-wrapper");
+  await screenshot("webform-handler-added-2", ".page-wrapper");
 
   await goto(
     "admin/structure/webform/manage/os2forms_f2_ex_000/handlers/f2_arkiver_paa_akt/edit",
   );
   await screenshot(
-    "webform-handler-archive-on-matter-matter-details.png",
+    "webform-handler-archive-on-matter-matter-details",
     "#edit-settings-os2forms-f2-f2-archive-archive-target-matter",
   );
 
@@ -309,11 +317,11 @@ test("user manual images – form-builder (da)", async ({ page }) => {
     "admin/structure/webform/manage/os2forms_f2_ex_001/handlers/f2_archive_on_case/edit",
   );
   await screenshot(
-    "webform-handler-archive-on-case.png",
+    "webform-handler-archive-on-case",
     "#edit-settings-os2forms-f2-f2",
   );
   await screenshot(
-    "webform-handler-archive-on-case-case.png",
+    "webform-handler-archive-on-case-case",
     "#edit-settings-os2forms-f2-f2-archive-archive-target-case",
   );
 
@@ -321,16 +329,16 @@ test("user manual images – form-builder (da)", async ({ page }) => {
     "admin/structure/webform/manage/os2forms_f2_ex_001/handlers/f2_archive_on_matter/edit",
   );
   await screenshot(
-    "webform-handler-archive-on-matter.png",
+    "webform-handler-archive-on-matter",
     "#edit-settings-os2forms-f2-f2",
   );
   await screenshot(
-    "webform-handler-archive-on-matter-matter.png",
+    "webform-handler-archive-on-matter-matter",
     "#edit-settings-os2forms-f2-f2-archive-archive-target-matter",
   );
 
   await goto("admin/structure/webform/manage/os2forms_f2_ex_001/handlers");
-  await screenshot("webform-handlers.png", "#webform-handlers");
+  await screenshot("webform-handlers", "#webform-handlers");
 
   await goto(
     "admin/structure/webform/manage/os2forms_f2_ex_001/handlers/f2_archive_on_case/edit",
@@ -339,5 +347,5 @@ test("user manual images – form-builder (da)", async ({ page }) => {
   await expect(page.getByText("Yderligere indstillinger")).toBeVisible();
   await page.getByText("Yderligere indstillinger").click();
   await page.getByText("Yderligere indstillinger").blur();
-  await screenshot("webform-handler-add-advanced.png", "#webform-handler-form");
+  await screenshot("webform-handler-add-advanced", "#webform-handler-form");
 });
