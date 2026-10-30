@@ -124,7 +124,7 @@ going to ${url} …`);
       // String(screenshotCounter++).padStart(3, "0") + "-" +
       name + ".png",
     );
-    const pagePath = page.url().replace(process.env.BASEURL, '')
+    const pagePath = page.url().replace(process.env.BASEURL, "");
     console.debug(`
 screenshooting ${selector}
             on ${pagePath}
