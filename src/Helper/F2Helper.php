@@ -5,6 +5,7 @@ namespace Drupal\os2forms_f2\Helper;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\os2forms_f2\Exception\F2Exception;
 use Drupal\os2forms_f2\Exception\F2NonUniqueCaseException;
+use Drupal\os2forms_f2\Exception\F2NonUniqueMatterException;
 use Drupal\os2forms_f2\Settings;
 use ItkDev\F2ApiClient\ApiClient;
 use ItkDev\F2ApiClient\Model\CaseFile;
@@ -66,10 +67,16 @@ class F2Helper {
    */
   public function fetchCaseByIdentifier(string $identifier): CaseFile {
     $client = $this->client();
-    if (filter_var($identifier, FILTER_VALIDATE_INT)) {
-      return $client->caseById((int) $identifier);
+
+    // First, we try to get a case by number (which is a string)
+    try {
+      return $client->caseByCaseNumber($identifier);
+    }
+    catch (\Throwable) {
+      // Ignore any errors.
     }
 
+    // Search for case.
     $cases = $client->caseSearch($identifier);
     if (1 !== count($cases)) {
       throw new F2NonUniqueCaseException($identifier);
@@ -85,13 +92,24 @@ class F2Helper {
   public function fetchMatterByIdentifier(string $identifier): Matter {
     $client = $this->client();
 
-    // @todo Both matter ID and number are integers …
-    // @code
-    // if (filter_var($identifier, FILTER_VALIDATE_INT)) {
-    //   return $client->matterById((int) $identifier);
-    // }
-    // @endcode
-    return $client->matterByMatterNumber($identifier);
+    // First, we try to get a matter by number (which is an integer)
+    if (filter_var($identifier, FILTER_VALIDATE_INT)) {
+      try {
+        return $client->matterByMatterNumber($identifier);
+      }
+      catch (\Throwable) {
+        // Ignore any errors.
+      }
+    }
+
+    // Search for matter.
+    $matters = $client->matterSearch($identifier);
+    if (1 !== count($matters)) {
+      throw new F2NonUniqueMatterException($identifier);
+    }
+    $matter = reset($matters);
+
+    return $client->matterById($this->getId($matter->id));
   }
 
   /**

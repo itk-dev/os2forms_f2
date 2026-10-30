@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2026-10-27 23:57+0100\n"
-"PO-Revision-Date: 2026-10-27 23:57+0100\n"
+"POT-Creation-Date: 2026-10-30 22:23+0100\n"
+"PO-Revision-Date: 2026-10-30 22:23+0100\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -90,8 +90,8 @@ msgid "Case identifier"
 msgstr "Sags-id"
 
 msgctxt "os2forms_f2"
-msgid "Case number or ID that uniquely identifies a single case."
-msgstr "Sagsnummer eller -id der entydigt identificerer en enkelt sag."
+msgid "Case number or search terms that uniquely identify a single case."
+msgstr "Sagsnummer eller søgetermer der entydigt identificerer en enkelt sag."
 
 msgctxt "os2forms_f2"
 msgid "Configure the OS2Forms F2 module"
@@ -150,6 +150,10 @@ msgid "Identifier \"@case_identifier\" does not uniquely identify a case."
 msgstr "Id'et \"@case_identifier\" identificerer ikke entydigt en sag."
 
 msgctxt "os2forms_f2"
+msgid "Identifier \"@matter_identifier\" does not uniquely identify a matter."
+msgstr "Id'et \"@matter_identifier\" identificerer ikke entydigt en akt."
+
+msgctxt "os2forms_f2"
 msgid "Inbound"
 msgstr "Indgående"
 
@@ -178,8 +182,8 @@ msgid "Matter identifier"
 msgstr "Akt-id"
 
 msgctxt "os2forms_f2"
-msgid "Matter number or ID that uniquely identifies a single matter."
-msgstr "Aktnummer eller -id der entydigt identificerer en enkelt akt."
+msgid "Matter number or search terms that uniquely identify a single matter."
+msgstr "Aktnummer eller søgetermer der entydigt identificerer en enkelt akt."
 
 msgctxt "os2forms_f2"
 msgid "Matter title"

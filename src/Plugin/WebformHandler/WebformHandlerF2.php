@@ -7,6 +7,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\os2forms_f2\Exception\F2NonUniqueCaseException;
+use Drupal\os2forms_f2\Exception\F2NonUniqueMatterException;
 use Drupal\os2forms_f2\Helper\F2Helper;
 use Drupal\os2forms_f2\Helper\WebformHelperF2;
 use Drupal\os2forms_f2\Settings;
@@ -159,7 +160,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           ArchiveTargetCase::CASE_IDENTIFIER => [
             '#type' => 'textfield',
             '#title' => $this->t('Case identifier', options: ['context' => 'os2forms_f2']),
-            '#description' => $this->t('Case number or ID that uniquely identifies a single case.', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('Case number or search terms that uniquely identify a single case.', options: ['context' => 'os2forms_f2']),
             '#default_value' => $settings->archiveTargetCase?->caseIdentifier,
 
             '#states' => [
@@ -203,7 +204,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             ],
             '#title' => $this->t('Matter type', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The type of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetCase?->matterType,
+            '#default_value' => $settings->archiveTargetCase->matterType ?? Matter::TYPE_INTERNAL,
 
             '#states' => [
               'required' => [
@@ -238,7 +239,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           ArchiveTargetMatter::MATTER_IDENTIFIER => [
             '#type' => 'textfield',
             '#title' => $this->t('Matter identifier', options: ['context' => 'os2forms_f2']),
-            '#description' => $this->t('Matter number or ID that uniquely identifies a single matter.', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('Matter number or search terms that uniquely identify a single matter.', options: ['context' => 'os2forms_f2']),
             '#default_value' => $settings->archiveTargetMatter?->matterIdentifier,
 
             '#states' => [
@@ -364,6 +365,11 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           else {
             try {
               $this->f2->fetchMatterByIdentifier($matterIdentifier);
+            }
+            catch (F2NonUniqueMatterException) {
+              $setError($key, t('Identifier "@matter_identifier" does not uniquely identify a matter.', [
+                '@matter_identifier' => $matterIdentifier,
+              ], options: ['context' => 'os2forms_f2']));
             }
             catch (\Throwable $throwable) {
               $setError($key, t('Cannot get matter by identifier "@matter_identifier" (@message).', [
