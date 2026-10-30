@@ -36,7 +36,6 @@ final class ExecController extends ControllerBase {
       };
       $contentType = $request->getContentTypeFormat();
       $arguments = match ($contentType) {
-        'form' => $request->request->get('arguments'),
         'json' => $request->toArray(),
         default => throw new BadRequestHttpException(sprintf('invalid content type: %s', $contentType)),
       };
@@ -46,22 +45,20 @@ final class ExecController extends ControllerBase {
 
       $this->logger->debug('Running command @command @arguments', [
         '@command' => $command,
-        '@arguments' => json_encode($arguments),
+        '@arguments' => $arguments,
       ]);
 
       $response = new StreamedResponse(headers: [
         'content-type' => 'text/plain',
       ]);
       $response->setCallback(function () use ($command, $arguments): void {
-        $process = is_array($arguments)
-        ? new Process([$command, ...$arguments])
-        : Process::fromShellCommandline($command . ' ' . $arguments);
-        $process->run(function ($type, $buffer): void {
+        $process = new Process([$command, ...$arguments]);
+        $process->mustRun(function ($type, $buffer): void {
           echo $buffer;
         });
       });
-      $response->send();
       $response->headers->set('X-Accel-Buffering', 'no');
+      $response->send();
 
       return $response;
     }
@@ -70,8 +67,7 @@ final class ExecController extends ControllerBase {
         '@message' => $throwable->getMessage(),
         'throwable' => $throwable,
       ]);
-
-      throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, message:  $throwable->getMessage(), previous:  $throwable);
+      throw new HttpException(Response::HTTP_INTERNAL_SERVER_ERROR, message: $throwable->getMessage());
     }
   }
 
