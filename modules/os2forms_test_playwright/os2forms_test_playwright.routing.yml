@@ -1,7 +1,6 @@
 os2forms_test_playwright.exec:
   path: "/os2forms-test-playwright/exec/{command}"
   defaults:
-    _title: "Exec"
     _controller: '\Drupal\os2forms_test_playwright\Controller\ExecController'
   requirements:
     _permission: "access content"
