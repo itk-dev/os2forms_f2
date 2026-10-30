@@ -141,13 +141,9 @@ tasks:
 
   translations:extract:
     desc: Extract module translations
+    deps:
+      - drupal:site:is-installed
     cmds:
-      # Patch https://github.com/OS2Forms/os2forms/blob/develop/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
-      - |
-        ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' */modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
-      - ddev drush --yes site:install minimal
-      - ddev drush --yes pm:install drupal_translation_extractor
-      - ddev drush --yes pm:install os2forms_f2
       - for:
           - da
         cmd: >-
@@ -156,6 +152,10 @@ tasks:
           --require-context=os2forms_f2 module:os2forms_f2
           --sort=asc --clean --debug
           --finder-do-not-ignore-vcs-ignored
+      # Show any changes
+      - task: translations:git:diff
+      # Restore if only some metadata is changed
+      - task: translations:git:restore
 
   translations:git:diff:
     desc: "`git diff` all translation files ignoring timestamp changes"
@@ -180,8 +180,20 @@ tasks:
           to check.
     cmd: git restore '*.po'
 
-  drupal:os2forms:install:
-    desc: Install OS2Forms F2 module and configure Drupal for testing
+  drupal:site:is-installed:
+    internal: true
+    preconditions:
+      # https://drupal.stackexchange.com/a/318384
+      - sh: '[ $(ddev drush status --field=bootstrap) = "Successful" ]'
+        msg: |
+          It seems that Drupal has not been installed. Run
+
+            task drupal:site:install
+
+          before running this task.
+
+  drupal:site:install:
+    desc: Installs Drupal site, enables OS2Forms F2 module and configures Drupal for development and testing
     prompt: Really reset Drupal site?
     cmds:
       - ddev drush --yes site:install
@@ -192,7 +204,7 @@ tasks:
       - |
         ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' */modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
 
-      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_test_playwright
+      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_test_playwright drupal_translation_extractor
 
       # Gin theme
       - ddev drush --yes theme:install gin
@@ -228,6 +240,8 @@ tasks:
 
   user-manual:images:generate:
     desc: Generate user manual images
+    deps:
+      - drupal:site:is-installed
     cmds:
       - cmd: ddev playwright test user-manual-images.spec.ts {{.CLI_ARGS}}
         # We want to postprocess any updated images even if something fails
