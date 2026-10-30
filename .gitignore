@@ -2,7 +2,8 @@
 composer.lock
 vendor/
 translations/*.mo
+*.local
 
 # DDEV stuff
-web/
-recipes/
+/web/
+/recipes/

@@ -1,0 +1,5 @@
+name: "OS2Forms test: Playwright"
+type: module
+description: "Playwright test module for OS2Forms"
+package: Custom
+core_version_requirement: ^11

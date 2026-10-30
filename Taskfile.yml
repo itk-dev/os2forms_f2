@@ -16,6 +16,7 @@ tasks:
     desc: "Apply coding standards"
     cmds:
       - task: coding-standards:composer:apply
+      - task: coding-standards:javascript:apply
       - task: coding-standards:markdown:apply
       - task: coding-standards:php:apply
       - task: coding-standards:yaml:apply
@@ -24,6 +25,7 @@ tasks:
     desc: "Check coding standards"
     cmds:
       - task: coding-standards:composer:check
+      - task: coding-standards:javascript:check
       - task: coding-standards:markdown:check
       - task: coding-standards:php:check
       - task: coding-standards:yaml:check
@@ -43,6 +45,19 @@ tasks:
     - task: ddev
       vars:
         TASK_ARGS: composer validate
+
+  coding-standards:javascript:apply:
+    desc: "Apply coding standards for JavaScript"
+    cmds:
+      # Cf. .github/workflows/javascript.yaml
+      - docker compose run --rm prettier 'tests/**/*.{js,ts}' --write
+
+  coding-standards:javascript:check:
+    desc: "Apply coding standards for JavaScript"
+    cmds:
+      - task: coding-standards:javascript:apply
+      # Cf. .github/workflows/javascript.yaml
+      - docker compose run --rm prettier 'tests/**/*.{js,ts}' --check
 
   coding-standards:markdown:apply:
     desc: "Apply coding standards for Markdown"
@@ -69,6 +84,8 @@ tasks:
     desc: "Apply and check coding standards for PHP"
     cmds:
       - task: coding-standards:php:apply
+        # phpcbf has weird exit codes …
+        ignore_error: true
       # Cf. .github/workflows/php.yaml
       - task: ddev
         vars:
@@ -100,7 +117,7 @@ tasks:
         vars:
           TASK_ARGS: phpstan
 
-  rector:
+  code-analysis:rector:
     desc: "Run rector"
     cmds:
       - task: ddev
@@ -108,38 +125,37 @@ tasks:
           TASK_ARGS: php vendor/bin/rector
 
   ddev:start:
-    desc: Start DDEV setup (https://github.com/ddev/ddev-drupal-contrib)
-    # https://github.com/ddev/ddev-drupal-contrib
-    deps:
-      - composer:install:lenient
+    desc: Start DDEV Drupal Contrib setup (https://github.com/ddev/ddev-drupal-contrib)
+    cmds:
+      # We want a clean slate
+      - rm -f composer.lock
+      - ddev start
+      - ddev poser --no-interaction
+      - ddev symlink-project
+
+  ddev:update:
+    desc: Update DDEV Drupal Contrib setup (https://github.com/ddev/ddev-drupal-contrib#update)
     cmds:
       - ddev add-on get ddev/ddev-drupal-contrib
       - ddev restart
-      - ddev poser --no-interaction
-      - ddev symlink-project
-      # Detect expected Drupal and PHP versions.
-      - ddev config --update
-
-  composer:install:lenient:
-    cmds:
-      # Create a temporary composer file to install https://github.com/mglaman/composer-drupal-lenient before the real install needs it.
-      - for:
-          - init --no-interaction
-          - config --no-plugins allow-plugins.mglaman/composer-drupal-lenient true
-          - require mglaman/composer-drupal-lenient:^1.0
-        cmd: ddev exec -- COMPOSER=composer.lenient.json composer {{.ITEM}}
-      # Clean up
-      - rm -f composer.lenient.*
-    internal: true
 
   translations:extract:
     desc: Extract module translations
     cmds:
+      # Patch https://github.com/OS2Forms/os2forms/blob/develop/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
+      - |
+        ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' */modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
       - ddev drush --yes site:install minimal
       - ddev drush --yes pm:install drupal_translation_extractor
+      - ddev drush --yes pm:install os2forms_f2
       - for:
           - da
-        cmd: ddev drush --yes drupal_translation_extractor:translation:extract {{.ITEM}} --dump-messages --force --output=%source/translations/%module.%locale.po --require-context=os2forms_f2 module:os2forms_f2 --debug
+        cmd: >-
+          ddev drush --yes drupal_translation_extractor:translation:extract {{.ITEM}}
+          --dump-messages --force --output=%source/translations/%module.%locale.po
+          --require-context=os2forms_f2 module:os2forms_f2
+          --sort=asc --clean --debug
+          --finder-do-not-ignore-vcs-ignored
 
   translations:git:diff:
     desc: "`git diff` all translation files ignoring timestamp changes"
@@ -163,3 +179,115 @@ tasks:
 
           to check.
     cmd: git restore '*.po'
+
+  drupal:os2forms:install:
+    desc: Install OS2Forms F2 module and configure Drupal for testing
+    prompt: Really reset Drupal site?
+    cmds:
+      - ddev drush --yes site:install
+      - ddev drush --yes user:password admin password
+      - ddev drush --yes pm:uninstall update
+
+      # Patch https://github.com/OS2Forms/os2forms/blob/develop/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
+      - |
+        ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' */modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
+
+      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_test_playwright
+
+      # Gin theme
+      - ddev drush --yes theme:install gin
+      - ddev drush --yes config:set system.theme default gin
+      - ddev drush --yes config:set system.theme admin gin
+      - ddev drush --yes pm:uninstall navigation
+      # - ddev drush --yes config:set gin.settings classic_toolbar horizontal
+
+      - ddev drush --yes config:set webform.settings ui.description_help false --input-format yaml
+      - ddev drush --yes config:set webform.settings settings.default_submission_log true --input-format=yaml
+
+      # Languages and locales
+      - ddev drush --yes pm:install language locale
+      - ddev drush --yes language:add da
+
+      # - ddev drush --yes locale:check
+      # - ddev drush --yes locale:update
+      # Import our module translations
+      - ddev drush --yes locale:import da modules/custom/os2forms_f2/translations/os2forms_f2.da.po
+
+      - task: drupal:os2forms:configure
+
+  drupal:os2forms:configure:
+    decs: Create settings for os2forms_f2 module
+    cmds:
+      # Some defaults
+      - ddev drush --yes config:set os2forms_f2.settings f2_api.log_level debug
+      - ddev drush --yes config:set os2forms_f2.settings general.queue os2forms_f2
+
+  playwright:install:
+    desc: Install Playwright stuff
+    cmd: ddev playwright-install --pm npm
+
+  user-manual:images:generate:
+    desc: Generate user manual images
+    cmds:
+      - cmd: ddev playwright test user-manual-images.spec.ts {{.CLI_ARGS}}
+        # We want to postprocess any updated images even if something fails
+        ignore_error: true
+      - task: user-manual:images:trim
+      - task: user-manual:images:restore
+
+  user-manual:images:trim:
+    desc: "Trim docs images"
+    vars:
+      BORDER_WIDTH: 4
+    # Trim and add border
+    cmd:
+      cmd: |
+        docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm mogrify \
+          -strip \
+          -background white \
+          -trim \
+          -gravity north -splice 0x{{.BORDER_WIDTH}}+0+0 \
+          -gravity south -splice 0x{{.BORDER_WIDTH}}+0+0 \
+          -gravity west -splice {{.BORDER_WIDTH}}x0+0+0 \
+          -gravity east -splice {{.BORDER_WIDTH}}x0+0+0 \
+          docs/user-manual/da/images/generated/**/*.png
+      # https://taskfile.dev/docs/reference/schema#shopt
+      shopt: [globstar]
+
+  user-manual:images:restore:
+    desc: "Restore docs images that are not visually modified"
+    cmd:
+      cmd: |
+        # https://stackoverflow.com/a/949391
+        latest_commit=$(git rev-parse --verify HEAD)
+
+         # M docs/en/images/manager/006-entry-look-up.png
+        status_modified_pattern="^ M "
+
+        debug_output_filename=false
+        if [[ '{{.COMPARE_OUTPUT_FILENAME | default "-"}}' != '-' ]]; then
+          debug_output_filename=true
+        fi
+
+        shopt -s globstar nullglob
+        for file in docs/user-manual/da/images/generated/**/*.png; do
+            status=$(git status --porcelain "$file")
+            if [[ "$status" =~ $status_modified_pattern ]]; then
+                if git cat-file -p "$latest_commit":"$file" | \
+                    docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm compare \
+                    - \
+                    "$file" \
+                    {{.COMPARE_OUTPUT_FILENAME | default "-"}} > /dev/null 2>&1; then
+                    echo "Restoring $file"
+                    git restore "$file"
+                else
+                    echo "$file modified"
+                    if [ "$debug_output_filename" = true ]; then
+                      echo
+                      echo "Comparison image written to {{.COMPARE_OUTPUT_FILENAME | default "-"}}"
+                      echo
+                    fi
+                fi
+            fi
+        done
+      shopt: [globstar]

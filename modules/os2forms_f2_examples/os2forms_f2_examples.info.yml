@@ -1,0 +1,7 @@
+name: "F2 form examples"
+type: module
+description: "OS2Forms: F2 form examples"
+package: OS2Forms
+core_version_requirement: ^11
+dependencies:
+  - os2forms_f2:os2forms_f2

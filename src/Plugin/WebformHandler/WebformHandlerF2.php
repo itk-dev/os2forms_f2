@@ -5,16 +5,22 @@ namespace Drupal\os2forms_f2\Plugin\WebformHandler;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
+use Drupal\os2forms_f2\Exception\F2NonUniqueCaseException;
 use Drupal\os2forms_f2\Helper\F2Helper;
 use Drupal\os2forms_f2\Helper\WebformHelperF2;
 use Drupal\os2forms_f2\Settings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget;
+use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetCase;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetMatter;
 use Drupal\webform\Plugin\WebformHandlerBase;
 use Drupal\webform\Utility\WebformDialogHelper;
 use Drupal\webform\WebformSubmissionInterface;
+use ItkDev\F2ApiClient\Model\Matter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * F2 Webform Handler.
@@ -44,17 +50,22 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   /**
    * The settings.
    */
-  private Settings $settingsService;
+  protected Settings $settingsService;
 
   /**
    * The webform helper.
    */
-  private WebformHelperF2 $helper;
+  protected WebformHelperF2 $helper;
 
   /**
    * The F2 helper.
    */
-  private F2Helper $f2;
+  protected F2Helper $f2;
+
+  /**
+   * The request stack.
+   */
+  protected RequestStack $requestStack;
 
   /**
    * {@inheritdoc}
@@ -65,6 +76,9 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     $instance->settingsService = $container->get(Settings::class);
     $instance->helper = $container->get(WebformHelperF2::class);
     $instance->f2 = $container->get(F2Helper::class);
+    /** @var RequestStack $requestStack */
+    $requestStack = $container->get('request_stack');
+    $instance->requestStack = $requestStack;
 
     return $instance;
   }
@@ -91,7 +105,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   #[\Override]
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $settings = $this->settingsService->getArchiveSettings((array) ($this->getSetting(ArchiveSettings::NAME)));
 
     // We have to wrap all handler setting fields in a container to show them on
@@ -112,8 +126,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#type' => 'textfield',
           '#required' => TRUE,
           '#title' => $this->t('Document title', options: ['context' => 'os2forms_f2']),
-          '#default_value' => $settings->documentTitle,
           '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.', options: ['context' => 'os2forms_f2']),
+          '#default_value' => $settings->documentTitle,
         ],
 
         ArchiveSettings::ARCHIVE_TARGET => [
@@ -122,25 +136,119 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#title' => $this->t('Archive target', options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->archiveTarget?->value,
           '#options' => [
-            ArchiveTarget::MatterID->value => $this->t('Matter ID', options: ['context' => 'os2forms_f2']),
+            ArchiveTarget::Case->value => $this->t('Case', options: ['context' => 'os2forms_f2']),
+            ArchiveTarget::Matter->value => $this->t('Matter', options: ['context' => 'os2forms_f2']),
           ],
         ],
 
-        ArchiveTargetMatter::NAME => [
-          ArchiveTargetMatter::MATTER_ID => [
+        ArchiveTargetCase::NAME => [
+          '#type' => 'fieldset',
+          '#title' => $this->t('Case', options: ['context' => 'os2forms_f2']),
+          '#states' => [
+            'visible' => [
+              ':input[name="settings[' . implode('][', [
+                self::ID,
+                ArchiveSettings::NAME,
+                ArchiveSettings::ARCHIVE_TARGET,
+              ]) . ']"]' => [
+                'value' => ArchiveTarget::Case->value,
+              ],
+            ],
+          ],
+
+          ArchiveTargetCase::CASE_IDENTIFIER => [
             '#type' => 'textfield',
-            '#required' => TRUE,
-            '#title' => $this->t('Matter ID', options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetMatter?->matterId,
+            '#title' => $this->t('Case identifier', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('Case number or ID that uniquely identifies a single case.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase?->caseIdentifier,
 
             '#states' => [
-              'visible' => [
+              'required' => [
                 ':input[name="settings[' . implode('][', [
                   self::ID,
                   ArchiveSettings::NAME,
                   ArchiveSettings::ARCHIVE_TARGET,
                 ]) . ']"]' => [
-                  'value' => ArchiveTarget::MatterID->value,
+                  'value' => ArchiveTarget::Case->value,
+                ],
+              ],
+            ],
+          ],
+
+          ArchiveTargetCase::MATTER_TITLE => [
+            '#type' => 'textfield',
+            '#title' => $this->t('Matter title', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The title of the matter that will be created for the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase?->matterTitle,
+
+            '#states' => [
+              'required' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
+                  'value' => ArchiveTarget::Case->value,
+                ],
+              ],
+            ],
+          ],
+
+          ArchiveTargetCase::MATTER_TYPE => [
+            '#type' => 'select',
+            '#options' => [
+              Matter::TYPE_INBOUND => $this->t('Inbound', options: ['context' => 'os2forms_f2']),
+              Matter::TYPE_INTERNAL => $this->t('Internal', options: ['context' => 'os2forms_f2']),
+              Matter::TYPE_OUTBOUND => $this->t('Outbound', options: ['context' => 'os2forms_f2']),
+            ],
+            '#title' => $this->t('Matter type', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The type of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase?->matterType,
+
+            '#states' => [
+              'required' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
+                  'value' => ArchiveTarget::Case->value,
+                ],
+              ],
+            ],
+          ],
+
+        ],
+
+        ArchiveTargetMatter::NAME => [
+          '#type' => 'fieldset',
+          '#title' => $this->t('Matter', options: ['context' => 'os2forms_f2']),
+          '#states' => [
+            'visible' => [
+              ':input[name="settings[' . implode('][', [
+                self::ID,
+                ArchiveSettings::NAME,
+                ArchiveSettings::ARCHIVE_TARGET,
+              ]) . ']"]' => [
+                'value' => ArchiveTarget::Matter->value,
+              ],
+            ],
+          ],
+
+          ArchiveTargetMatter::MATTER_IDENTIFIER => [
+            '#type' => 'textfield',
+            '#title' => $this->t('Matter identifier', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('Matter number or ID that uniquely identifies a single matter.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetMatter?->matterIdentifier,
+
+            '#states' => [
+              'required' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
+                  'value' => ArchiveTarget::Matter->value,
                 ],
               ],
             ],
@@ -149,22 +257,58 @@ final class WebformHandlerF2 extends WebformHandlerBase {
       ],
     ];
 
-    if (ArchiveTarget::MatterID === $settings->archiveTarget) {
-      $matterId = $settings->archiveTargetMatter?->matterId;
-      if (NULL !== $matterId) {
-        try {
-          $matter = $this->f2->client()->matterById($matterId);
+    // Show some details in the archive target.
+    if (Request::METHOD_GET === $this->requestStack->getMainRequest()->getRealMethod()) {
+      switch ($settings->archiveTarget) {
+        case ArchiveTarget::Case:
+          $caseIdentifier = $settings->archiveTargetCase?->caseIdentifier;
+          if (NULL !== $caseIdentifier) {
+            try {
+              $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
 
-          $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
-            '#type' => 'details',
-            '#open' => TRUE,
-            '#title' => $this->t('Matter', options: ['context' => 'os2forms_f2']),
-            '#markup' => $matter,
-          ];
-        }
-        catch (\Throwable) {
-          // Ignore all errors.
-        }
+              $details = [
+                '#markup' => (string) $case,
+              ];
+            }
+            catch (\Throwable $t) {
+              $details = [
+                '#markup' => $this->t('Error: @error', ['@error' => $t->getMessage()], options: ['context' => 'os2forms_f2']),
+              ];
+            }
+
+            $form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME]['details'] = [
+              '#type' => 'details',
+              '#attributes' => ['id' => 'archive-details'],
+              '#open' => TRUE,
+              '#title' => $this->t('Case details', options: ['context' => 'os2forms_f2']),
+            ] + $details;
+          }
+          break;
+
+        case ArchiveTarget::Matter:
+          $matterIdentifier = $settings->archiveTargetMatter?->matterIdentifier;
+          if (NULL !== $matterIdentifier) {
+            try {
+              $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
+              $details = [
+                '#markup' => (string) $matter,
+              ];
+            }
+            catch (\Throwable $t) {
+              $details = [
+                '#markup' => $this->t('Error: @error', ['@error' => $t->getMessage()], options: ['context' => 'os2forms_f2']),
+              ];
+            }
+
+            $form[self::ID][ArchiveSettings::NAME][ArchiveTargetMatter::NAME]['details'] = [
+              '#type' => 'details',
+              '#attributes' => ['id' => 'archive-details'],
+              '#open' => TRUE,
+              '#title' => $this->t('Matter details', options: ['context' => 'os2forms_f2']),
+            ] + $details;
+          }
+          break;
+
       }
     }
 
@@ -177,39 +321,70 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   #[\Override]
-  public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function validateConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::validateConfigurationForm($form, $form_state);
 
     $setError = static fn(string|array $path, TranslatableMarkup $message) => $form_state->setErrorByName(implode('][', (array) $path), $message);
 
-    $target = $form_state->getValue([self::ID, ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET]);
-    if (ArchiveTarget::MatterID->value === $target) {
-      $key = [self::ID, ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_ID];
-      $matterId = trim((string) $form_state->getValue($key));
-      $matterId = filter_var($matterId, FILTER_VALIDATE_INT);
-      if (FALSE === $matterId) {
-        $setError($key, t('Missing or invalid matter ID.', options: ['context' => 'os2forms_f2']));
-      }
-      else {
-        try {
-          $this->f2->client()->matterById($matterId);
-        }
-        catch (\Throwable $throwable) {
-          $setError($key, t('Cannot get matter by ID @matter_id (@message).', [
-            '@matter_id' => $matterId,
-            '@message' => $throwable->getMessage(),
-          ], options: ['context' => 'os2forms_f2']));
-        }
+    $targetKey = [self::ID, ArchiveSettings::NAME, ArchiveSettings::ARCHIVE_TARGET];
+    $target = $form_state->getValue($targetKey);
+    try {
+      $target = ArchiveTarget::from($target);
+      switch ($target) {
+        case ArchiveTarget::Case:
+          $key = [self::ID, ArchiveSettings::NAME, ArchiveTargetCase::NAME, ArchiveTargetCase::CASE_IDENTIFIER];
+          $caseIdentifier = trim((string) $form_state->getValue($key));
+          if ('' === $caseIdentifier) {
+            $setError($key, t('Missing case identifier.', options: ['context' => 'os2forms_f2']));
+          }
+          else {
+            try {
+              $this->f2->fetchCaseByIdentifier($caseIdentifier);
+            }
+            catch (F2NonUniqueCaseException) {
+              $setError($key, t('Identifier "@case_identifier" does not uniquely identify a case.', [
+                '@case_identifier' => $caseIdentifier,
+              ], options: ['context' => 'os2forms_f2']));
+            }
+            catch (\Throwable $throwable) {
+              $setError($key, t('Cannot get case by identifier "@case_identifier" (@message).', [
+                '@case_identifier' => $caseIdentifier,
+                '@message' => $throwable->getMessage(),
+              ], options: ['context' => 'os2forms_f2']));
+            }
+          }
+          break;
+
+        case ArchiveTarget::Matter:
+          $key = [self::ID, ArchiveSettings::NAME, ArchiveTargetMatter::NAME, ArchiveTargetMatter::MATTER_IDENTIFIER];
+          $matterIdentifier = trim((string) $form_state->getValue($key));
+          if ('' === $matterIdentifier) {
+            $setError($key, t('Missing matter identifier.', options: ['context' => 'os2forms_f2']));
+          }
+          else {
+            try {
+              $this->f2->fetchMatterByIdentifier($matterIdentifier);
+            }
+            catch (\Throwable $throwable) {
+              $setError($key, t('Cannot get matter by identifier "@matter_identifier" (@message).', [
+                '@matter_identifier' => $matterIdentifier,
+                '@message' => $throwable->getMessage(),
+              ], options: ['context' => 'os2forms_f2']));
+            }
+          }
+          break;
       }
     }
-
+    catch (\ValueError) {
+      $setError($targetKey, $this->t('Invalid archive target: @target', ['@target' => $target], options: ['context' => 'os2forms_f2']));
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   #[\Override]
-  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state): void {
     parent::submitConfigurationForm($form, $form_state);
     foreach ([
       ArchiveSettings::NAME,
@@ -224,7 +399,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   #[\Override]
-  public function postSave(WebformSubmissionInterface $webform_submission, $update = TRUE) {
+  public function postSave(WebformSubmissionInterface $webform_submission, $update = TRUE): void {
     if (!$this->additionalStatesRunOnPostSave($webform_submission)) {
       return;
     }
@@ -236,25 +411,46 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    * {@inheritdoc}
    */
   #[\Override]
-  public function getSummary() {
+  public function getSummary(): array {
     $settings = $this->settingsService->getHandlerSettings($this);
 
-    $build = [
-      'info' => [
-        '#prefix' => '<div>',
-        '#suffix' => '</div>',
-      ],
-    ];
+    $summary = [];
 
     switch ($settings->archive?->archiveTarget) {
-      case ArchiveTarget::MatterID:
-        $matterId = $settings->archive->archiveTargetMatter?->matterId;
-        if ($matterId) {
-          $build['info'][ArchiveTargetMatter::NAME] = [
-            '#markup' => $this->t('Archive on matter @matter_id', ['@matter_id' => $matterId], options: ['context' => 'os2forms_f2']),
+      case ArchiveTarget::Case:
+        $caseIdentifier = $settings->archive->archiveTargetCase?->caseIdentifier;
+        if ($caseIdentifier) {
+          $summary[ArchiveTargetCase::NAME] = [
+            '#markup' => $this->t('Archive on case "@case_identifier".', ['@case_identifier' => $caseIdentifier], options: ['context' => 'os2forms_f2']),
           ];
         }
         break;
+
+      case ArchiveTarget::Matter:
+        $matterIdentifier = $settings->archive->archiveTargetMatter?->matterIdentifier;
+        if ($matterIdentifier) {
+          $summary[ArchiveTargetMatter::NAME] = [
+            '#markup' => $this->t('Archive on matter "@matter_identifier".', ['@matter_identifier' => $matterIdentifier], options: ['context' => 'os2forms_f2']),
+          ];
+        }
+        break;
+    }
+
+    $build = [];
+    if ($summary) {
+      $build['summary'] = [
+        '#type' => 'container',
+      ] + $summary;
+      $build['see_details'] = [
+        '#type' => 'container',
+        '#markup' => ' ' . $this->t('<a href=":edit_url">Edit</a> to see details.', [
+          ':edit_url' => Url::fromRoute('entity.webform.handler.edit_form', [
+            'webform' => $this->getWebform()->id(),
+            'webform_handler' => $this->getHandlerId(),
+          ])->toString(TRUE)->getGeneratedUrl(),
+        ], options: ['context' => 'os2forms_f2']),
+        '#weight' => 999,
+      ];
     }
 
     return $build;

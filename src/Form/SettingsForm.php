@@ -8,7 +8,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -17,6 +16,7 @@ use Drupal\os2forms_f2\Helper\F2Helper;
 use Drupal\os2forms_f2\Settings;
 use Drupal\os2forms_f2\Settings\F2ApiSettings;
 use Drupal\os2forms_f2\Settings\GeneralSettings;
+use Psr\Log\LogLevel;
 
 /**
  * Configure F2 settings for this site.
@@ -28,24 +28,16 @@ final class SettingsForm extends ConfigFormBase {
   private const string ACTION_PING_API = 'action_ping_api';
 
   /**
-   * The queue storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  private readonly EntityStorageInterface $queueStorage;
-
-  /**
    * Constructor.
    */
   public function __construct(
     ConfigFactoryInterface $config_factory,
     TypedConfigManagerInterface $typedConfigManager,
-    EntityTypeManagerInterface $entityTypeManager,
-    private readonly Settings $settings,
-    private readonly F2Helper $f2,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected Settings $settings,
+    protected F2Helper $f2,
   ) {
     parent::__construct($config_factory, $typedConfigManager);
-    $this->queueStorage = $entityTypeManager->getStorage('advancedqueue_queue');
   }
 
   /**
@@ -139,6 +131,23 @@ final class SettingsForm extends ConfigFormBase {
       '#description' => $this->t('The F2 username to act on behalf of', options: ['context' => 'os2forms_f2']),
     ];
 
+    $section[F2ApiSettings::LOG_LEVEL] = [
+      '#type' => 'select',
+      '#options' => [
+        LogLevel::EMERGENCY => $this->t('Emergency', options: ['context' => 'os2forms_f2']),
+        LogLevel::ALERT     => $this->t('Alert', options: ['context' => 'os2forms_f2']),
+        LogLevel::CRITICAL  => $this->t('Critical', options: ['context' => 'os2forms_f2']),
+        LogLevel::ERROR     => $this->t('Error', options: ['context' => 'os2forms_f2']),
+        LogLevel::WARNING   => $this->t('Warning', options: ['context' => 'os2forms_f2']),
+        LogLevel::NOTICE    => $this->t('Notice', options: ['context' => 'os2forms_f2']),
+        LogLevel::INFO      => $this->t('Info', options: ['context' => 'os2forms_f2']),
+        LogLevel::DEBUG     => $this->t('Debug', options: ['context' => 'os2forms_f2']),
+      ],
+      '#required' => TRUE,
+      '#title' => $this->t('API log level', options: ['context' => 'os2forms_f2']),
+      '#default_value' => $settings->logLevel,
+    ];
+
     return $section;
   }
 
@@ -155,13 +164,14 @@ final class SettingsForm extends ConfigFormBase {
           '@queue' => $settings->queue,
           ':queue_url' => '/admin/config/system/queues/jobs/' . urlencode((string) $settings->queue),
         ], options: ['context' => 'os2forms_f2']);
+    $storage = $this->entityTypeManager->getStorage('advancedqueue_queue');
     $section[GeneralSettings::QUEUE] = [
       '#type' => 'select',
       '#required' => TRUE,
       '#title' => $this->t('Queue', options: ['context' => 'os2forms_f2']),
       '#options' => array_map(
         static fn(EntityInterface $queue) => $queue->label(),
-        $this->queueStorage->loadMultiple()
+        $storage->loadMultiple()
       ),
       '#empty_option' => $this->t('No queue', options: ['context' => 'os2forms_f2']),
       '#default_value' => $settings->queue,
@@ -194,8 +204,26 @@ final class SettingsForm extends ConfigFormBase {
         $this->messenger()->addStatus($this->t('Pinged API successfully.', options: ['context' => 'os2forms_f2']));
       }
       catch (\Throwable $t) {
-        $this->messenger()->addError($this->t('Pinging API failed: @message', ['@message' => $t->getMessage()], options: ['context' => 'os2forms_f2']));
+        $previous = $t->getPrevious();
+        $message = NULL !== $previous
+          ? $this->t(
+            'Pinging API failed: @message (@previous_message)',
+            [
+              '@message' => $t->getMessage(),
+              '@previous_message' => $previous->getMessage(),
+            ],
+            options: ['context' => 'os2forms_f2']
+          )
+        : $this->t(
+            'Pinging API failed: @message',
+            [
+              '@message' => $t->getMessage(),
+            ],
+            options: ['context' => 'os2forms_f2']
+          );
+        $this->messenger()->addError($message);
       }
+
       return;
     }
 

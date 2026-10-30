@@ -3,6 +3,7 @@
 namespace Drupal\os2forms_f2\Settings;
 
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget;
+use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetCase;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetMatter;
 
 /**
@@ -16,6 +17,7 @@ final class ArchiveSettings extends AbstractSettings {
   ];
 
   protected static array $settingsProperties = [
+    self::ARCHIVE_TARGET_CASE => ArchiveTargetCase::class,
     self::ARCHIVE_TARGET_MATTER => ArchiveTargetMatter::class,
   ];
 
@@ -30,6 +32,9 @@ final class ArchiveSettings extends AbstractSettings {
 
   const string ARCHIVE_TARGET = 'archive_target';
   public ?ArchiveTarget $archiveTarget = NULL;
+
+  const string ARCHIVE_TARGET_CASE = 'archive_target_case';
+  public ?ArchiveTargetCase $archiveTargetCase = NULL;
 
   const string ARCHIVE_TARGET_MATTER = 'archive_target_matter';
   public ?ArchiveTargetMatter $archiveTargetMatter = NULL;

@@ -1,0 +1,4 @@
+services:
+  playwright:
+    volumes:
+      - ../docs/user-manual:/docs/user-manual
