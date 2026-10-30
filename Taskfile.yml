@@ -198,7 +198,7 @@ tasks:
 
       # Patch https://github.com/OS2Forms/os2forms/blob/develop/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
       - |
-        ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' Drupal/modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
+        ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' */modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
 
       - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_test_playwright
 

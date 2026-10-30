@@ -13,5 +13,5 @@ web/core/
 web/libraries/
 web/*/contrib/
 # DDEV stuff
-/Drupal/
+/web/
 /recipes/

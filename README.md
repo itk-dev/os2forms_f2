@@ -46,8 +46,8 @@ We use [DDEV Drupal Contrib](https://addons.ddev.com/addons/ddev/ddev-drupal-con
 
 The DDEV environment has been created by following the template on <https://github.com/ddev/ddev-drupal-contrib#install>:
 
-```shell
-ddev config --project-type=drupal11 --docroot=Drupal
+```shell name=ddev-create
+ddev config --project-type=drupal11 --docroot=web
 ddev add-on get ddev/ddev-drupal-contrib
 ddev add-on get julienloizelet/ddev-playwright
 ddev start
@@ -56,11 +56,6 @@ ddev symlink-project
 # Detect expected Drupal and PHP versions.
 ddev config --update
 ```
-
-During development, we often have the Drupal modules cloned into `web/sites/default/modules` in a Drupal project. Using
-`Drupal` as docroot affectively hides the DDEV site from the Drupal project during extension discovery (`Drupal` is
-ignored by the [`RecursiveExtensionFilterCallback`
-class](https://git.drupalcode.org/project/drupal/-/blob/11.4.11/core/lib/Drupal/Core/Extension/Discovery/RecursiveExtensionFilterCallback.php?ref_type=tags&plain=1#L46-74)).
 
 We have a dependency on [OS2Forms](https://github.com/OS2Forms/os2forms) which requires [Drupal
 Lenient](https://github.com/mglaman/composer-drupal-lenient) to install some outdated modules, and therefore we use [a
