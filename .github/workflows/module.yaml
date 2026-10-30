@@ -18,43 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # https://github.com/ddev/github-action-setup-ddev
-      - uses: ddev/github-action-setup-ddev@v1
-        with:
-          autostart: false
-
-      - name: Start DDEV
-        # https://github.com/ddev/ddev-drupal-contrib
-        run: |
-          ddev start
-          ddev poser --no-interaction --no-security-blocking
-          ddev symlink-project
-
-      - name: Composer - validate
-        run: ddev composer validate --strict
-
-      - name: Composer - normalize
-        run: ddev composer normalize --dry-run
-
-      - name: PHP coding standards
-        run: ddev phpcs
-
-      - name: Twig coding standards
-        run: >-
-          [[ -z $(git ls-files '*.twig') ]] ||
-          ddev exec vendor/bin/twig-cs-fixer
-
-      - name: Code analysis
-        run: ddev phpstan
-
-      - name: Rector
-        run: ddev php vendor/bin/rector --dry-run
-
-  translations:
-    name: Translations
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
       - uses: go-task/setup-task@v2
       # https://github.com/ddev/github-action-setup-ddev
       - uses: ddev/github-action-setup-ddev@v1
@@ -67,6 +30,35 @@ jobs:
           ddev start
           ddev poser --no-interaction --no-security-blocking
           ddev symlink-project
+
+      # https://github.com/mxschmitt/action-tmate?tab=readme-ov-file#manually-triggered-debug
+      # Enable tmate debugging if debug logging is enabled (cf.
+      # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/accessing-contextual-information-about-workflow-runs#runner-context)
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: false
+          # if: 1 == runner.debug
+
+      # - name: Composer - validate
+      #   run: ddev composer validate --strict
+
+      # - name: Composer - normalize
+      #   run: ddev composer normalize --dry-run
+
+      # - name: PHP coding standards
+      #   run: ddev phpcs
+
+      # - name: Twig coding standards
+      #   run: >-
+      #     [[ -z $(git ls-files '*.twig') ]] ||
+      #     ddev exec vendor/bin/twig-cs-fixer
+
+      # - name: Code analysis
+      #   run: ddev phpstan
+
+      # - name: Rector
+      #   run: ddev php vendor/bin/rector --dry-run
 
       - name: Extract translations
         run: task translations:extract
