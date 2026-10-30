@@ -19,7 +19,7 @@ test("webform submission", async ({ page }) => {
     selector: string = ".page-wrapper",
   ) => {
     const filePath = path.join(
-      "/docs/user-manual/da/images/generated/",
+      `/docs/user-manual/${locale}/images/generated/`,
       context,
       String(screenshotCounter++).padStart(3, "0") + "-" + name + ".png",
     );
@@ -40,14 +40,15 @@ test("webform submission", async ({ page }) => {
   };
 
   await drush([
-    'sql:query', [
+    "sql:query",
+    [
       "TRUNCATE advancedqueue",
       "TRUNCATE webform_submission_log",
       "TRUNCATE webform_submission_data",
       "TRUNCATE webform_submission",
       "ALTER TABLE webform_submission AUTO_INCREMENT = 1",
       "UPDATE webform SET next_serial = 1",
-    ].join(';')
+    ].join(";"),
   ]);
 
   await goto("webform/os2forms_f2_ex_001");

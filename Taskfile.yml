@@ -52,20 +52,17 @@ tasks:
         TASK_ARGS: composer validate
 
   coding-standards:javascript:apply:
-    desc: "Apply coding standards for JavaScript and TypeScript"
-    vars:
-      GLOBS: "{{range .JAVASCRIPT_GLOBS }} '{{ . }}'{{end}}"
+    desc: "Apply coding standards for JAVASCRIPT"
     cmds:
       # Cf. .github/workflows/javascript.yaml
-      - docker compose run --rm prettier {{.GLOBS}} --write
+      - docker compose run --rm prettier 'tests/**/*.{js,ts}' --write
 
   coding-standards:javascript:check:
-    desc: "Apply and check coding standards for JavaScript and TypeScript"
-    vars:
-      GLOBS: "{{range .JAVASCRIPT_GLOBS }} '{{ . }}'{{end}}"
+    desc: "Apply coding standards for JAVASCRIPT"
     cmds:
       - task: coding-standards:javascript:apply
-      - docker compose run --rm prettier {{.GLOBS}} --check
+      # Cf. .github/workflows/javascript.yaml
+      - docker compose run --rm prettier 'tests/**/*.{js,ts}' --check
 
   coding-standards:markdown:apply:
     desc: "Apply coding standards for Markdown"
@@ -244,8 +241,8 @@ tasks:
   user-manual:images:trim:
     desc: "Trim docs images"
     vars:
-      BORDER_WIDTH: 0
-    # Trim and add top and bottom border
+      BORDER_WIDTH: 4
+    # Trim and add border
     cmd:
       cmd: |
         docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm mogrify \
@@ -254,7 +251,9 @@ tasks:
           -trim \
           -gravity north -splice 0x{{.BORDER_WIDTH}}+0+0 \
           -gravity south -splice 0x{{.BORDER_WIDTH}}+0+0 \
-          docs/**/*.png
+          -gravity west -splice {{.BORDER_WIDTH}}x0+0+0 \
+          -gravity east -splice {{.BORDER_WIDTH}}x0+0+0 \
+          docs/user-manual/da/images/generated/**/*.png
       # https://taskfile.dev/docs/reference/schema#shopt
       shopt: [globstar]
 
@@ -274,7 +273,7 @@ tasks:
         fi
 
         shopt -s globstar nullglob
-        for file in docs/**/*.png; do
+        for file in docs/user-manual/da/images/generated/**/*.png; do
             status=$(git status --porcelain "$file")
             if [[ "$status" =~ $status_modified_pattern ]]; then
                 if git cat-file -p "$latest_commit":"$file" | \
