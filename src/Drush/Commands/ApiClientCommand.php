@@ -39,7 +39,7 @@ final class ApiClientCommand extends Command {
       ->addArgument('action', InputArgument::REQUIRED, 'The action')
       ->addArgument('arg', InputArgument::OPTIONAL, 'The action argument')
       ->addOption('show-links', NULL, InputOption::VALUE_NONE, 'Show links.')
-      ->addOption('cache-directory', NULL, InputOption::VALUE_REQUIRED, 'Path to to cache directory. If not specified, the default file system cache directory will be used.');
+      ->addOption('cache-directory', NULL, InputOption::VALUE_REQUIRED, 'Path to the cache directory. If not specified, the default file system cache directory will be used.');
   }
 
   /**
