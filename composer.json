@@ -23,6 +23,7 @@
         "mglaman/composer-drupal-lenient": "^1.0",
         "mglaman/phpstan-drupal": "^2.2",
         "palantirnet/drupal-rector": "^1.1",
+        "php-vcr/php-vcr": "^1.12",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "2.3.3",
         "phpstan/phpstan-deprecation-rules": "^2.0"
