@@ -68,6 +68,11 @@
                 "drupal/events_logging",
                 "drupal/switch_page_theme"
             ]
+        },
+        "patches": {
+            "php-vcr/php-vcr": {
+                "Undefined array key 2097198": "patches/php-vcr/php-vcr/curl-helper.patch"
+            }
         }
     }
 }

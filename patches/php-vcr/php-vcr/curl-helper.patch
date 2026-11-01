@@ -1,0 +1,13 @@
+diff --git a/src/VCR/Util/CurlHelper.php b/src/VCR/Util/CurlHelper.php
+index 7817d3d..ad701a6 100644
+--- a/src/VCR/Util/CurlHelper.php
++++ b/src/VCR/Util/CurlHelper.php
+@@ -210,7 +210,7 @@ class CurlHelper
+                 $info = $response->getCurlInfo(self::$curlInfoList[\CURLINFO_CERTINFO]) ?? [];
+                 break;
+             default:
+-                $info = $response->getCurlInfo(self::$curlInfoList[$option]);
++                $info = $response->getCurlInfo(self::$curlInfoList[$option] ?? null);
+                 break;
+         }
+ 
