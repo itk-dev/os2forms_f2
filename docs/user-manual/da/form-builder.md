@@ -24,7 +24,7 @@ på yderligere muligheder i behandlerindstillingerne.
 
 Som bekendt ligger dokumenter i F2 på en akt, og for at arkivere på en sag opretter behandleren derfor indledningsvist
 en akt som dokumentet kan knyttes til. For at arkivere på en sag skal man angive et id der entydigt udpeger en sag i F2.
-Det vil være oplagt at bruge et sags-nummer
+Det vil være oplagt at bruge et sagsnummer
 
 ![Arkivér på sag](./images/generated/form-builder/webform-handler-add-archive-on-case.png)
 
@@ -46,9 +46,11 @@ Hvis man, som antydet, redigerer en F2-behandler kan man se detaljer om hvilken 
 
 ## Arkivering på akt
 
-Når man vil arkivere på en (eksisterende) akt skal man angive et id, fx akt-nummer, der entydigt udpeger akten i F2.
+Når man vil arkivere på en (eksisterende) akt skal man angive et id, fx aktnummer, der entydigt udpeger akten i F2.
 
 ![Arkivér på akt](./images/generated/form-builder/webform-handler-add-archive-on-matter.png)
+
+![Udfyldt "Arkivér på akt"](./images/generated/form-builder/webform-handler-add-archive-on-matter-filled.png)
 
 Når man gemmer tjekker systemet at akt-id'et entydigt identificerer en akt i F2:
 

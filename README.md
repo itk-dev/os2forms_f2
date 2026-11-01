@@ -154,7 +154,7 @@ F2_MATTER_IDENTIFIER='903'
 With these in place, we can now generate images:
 
 ``` shell
-task drupal:os2forms:install --yes
+task drupal:site:install --yes
 task playwright:install --yes
 task user-manual:images:generate
 ```

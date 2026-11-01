@@ -1,0 +1,270 @@
+
+-
+    request:
+        method: GET
+        url: 'https://aak-esdh-test-mob.f2-cloud.com/F2Rest/ServiceIndex'
+        headers:
+            Host: REDACTED
+            Accept: application/json
+            User-Agent: 'Symfony HttpClient (Curl)'
+            Accept-Encoding: gzip
+            expect: ''
+    response:
+        status:
+            code: 200
+            message: OK
+        headers:
+            Cache-Control: private
+            Content-Type: application/json
+            Server: Microsoft-IIS/10.0
+            X-AspNet-Version: 4.0.30319
+            X-Powered-By: ASP.NET
+            Date: 'Sun, 01 Nov 2026 10:19:19 GMT'
+            Content-Length: '5903'
+        body: '{"http://cbrain.com/casefile/rel/securitygroup-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/security-groups/{id}","title":"Get security group by id"},"http://cbrain.com/casefile/rel/securitygroup-by-synch-key":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/security-groups?sync-key={syncKey}","title":"Get security group by synchronization key"},"http://cbrain.com/casefile/rel/securitygroup-by-party-number":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/security-groups?party-number={partyNumber}","title":"Get security group by party number"},"http://cbrain.com/casefile/rel/securitygroup-create":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/security-groups/create","title":"Create security group"},"http://cbrain.com/casefile/rel/matter-search":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/search/matters","title":"Matter search"},"http://cbrain.com/casefile/rel/case-search":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/search/cases","title":"Case file search"},"http://cbrain.com/casefile/rel/party-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/parties/{id}","title":"Get party by id"},"http://cbrain.com/casefile/rel/party-by-party-number":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/parties?partyNo={partyNo}","title":"Get party by party number"},"http://cbrain.com/casefile/rel/party-by-synch-key":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/parties?synchKey={synchKey}","title":"Get party by synchronization key"},"http://cbrain.com/casefile/rel/party-by-cvrcpr-number":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/parties?cvrcpr={cvrcpr}&cvr_p={cvr_p}","title":"Get party by external identification number"},"http://cbrain.com/casefile/rel/party-by-email":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/parties?email={email}","title":"Get party by e-mail"},"http://cbrain.com/casefile/rel/party-by-login":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/parties?login={login}","title":"Get party by login"},"http://cbrain.com/casefile/rel/create-external-party":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/external-party-create","title":"Create external party"},"http://cbrain.com/casefile/rel/oauth2-token":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/oauth2/token","title":"Token endpoint for OAuth2"},"http://cbrain.com/casefile/rel/oauth2-token-introspection":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/oauth2/tokenintrospection","title":"Token Introspection endpoint for OAuth2"},"http://cbrain.com/casefile/rel/note-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/notes/{id}","title":"Get note by ID"},"http://cbrain.com/casefile/rel/create-meeting":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/meeting-create","title":"Create meeting"},"http://cbrain.com/casefile/rel/meeting-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/meetings/{nodeId}","title":"Get meeting by ID"},"http://cbrain.com/casefile/rel/matter-search-filter":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/matter-search","title":"Filtered matter search"},"http://cbrain.com/casefile/rel/mailimport":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/mailimport","title":"Mail Import"},"http://cbrain.com/casefile/rel/enum-type-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/enum-types/{typeId}","title":"Get enumeration type by type id"},"http://cbrain.com/casefile/rel/create-matter":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/matter-create","title":"Create matter"},"http://cbrain.com/casefile/rel/matter-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/matters/{id}","title":"Get matter by ID"},"http://cbrain.com/casefile/rel/matter-by-matter-number":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/matters?matterNumber={matterNumber}","title":"Get matter by matter number"},"http://cbrain.com/casefile/rel/matter-by-guid":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/matters?guid={guid}","title":"Get matter by F2 GUID"},"http://cbrain.com/casefile/rel/document-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/documents/{id}","title":"Get document by ID"},"http://cbrain.com/casefile/rel/document-by-guid":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/documents?guid={guid}","title":"Get document by F2 GUID"},"http://cbrain.com/casefile/rel/custom-query-index":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/custom-queries","title":"Custom query index"},"http://cbrain.com/casefile/rel/chat-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/chats/{id}","title":"Get chat by ID"},"http://cbrain.com/casefile/rel/create-case":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/case-create","title":"Create case"},"http://cbrain.com/casefile/rel/case-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/cases/{id}","title":"Get case by ID"},"http://cbrain.com/casefile/rel/case-by-case-number":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/cases?caseNumber={caseNumber}","title":"Get case by case number"},"http://cbrain.com/casefile/rel/case-by-guid":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/cases?guid={guid}","title":"Get case by F2 GUID"},"http://cbrain.com/casefile/rel/delete-case-dry-run":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/cases/{nodeId}/case-delete-dry-run","title":"Delete case dry run"},"http://cbrain.com/casefile/rel/delete-case":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/cases/{nodeId}/case-delete","title":"Delete case"},"http://cbrain.com/casefile/rel/case-search-filter":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/case-search","title":"Filtered case search"},"http://cbrain.com/casefile/rel/approval-by-id":{"href":"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/approvals/{id}","title":"Get approval by ID"}}'
+        curl_info:
+            url: 'https://aak-esdh-test-mob.f2-cloud.com/F2Rest/ServiceIndex'
+            content_type: application/json
+            http_code: 200
+            header_size: 214
+            request_size: 163
+            filetime: -1
+            ssl_verify_result: 0
+            redirect_count: 0
+            total_time: 0.080024
+            namelookup_time: 0.004098
+            connect_time: 0.020484
+            pretransfer_time: 0.045333
+            size_upload: 0.0
+            size_download: 5903.0
+            speed_download: 73765.0
+            speed_upload: 0.0
+            download_content_length: 5903.0
+            upload_content_length: 0.0
+            starttransfer_time: 0.080005
+            redirect_time: 0.0
+            redirect_url: ''
+            primary_ip: 86.48.32.124
+            certinfo: {  }
+            primary_port: 443
+            local_ip: 172.23.0.3
+            local_port: 40020
+            http_version: 2
+            protocol: 2
+            ssl_verifyresult: 0
+            scheme: https
+            appconnect_time_us: 45302
+            connect_time_us: 20484
+            namelookup_time_us: 4098
+            pretransfer_time_us: 45333
+            redirect_time_us: 0
+            starttransfer_time_us: 80005
+            posttransfer_time_us: 45337
+            total_time_us: 80024
+            effective_method: GET
+            capath: /etc/ssl/certs
+            cainfo: /etc/ssl/certs/ca-certificates.crt
+    index: 0
+-
+    request:
+        method: POST
+        url: 'https://aak-esdh-test-mob.f2-cloud.com/F2Rest/oauth2/token'
+        headers:
+            Host: REDACTED
+            accept: application/json
+            Content-Type: application/x-www-form-urlencoded
+            Authorization: REDACTED
+            User-Agent: 'Symfony HttpClient (Curl)'
+            Accept-Encoding: gzip
+            expect: ''
+        body: 'grant_type=password&username=F2RESTAPI-Bruger3'
+    response:
+        status:
+            code: 200
+            message: OK
+        headers:
+            Cache-Control: private
+            Content-Type: application/json
+            Server: Microsoft-IIS/10.0
+            X-AspNet-Version: 4.0.30319
+            X-Powered-By: ASP.NET
+            Date: 'Sun, 01 Nov 2026 10:19:19 GMT'
+            Content-Length: '118'
+        body: '{"access_token":"ExuteG8n9GjVswMW3MZg","token_type":"bearer","expires_in":3600,"refresh_token":"LkEJBiXKibac6ocX13DU"}'
+        curl_info:
+            url: 'https://aak-esdh-test-mob.f2-cloud.com/F2Rest/oauth2/token'
+            content_type: application/json
+            http_code: 200
+            header_size: 213
+            request_size: 382
+            filetime: -1
+            ssl_verify_result: 0
+            redirect_count: 0
+            total_time: 0.071812
+            namelookup_time: 1.1E-5
+            connect_time: 0.01124
+            pretransfer_time: 0.022599
+            size_upload: 46.0
+            size_download: 118.0
+            speed_download: 1643.0
+            speed_upload: 640.0
+            download_content_length: 118.0
+            upload_content_length: 46.0
+            starttransfer_time: 0.071798
+            redirect_time: 0.0
+            redirect_url: ''
+            primary_ip: 86.48.32.124
+            certinfo: {  }
+            primary_port: 443
+            local_ip: 172.23.0.3
+            local_port: 40026
+            http_version: 2
+            protocol: 2
+            ssl_verifyresult: 0
+            scheme: https
+            appconnect_time_us: 22507
+            connect_time_us: 11240
+            namelookup_time_us: 11
+            pretransfer_time_us: 22599
+            redirect_time_us: 0
+            starttransfer_time_us: 71798
+            posttransfer_time_us: 22598
+            total_time_us: 71812
+            effective_method: POST
+            capath: /etc/ssl/certs
+            cainfo: /etc/ssl/certs/ca-certificates.crt
+    index: 0
+-
+    request:
+        method: GET
+        url: 'https://aak-esdh-test-mob.f2-cloud.com/F2Rest/search/matters'
+        headers:
+            Host: REDACTED
+            Accept: '*/*'
+            Authorization: REDACTED
+            User-Agent: 'Symfony HttpClient (Curl)'
+            Accept-Encoding: gzip
+            expect: ''
+    response:
+        status:
+            code: 200
+            message: OK
+        headers:
+            Cache-Control: private
+            Content-Type: application/opensearchdescription+xml
+            Server: Microsoft-IIS/10.0
+            X-AspNet-Version: 4.0.30319
+            X-Powered-By: ASP.NET
+            Date: 'Sun, 01 Nov 2026 10:19:19 GMT'
+            Content-Length: '668'
+        body: "<?xml version=\"1.0\" encoding=\"utf-8\"?><?xml-stylesheet type=\"text/xsl\" href=\"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/xml2html.xsl\"?><OpenSearchDescription xmlns=\"http://a9.com/-/spec/opensearch/1.1/\"><ShortName>Matter search</ShortName><Description>Searching by any text for matters in F2. \r\nThe format for this search description is Open Search as described \r\nhere: http://www.opensearch.org/Specifications/OpenSearch/1.1.</Description><Author>cBrain</Author><Contact>cbrain@cbrain.dk</Contact><Url type=\"application/atom+xml\" template=\"https://aak-esdh-test-mob.f2-cloud.com/F2Rest/searches/matters?q={searchTerms}&amp;count={count}\" /></OpenSearchDescription>"
+        curl_info:
+            url: 'https://aak-esdh-test-mob.f2-cloud.com/F2Rest/search/matters'
+            content_type: application/opensearchdescription+xml
+            http_code: 200
+            header_size: 234
+            request_size: 196
+            filetime: -1
+            ssl_verify_result: 0
+            redirect_count: 0
+            total_time: 0.059161
+            namelookup_time: 9.0E-6
+            connect_time: 0.011866
+            pretransfer_time: 0.023175
+            size_upload: 0.0
+            size_download: 668.0
+            speed_download: 11291.0
+            speed_upload: 0.0
+            download_content_length: 668.0
+            upload_content_length: 0.0
+            starttransfer_time: 0.059146
+            redirect_time: 0.0
+            redirect_url: ''
+            primary_ip: 86.48.32.124
+            certinfo: {  }
+            primary_port: 443
+            local_ip: 172.23.0.3
+            local_port: 40042
+            http_version: 2
+            protocol: 2
+            ssl_verifyresult: 0
+            scheme: https
+            appconnect_time_us: 23152
+            connect_time_us: 11866
+            namelookup_time_us: 9
+            pretransfer_time_us: 23175
+            redirect_time_us: 0
+            starttransfer_time_us: 59146
+            posttransfer_time_us: 23179
+            total_time_us: 59161
+            effective_method: GET
+            capath: /etc/ssl/certs
+            cainfo: /etc/ssl/certs/ca-certificates.crt
+    index: 0
+-
+    request:
+        method: GET
+        url: 'https://aak-esdh-test-mob.f2-cloud.com/F2Rest/searches/matters?q=ping&count=10'
+        headers:
+            Host: REDACTED
+            Accept: '*/*'
+            Authorization: REDACTED
+            User-Agent: 'Symfony HttpClient (Curl)'
+            Accept-Encoding: gzip
+            expect: ''
+    response:
+        status:
+            code: 200
+            message: OK
+        headers:
+            Cache-Control: private
+            Content-Type: application/atom+xml
+            Server: Microsoft-IIS/10.0
+            X-AspNet-Version: 4.0.30319
+            X-Powered-By: ASP.NET
+            Date: 'Sun, 01 Nov 2026 10:19:19 GMT'
+            Content-Length: '763'
+        body: '<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title type="text">F2 matter search for "ping"</title><subtitle type="text"></subtitle><id>uuid:43957e5d-8d35-497d-b5de-83261dad0799;id=35</id><updated>2026-11-01T10:19:19Z</updated><author><name>cBrain</name><email>cbrain@cbrain.dk</email></author><link rel="alternate" href="https://aak-esdh-test-mob.f2-cloud.com/F2Rest/searches/matters?q=ping" /><link rel="self" type="application/atom+xml" title="F2 matter search for &quot;ping&quot;" href="https://aak-esdh-test-mob.f2-cloud.com/F2Rest/searches/matters?q=ping" /><link rel="search" type="application/opensearchdescription+xml" title="Matter search" href="https://aak-esdh-test-mob.f2-cloud.com/F2Rest/search/matters" /></feed>'
+        curl_info:
+            url: 'https://aak-esdh-test-mob.f2-cloud.com/F2Rest/searches/matters?q=ping&count=10'
+            content_type: application/atom+xml
+            http_code: 200
+            header_size: 217
+            request_size: 214
+            filetime: -1
+            ssl_verify_result: 0
+            redirect_count: 0
+            total_time: 0.189421
+            namelookup_time: 1.1E-5
+            connect_time: 0.008522
+            pretransfer_time: 0.020101
+            size_upload: 0.0
+            size_download: 763.0
+            speed_download: 4028.0
+            speed_upload: 0.0
+            download_content_length: 763.0
+            upload_content_length: 0.0
+            starttransfer_time: 0.189409
+            redirect_time: 0.0
+            redirect_url: ''
+            primary_ip: 86.48.32.124
+            certinfo: {  }
+            primary_port: 443
+            local_ip: 172.23.0.3
+            local_port: 40058
+            http_version: 2
+            protocol: 2
+            ssl_verifyresult: 0
+            scheme: https
+            appconnect_time_us: 20075
+            connect_time_us: 8522
+            namelookup_time_us: 11
+            pretransfer_time_us: 20101
+            redirect_time_us: 0
+            starttransfer_time_us: 189409
+            posttransfer_time_us: 20104
+            total_time_us: 189421
+            effective_method: GET
+            capath: /etc/ssl/certs
+            cainfo: /etc/ssl/certs/ca-certificates.crt
+    index: 0

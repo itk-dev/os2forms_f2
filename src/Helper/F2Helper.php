@@ -116,7 +116,7 @@ class F2Helper {
    * Get integer ID from F2 item URL.
    */
   private function getId(string $url): int {
-    if (preg_match('@/cases/(?<id>\d+)$@', $url, $matches)) {
+    if (preg_match('@/(?<id>\d+)$@', $url, $matches)) {
       return (int) $matches['id'];
     }
 
