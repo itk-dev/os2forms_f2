@@ -181,10 +181,10 @@ screenshooting ${selector}
   await vcrRecord(context + "-add-handler");
 
   // Add handler
-  await goto("admin/structure/webform/manage/os2forms_f2_ex_000/handlers");
+  await goto("admin/structure/webform/manage/os2forms_f2_test_000/handlers");
   await page
     .locator(
-      '[data-drupal-link-system-path="admin/structure/webform/manage/os2forms_f2_ex_000/handlers/add"]',
+      '[data-drupal-link-system-path="admin/structure/webform/manage/os2forms_f2_test_000/handlers/add"]',
     )
     .click();
   await page.locator(".form-element--type-search").fill("F2");
@@ -193,7 +193,7 @@ screenshooting ${selector}
   await screenshot("webform-handler-select-f2", ".webform-ui-dialog");
 
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_000/handlers/add/os2forms_f2_f2",
+    "admin/structure/webform/manage/os2forms_f2_test_000/handlers/add/os2forms_f2_f2",
   );
   await screenshot("webform-handler-add-general", "#webform-handler-form");
   await screenshot(
@@ -203,7 +203,7 @@ screenshooting ${selector}
 
   // Archive on case
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_000/handlers/add/os2forms_f2_f2",
+    "admin/structure/webform/manage/os2forms_f2_test_000/handlers/add/os2forms_f2_f2",
   );
 
   await page.locator('[name="label"]').fill("F2 – arkivér på sag");
@@ -272,11 +272,11 @@ screenshooting ${selector}
     ".messages__wrapper",
   );
 
-  await goto("admin/structure/webform/manage/os2forms_f2_ex_000/handlers");
+  await goto("admin/structure/webform/manage/os2forms_f2_test_000/handlers");
   await screenshot("webform-handler-added", ".page-wrapper");
 
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_000/handlers/f2_arkiver_paa_sag/edit",
+    "admin/structure/webform/manage/os2forms_f2_test_000/handlers/f2_arkiver_paa_sag/edit",
   );
   await screenshot(
     "webform-handler-archive-on-case-case-details",
@@ -285,7 +285,7 @@ screenshooting ${selector}
 
   // Archive on matter
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_000/handlers/add/os2forms_f2_f2",
+    "admin/structure/webform/manage/os2forms_f2_test_001/handlers/add/os2forms_f2_f2",
   );
 
   await page.locator('[name="label"]').fill("F2 – arkivér på akt");
@@ -341,21 +341,19 @@ screenshooting ${selector}
     ".messages__wrapper",
   );
 
-  await goto("admin/structure/webform/manage/os2forms_f2_ex_000/handlers");
+  await goto("admin/structure/webform/manage/os2forms_f2_test_001/handlers");
   await screenshot("webform-handler-added-2", ".page-wrapper");
 
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_000/handlers/f2_arkiver_paa_akt/edit",
+    "admin/structure/webform/manage/os2forms_f2_test_001/handlers/f2_arkiver_paa_akt/edit",
   );
   await screenshot(
     "webform-handler-archive-on-matter-matter-details",
     "#edit-settings-os2forms-f2-f2-archive-archive-target-matter",
   );
 
-  // Existing handler
-
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_001/handlers/f2_archive_on_case/edit",
+    "admin/structure/webform/manage/os2forms_f2_test_000/handlers/f2_arkiver_paa_sag/edit",
   );
   await screenshot(
     "webform-handler-archive-on-case",
@@ -367,7 +365,7 @@ screenshooting ${selector}
   );
 
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_001/handlers/f2_archive_on_matter/edit",
+    "admin/structure/webform/manage/os2forms_f2_test_001/handlers/f2_arkiver_paa_akt/edit",
   );
   await screenshot(
     "webform-handler-archive-on-matter",
@@ -378,11 +376,11 @@ screenshooting ${selector}
     "#edit-settings-os2forms-f2-f2-archive-archive-target-matter",
   );
 
-  await goto("admin/structure/webform/manage/os2forms_f2_ex_001/handlers");
+  await goto("admin/structure/webform/manage/os2forms_f2_test_000/handlers");
   await screenshot("webform-handlers", "#webform-handlers");
 
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_001/handlers/f2_archive_on_case/edit",
+    "admin/structure/webform/manage/os2forms_f2_test_000/handlers/f2_arkiver_paa_sag/edit",
   );
   await page.getByRole("tab", { name: "Avanceret" }).click();
   await expect(page.getByText("Yderligere indstillinger")).toBeVisible();
@@ -454,17 +452,18 @@ screenshooting ${selector}
 
   await drush([
     "sql:query",
-    [
-      "TRUNCATE advancedqueue",
-      "TRUNCATE webform_submission_log",
-      "TRUNCATE webform_submission_data",
-      "TRUNCATE webform_submission",
-      "ALTER TABLE webform_submission AUTO_INCREMENT = 1",
-      "UPDATE webform SET next_serial = 1",
-    ].join(";"),
+    `
+TRUNCATE advancedqueue;
+TRUNCATE webform_submission_log;
+TRUNCATE webform_submission_data;
+TRUNCATE webform_submission;
+TRUNCATE os2forms_f2_f2_item;
+ALTER TABLE webform_submission AUTO_INCREMENT = 1;
+UPDATE webform SET next_serial = 1;
+`,
   ]);
 
-  await goto("webform/os2forms_f2_ex_000");
+  await goto("webform/os2forms_f2_test_000");
   await screenshot("form-empty");
 
   await page
@@ -476,7 +475,7 @@ screenshooting ${selector}
   await screenshot("form-submitted");
 
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_000/submission/1/log",
+    "admin/structure/webform/manage/os2forms_f2_test_000/submission/1/log",
   );
   await screenshot("submission-log");
 
@@ -485,7 +484,7 @@ screenshooting ${selector}
   await drush(["advancedqueue:queue:process", "os2forms_f2"]);
 
   await goto(
-    "admin/structure/webform/manage/os2forms_f2_ex_000/submission/1/log",
+    "admin/structure/webform/manage/os2forms_f2_test_000/submission/1/log",
   );
   await screenshot("submission-log-after-queue-processed");
 

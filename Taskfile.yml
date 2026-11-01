@@ -198,13 +198,13 @@ tasks:
     cmds:
       - ddev drush --yes site:install
       - ddev drush --yes user:password admin password
-      - ddev drush --yes pm:uninstall update
+      - ddev drush --yes pm:uninstall update announcements_feed
 
       # Patch https://github.com/OS2Forms/os2forms/blob/develop/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
       - |
         ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' */modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
 
-      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_test_playwright drupal_translation_extractor
+      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_f2_test drupal_translation_extractor
 
       # Some defaults
       - ddev drush --yes config:set os2forms_f2.settings f2_api.log_level debug
@@ -236,12 +236,14 @@ tasks:
     prompt: Really reset Drupal site?
     cmds:
       - ddev drush --yes config:import --partial --source modules/custom/os2forms_f2/modules/os2forms_f2_examples/config/install
+      - ddev drush --yes config:import --partial --source modules/custom/os2forms_f2/modules/os2forms_f2_test/config/install
       - >-
         ddev drush --yes sql:query "
         TRUNCATE advancedqueue;
         TRUNCATE webform_submission_log;
         TRUNCATE webform_submission_data;
         TRUNCATE webform_submission;
+        TRUNCATE os2forms_f2_f2_item;
         ALTER TABLE webform_submission AUTO_INCREMENT = 1;
         UPDATE webform SET next_serial = 1;
         "

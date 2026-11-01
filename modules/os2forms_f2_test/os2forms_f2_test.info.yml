@@ -1,0 +1,8 @@
+name: "F2 test"
+type: module
+description: "OS2Forms: F2 test"
+package: OS2Forms
+core_version_requirement: ^11
+dependencies:
+  - os2forms_f2:os2forms_f2
+  - os2forms_test_playwright:os2forms_test_playwright
