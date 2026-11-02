@@ -45,7 +45,7 @@ final class ExecController extends ControllerBase {
 
       $this->logger->debug('Running command @command @arguments', [
         '@command' => $command,
-        '@arguments' => $arguments,
+        '@arguments' => json_encode($arguments),
       ]);
 
       $response = new StreamedResponse(headers: [

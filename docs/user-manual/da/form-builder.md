@@ -24,9 +24,11 @@ på yderligere muligheder i behandlerindstillingerne.
 
 Som bekendt ligger dokumenter i F2 på en akt, og for at arkivere på en sag opretter behandleren derfor indledningsvist
 en akt som dokumentet kan knyttes til. For at arkivere på en sag skal man angive et id der entydigt udpeger en sag i F2.
-Det vil være oplagt at bruge et sagsnummer
+Det vil være oplagt at bruge et sagsnummer.
 
 ![Arkivér på sag](./images/generated/form-builder/webform-handler-add-archive-on-case.png)
+
+Akttypen er som standard “Intern" og det vil formentlig aldrig blive aktuelt at ændre den til noget andet.
 
 ![Udfyldt "Arkivér på sag"](./images/generated/form-builder/webform-handler-add-archive-on-case-filled.png)
 
@@ -43,6 +45,16 @@ Hvis id'et entydigt identificerer en sag i F2, så har man med succes tilføjet 
 Hvis man, som antydet, redigerer en F2-behandler kan man se detaljer om hvilken sag der faktisk arkiveres på:
 
 ![Detaljer om sag](./images/generated/form-builder/webform-handler-archive-on-case-case-details.png)
+
+### Indsendelse af formular
+
+Når en bruger indsender en besvarelse af en formular med en F2-behandler, så oprettes et job i F2-job i køen:
+
+![Resultatloggen efter indsendelse](./images/generated/webform-submission/submission-log.png)
+
+Når jobbet i køen er blevet behandlet kan man se hvad der faktisk er sket:
+
+![Resultatloggen efter behandling af kø](./images/generated/webform-submission/submission-log-after-queue-processed.png)
 
 ## Arkivering på akt
 

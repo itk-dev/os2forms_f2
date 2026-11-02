@@ -146,7 +146,7 @@ final class VcrOperator implements EventSubscriberInterface {
   }
 
   /**
-   *
+   * Validate configuration.
    */
   private function validateConfiguration(): array {
     $configuration = $this->state->get(self::CONFIGURATION);

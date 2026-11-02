@@ -186,3 +186,16 @@ to reset Drupal before generating the images.
 > [!TIP]
 > See [Run a Playwright command](https://addons.ddev.com/addons/julienloizelet/ddev-playwright#run-a-playwright-command)
 > for other cool tricks supported by DDEV and the Playwright add-on.
+
+We use [php-vcr](https://github.com/php-vcr/php-vcr) to record and replay interactions with the F2 API during testing
+and store cassettes in `tests/vcr-cassettes`.
+
+> [!NOTE]
+> php-vcr has some redaction issues (cf. <https://github.com/php-vcr/php-vcr/issues/503>) so we're not yet ready to
+> publish cassettes and Git ignore the cassettes for now.
+
+---
+
+``` shell
+ddev dotenv set .env.local --os2forms-f2-test=value
+```
