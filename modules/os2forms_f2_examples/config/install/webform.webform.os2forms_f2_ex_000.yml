@@ -13,7 +13,7 @@ uid: 0
 template: false
 archive: false
 id: os2forms_f2_ex_000
-title: F2
+title: F2 (archive on case)
 description: null
 categories: {  }
 elements: |-
@@ -212,5 +212,25 @@ access:
     roles: {  }
     users: {  }
     permissions: {  }
-handlers: {  }
+handlers:
+  f2_archive_on_case:
+    id: os2forms_f2_f2
+    handler_id: f2_archive_on_case
+    label: 'F2 (arkivér på sag)'
+    notes: ''
+    status: true
+    conditions: {  }
+    weight: 1
+    settings:
+      archive:
+        attachment_element: attachment
+        document_title: '[webform_submission:label] ([site:url]) – [current-date:html_datetime]'
+        archive_target: case
+        archive_target_case:
+          case_identifier: '2026 - 1234567890'
+          matter_title: 'Matter: [webform_submission:label] ([site:url]) – [current-date:html_datetime]'
+          matter_type: Internal
+      additional:
+        states:
+          - completed
 variants: {  }

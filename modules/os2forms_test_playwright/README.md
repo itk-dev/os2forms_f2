@@ -47,3 +47,14 @@ Files, Public    : sites/default/files
 Files, Temp      : /tmp
 Drupal config    : sites/default/files/sync
 ```
+
+Control [php-cvr](https://php-vcr.github.io/php-vcr/):
+
+@todo
+
+``` shell
+# Insert cassette and start recording
+$ ddev exec curl http://localhost/os2forms-test-playwright/vcr/record --json '{"cassette": "my_cassette"}'
+# Eject cassette
+$ ddev exec curl http://localhost/os2forms-test-playwright/vcr/eject --request POST
+```

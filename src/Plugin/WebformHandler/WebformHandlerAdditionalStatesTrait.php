@@ -87,7 +87,6 @@ trait WebformHandlerAdditionalStatesTrait {
         WebformSubmissionInterface::STATE_CONVERTED => $this->t('anonymous <b>submission is converted</b> to authenticated.', options: ['context' => 'os2forms_f2']),
         WebformSubmissionInterface::STATE_COMPLETED => $this->t('<b>submission is completed</b>.', options: ['context' => 'os2forms_f2']),
         WebformSubmissionInterface::STATE_UPDATED => $this->t('<b>submission is updated</b>.', options: ['context' => 'os2forms_f2']),
-        WebformSubmissionInterface::STATE_DELETED => $this->t('<b>submission is deleted</b>.', options: ['context' => 'os2forms_f2']),
         WebformSubmissionInterface::STATE_LOCKED => $this->t('<b>submission is locked</b>.', options: ['context' => 'os2forms_f2']),
       ],
       '#access' => !$resultsDisabled,

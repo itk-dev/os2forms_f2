@@ -6,3 +6,13 @@ os2forms_test_playwright.exec:
     _permission: "access content"
   methods: POST
   no_cache: TRUE
+
+os2forms_test_playwright.vcr:
+  path: "/os2forms-test-playwright/vcr/{command}"
+  defaults:
+    _controller: '\Drupal\os2forms_test_playwright\Controller\VcrController'
+    argument: null
+  requirements:
+    _permission: "access content"
+  methods: POST
+  no_cache: TRUE

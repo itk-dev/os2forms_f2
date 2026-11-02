@@ -3,8 +3,7 @@ parameters:
     paths:
      - src
     ignoreErrors:
-        - message: '#Constructor of class Drupal\\os2forms_f2\\Exception\\F2NonUniqueCaseException has an unused parameter \$message.#'
-          path: src/Exception/F2NonUniqueCaseException.php
+        - message: '#Constructor of class Drupal\\os2forms_f2\\Exception\\F2NonUnique(Case|Matter)Exception has an unused parameter \$message.#'
         - message: '#Method Drupal\\os2forms_f2\\.+\(\) return type has no value type specified in iterable type array.#'
         - message: '#Method Drupal\\os2forms_f2\\.+\(\) has parameter \$.+ with no value type specified in iterable type array.#'
         - message: '#Function .+\(\) return type has no value type specified in iterable type array.#'

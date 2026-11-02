@@ -5,3 +5,7 @@ services:
   logger.channel.os2forms_test_playwright:
     parent: logger.channel_base
     arguments: ["os2forms_test_playwright"]
+
+  Drupal\os2forms_test_playwright\VcrOperator:
+    tags:
+      - { name: event_subscriber }
