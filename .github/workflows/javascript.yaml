@@ -16,7 +16,7 @@ name: JavaScript
 on:
   pull_request:
     paths: &paths
-      - "tests/**/*.{js,ts}"
+      - "tests/**/*.ts"
       - "docker-compose.yml"
   push:
     branches:

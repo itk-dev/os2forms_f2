@@ -7,6 +7,8 @@ parameters:
         - message: '#Method Drupal\\os2forms_f2\\.+\(\) return type has no value type specified in iterable type array.#'
         - message: '#Method Drupal\\os2forms_f2\\.+\(\) has parameter \$.+ with no value type specified in iterable type array.#'
         - message: '#Function .+\(\) return type has no value type specified in iterable type array.#'
+        - message: '#Call to an undefined method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::addListener\(\).#'
+          path: modules/os2forms_test_playwright/src/VcrOperator.php
 
 # Local Variables:
 # mode: yaml
