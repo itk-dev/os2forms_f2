@@ -131,7 +131,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $queue->enqueueJob($job);
       $context['@queue'] = $queue->id();
       $this->notice('F2 job (archive on @archive_target) added to the queue @queue.', $context + [
-        '@archive_target' => $handlerSettings->archive?->archiveTarget?->value ?? '',
+        '@archive_target' => $handlerSettings->archive->archiveTarget->value,
       ]);
 
       return $job;

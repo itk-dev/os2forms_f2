@@ -391,7 +391,6 @@ screenshooting ${selector}
   await vcrEject();
 });
 
-
 test("webform submission", async ({ page }) => {
   const context = "webform-submission";
   const locale = "da";

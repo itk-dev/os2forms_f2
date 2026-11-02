@@ -53,7 +53,7 @@ jobs:
       - uses: go-task/setup-task@v2
 
       - name: Install Drupal site
-        run: task drupal:site:install
+        run: task drupal:site:install --yes
 
       - name: Extract translations
         run: task translations:extract

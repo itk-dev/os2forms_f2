@@ -33,6 +33,9 @@ final class VcrOperator implements EventSubscriberInterface {
    *
    * @param array<string, mixed> $configuration
    *   The configuration.
+   *
+   * @return array<string, mixed>
+   *   The complete and validated configuration.
    */
   public function configure(array $configuration): array {
     $conf = $this->state->get(self::CONFIGURATION);
@@ -147,6 +150,9 @@ final class VcrOperator implements EventSubscriberInterface {
 
   /**
    * Validate configuration.
+   *
+   * @return array<string, mixed>
+   *   The complete and validated configuration.
    */
   private function validateConfiguration(): array {
     $configuration = $this->state->get(self::CONFIGURATION);
