@@ -154,6 +154,7 @@ tasks:
           --finder-do-not-ignore-vcs-ignored
       # Show any changes
       - task: translations:git:diff
+        ignore_error: true
       # Restore if only some metadata is changed
       - task: translations:git:restore
 
