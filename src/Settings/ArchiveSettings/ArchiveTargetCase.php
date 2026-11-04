@@ -21,4 +21,7 @@ final class ArchiveTargetCase extends AbstractSettings {
   const string MATTER_TYPE = 'matter_type';
   public ?string $matterType = Matter::TYPE_INTERNAL;
 
+  const string MATTER_ACCESS_LEVEL = 'matter_access_level';
+  public ?string $matterAccessLevel = Matter::ACCESS_LEVEL_ALL;
+
 }

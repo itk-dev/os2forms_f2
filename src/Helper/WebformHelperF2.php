@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\ElementInfoManager;
+use Drupal\os2forms_f2\Exception\F2Exception;
 use Drupal\os2forms_f2\Exception\InvalidAttachmentElementException;
 use Drupal\os2forms_f2\Exception\RuntimeException;
 use Drupal\os2forms_f2\Exception\SubmissionNotFoundException;
@@ -175,6 +176,24 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $handlerSettings = new HandlerSettings($payload['handlerSettings']);
       $this->replaceTokens($handlerSettings, $submission);
 
+      $documentTitle = $handlerSettings->archive->documentTitle;
+      $documentTitleLength = mb_strlen($documentTitle);
+      if ($documentTitleLength > Document::TITLE_MAX_LENGTH) {
+        throw new F2Exception(sprintf(
+          'Document title "%s" is too long. Maximum length is %s, but the actual length is %d.',
+          $documentTitle, Document::TITLE_MAX_LENGTH, $documentTitleLength
+        ));
+      }
+
+      $matterTitle = $handlerSettings->archive->archiveTargetCase->matterTitle ?? '';
+      $matterTitleLength = mb_strlen($matterTitle);
+      if ($matterTitleLength > Matter::TITLE_MAX_LENGTH) {
+        throw new F2Exception(sprintf(
+          'Matter title "%s" is too long. Maximum length is %s, but the actual length is %d.',
+          $matterTitle, Matter::TITLE_MAX_LENGTH, $matterTitleLength
+        ));
+      }
+
       $target = $handlerSettings->archive?->archiveTarget;
       return match ($target) {
         ArchiveTarget::Case => $this->archiveOnCase($submission, $handlerSettings),
@@ -241,6 +260,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $matter = new Matter();
       $matter->title = $handlerSettings->archive->archiveTargetCase->matterTitle;
       $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
+      $matter->accessLevel = $handlerSettings->archive->archiveTargetCase->matterAccessLevel;
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
 
       $this->info('Matter for submission @submission created: @matter', $context + [
