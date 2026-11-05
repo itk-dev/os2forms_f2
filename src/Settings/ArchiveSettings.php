@@ -2,6 +2,7 @@
 
 namespace Drupal\os2forms_f2\Settings;
 
+use Drupal\Core\Site\Settings as DrupalSettings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetCase;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetMatter;
@@ -38,5 +39,12 @@ final class ArchiveSettings extends AbstractSettings {
 
   const string ARCHIVE_TARGET_MATTER = 'archive_target_matter';
   public ?ArchiveTargetMatter $archiveTargetMatter = NULL;
+
+  /**
+   * Get value of "matter responsible party" feature flags.
+   */
+  public static function isMatterResponsiblePartyEnabled(): bool {
+    return TRUE === (DrupalSettings::get('os2forms_f2')[ArchiveSettings::NAME][ArchiveTargetCase::MATTER_RESPONSIBLE_PARTY_IDENTIFIER]['enabled'] ?? NULL);
+  }
 
 }

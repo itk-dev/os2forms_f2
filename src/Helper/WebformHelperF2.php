@@ -28,6 +28,7 @@ use Drupal\webform\WebformTokenManagerInterface;
 use Drupal\webform_attachment\Element\WebformAttachmentBase;
 use ItkDev\F2ApiClient\Model\Document;
 use ItkDev\F2ApiClient\Model\Matter;
+use ItkDev\F2ApiClient\Model\Party;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -263,6 +264,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $matter->accessLevel = $handlerSettings->archive->archiveTargetCase->matterAccessLevel;
       // Always archive ("journaliser") matter.
       $matter->archived = TRUE;
+      $this->setMatterResponsible($matter, $handlerSettings);
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
 
       $this->info('Matter for submission @submission created: @matter', $context + [
@@ -407,6 +409,31 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $mimeType,
       $fileName
     );
+  }
+
+  /**
+   * Set responsible party on matter if requested.
+   */
+  private function setMatterResponsible(Matter $matter, HandlerSettings $handlerSettings): void {
+    if (!ArchiveSettings::isMatterResponsiblePartyEnabled()) {
+      return;
+    }
+
+    $partyIdentifier = $handlerSettings->archive->archiveTargetCase->matterResponsiblePartyIdentifier;
+    if (NULL != $partyIdentifier) {
+      $responsible = new Party();
+      if ($partyNumber = filter_var($partyIdentifier, FILTER_VALIDATE_INT)) {
+        $responsible->partyNumber = $partyNumber;
+      }
+      elseif ($email = filter_var($partyIdentifier, FILTER_VALIDATE_EMAIL)) {
+        $responsible->email = $email;
+      }
+      else {
+        // Unhandled value.
+        return;
+      }
+      $matter->responsible = $responsible;
+    }
   }
 
 }
