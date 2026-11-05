@@ -261,6 +261,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $matter->title = $handlerSettings->archive->archiveTargetCase->matterTitle;
       $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
       $matter->accessLevel = $handlerSettings->archive->archiveTargetCase->matterAccessLevel;
+      $matter->archived = true;
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
 
       $this->info('Matter for submission @submission created: @matter', $context + [
