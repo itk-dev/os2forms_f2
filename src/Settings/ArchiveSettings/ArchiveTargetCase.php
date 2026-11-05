@@ -24,4 +24,7 @@ final class ArchiveTargetCase extends AbstractSettings {
   const string MATTER_ACCESS_LEVEL = 'matter_access_level';
   public ?string $matterAccessLevel = Matter::ACCESS_LEVEL_ALL;
 
+  const string MATTER_RESPONSIBLE_PARTY_IDENTIFIER = 'matter_responsible_party_identifier';
+  public ?string $matterResponsiblePartyIdentifier = NULL;
+
 }

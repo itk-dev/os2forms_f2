@@ -196,6 +196,12 @@ and store cassettes in `tests/vcr-cassettes`.
 
 ---
 
-``` shell
-ddev dotenv set .env.local --os2forms-f2-test=value
+## Feature flags
+
+Some features are not yet ready for production, but can be enabled by settings in `settings.local.php`:
+
+``` php
+# settings.local.php
+// Enable responsible party on matter
+$settings['os2forms_f2']['archive']['matter_responsible_party_identifier']['enabled'] = TRUE;
 ```
