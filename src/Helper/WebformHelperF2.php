@@ -238,7 +238,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     }
     $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
 
-    $this->info('Achiving document for submission @submission on case @case ', $context + [
+    $this->info('Archiving document for submission @submission on case @case ', $context + [
       '@submission' => $submission->label(),
       '@case' => (string) $case,
     ]);
@@ -298,7 +298,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     }
     $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
 
-    $this->info('Achiving document for submission @submission on matter @matter ', $context + [
+    $this->info('Archiving document for submission @submission on matter @matter ', $context + [
       '@submission' => $submission->label(),
       '@matter' => (string) $matter,
     ]);
