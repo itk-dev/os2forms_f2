@@ -248,6 +248,12 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             ],
           ],
 
+          ArchiveTargetCase::MATTER_RESPONSIBLE_PARTY_IDENTIFIER => [
+            '#type' => 'textfield',
+            '#title' => $this->t('Responsible party identifier', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The party responsible for the matter that will be created. Can be a party number or an email address.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase->matterResponsiblePartyIdentifier,
+          ],
         ],
 
         ArchiveTargetMatter::NAME => [
@@ -383,6 +389,24 @@ final class WebformHandlerF2 extends WebformHandlerBase {
               ], options: ['context' => 'os2forms_f2']));
             }
           }
+
+          // Validate responsible party identifier.
+          $key = [
+            self::ID,
+            ArchiveSettings::NAME,
+            ArchiveTargetCase::NAME,
+            ArchiveTargetCase::MATTER_RESPONSIBLE_PARTY_IDENTIFIER,
+          ];
+          $partyIdentifier = trim((string) $form_state->getValue($key));
+          if ('' !== $partyIdentifier) {
+            if (FALSE === filter_var($partyIdentifier, FILTER_VALIDATE_INT)
+              && FALSE === filter_var($partyIdentifier, FILTER_VALIDATE_EMAIL)) {
+              $setError($key, t('Party identifier "@party_identifier" must be an integer or an email address.', [
+                '@party_identifier' => $partyIdentifier,
+              ], options: ['context' => 'os2forms_f2']));
+            }
+          }
+
           break;
 
         case ArchiveTarget::Matter:
