@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\ElementInfoManager;
+use Drupal\os2forms_f2\Exception\F2Exception;
 use Drupal\os2forms_f2\Exception\InvalidAttachmentElementException;
 use Drupal\os2forms_f2\Exception\RuntimeException;
 use Drupal\os2forms_f2\Exception\SubmissionNotFoundException;
@@ -27,6 +28,7 @@ use Drupal\webform\WebformTokenManagerInterface;
 use Drupal\webform_attachment\Element\WebformAttachmentBase;
 use ItkDev\F2ApiClient\Model\Document;
 use ItkDev\F2ApiClient\Model\Matter;
+use ItkDev\F2ApiClient\Model\Party;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -175,6 +177,24 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $handlerSettings = new HandlerSettings($payload['handlerSettings']);
       $this->replaceTokens($handlerSettings, $submission);
 
+      $documentTitle = $handlerSettings->archive->documentTitle;
+      $documentTitleLength = mb_strlen($documentTitle);
+      if ($documentTitleLength > Document::TITLE_MAX_LENGTH) {
+        throw new F2Exception(sprintf(
+          'Document title "%s" is too long. Maximum length is %s, but the actual length is %d.',
+          $documentTitle, Document::TITLE_MAX_LENGTH, $documentTitleLength
+        ));
+      }
+
+      $matterTitle = $handlerSettings->archive->archiveTargetCase->matterTitle ?? '';
+      $matterTitleLength = mb_strlen($matterTitle);
+      if ($matterTitleLength > Matter::TITLE_MAX_LENGTH) {
+        throw new F2Exception(sprintf(
+          'Matter title "%s" is too long. Maximum length is %s, but the actual length is %d.',
+          $matterTitle, Matter::TITLE_MAX_LENGTH, $matterTitleLength
+        ));
+      }
+
       $target = $handlerSettings->archive?->archiveTarget;
       return match ($target) {
         ArchiveTarget::Case => $this->archiveOnCase($submission, $handlerSettings),
@@ -219,7 +239,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     }
     $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
 
-    $this->info('Achiving document for submission @submission on case @case ', $context + [
+    $this->info('Archiving document for submission @submission on case @case ', $context + [
       '@submission' => $submission->label(),
       '@case' => (string) $case,
     ]);
@@ -241,6 +261,10 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $matter = new Matter();
       $matter->title = $handlerSettings->archive->archiveTargetCase->matterTitle;
       $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
+      $matter->accessLevel = $handlerSettings->archive->archiveTargetCase->matterAccessLevel;
+      // Always archive ("journaliser") matter.
+      $matter->archived = TRUE;
+      $this->setMatterResponsible($matter, $handlerSettings);
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
 
       $this->info('Matter for submission @submission created: @matter', $context + [
@@ -278,7 +302,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     }
     $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
 
-    $this->info('Achiving document for submission @submission on matter @matter ', $context + [
+    $this->info('Archiving document for submission @submission on matter @matter ', $context + [
       '@submission' => $submission->label(),
       '@matter' => (string) $matter,
     ]);
@@ -385,6 +409,31 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $mimeType,
       $fileName
     );
+  }
+
+  /**
+   * Set responsible party on matter if requested.
+   */
+  private function setMatterResponsible(Matter $matter, HandlerSettings $handlerSettings): void {
+    if (!ArchiveSettings::isMatterResponsiblePartyEnabled()) {
+      return;
+    }
+
+    $partyIdentifier = $handlerSettings->archive->archiveTargetCase->matterResponsiblePartyIdentifier;
+    if (NULL != $partyIdentifier) {
+      $responsible = new Party();
+      if ($partyNumber = filter_var($partyIdentifier, FILTER_VALIDATE_INT)) {
+        $responsible->partyNumber = $partyNumber;
+      }
+      elseif ($email = filter_var($partyIdentifier, FILTER_VALIDATE_EMAIL)) {
+        $responsible->email = $email;
+      }
+      else {
+        // Unhandled value.
+        return;
+      }
+      $matter->responsible = $responsible;
+    }
   }
 
 }

@@ -18,6 +18,7 @@ use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetMatter;
 use Drupal\webform\Plugin\WebformHandlerBase;
 use Drupal\webform\Utility\WebformDialogHelper;
 use Drupal\webform\WebformSubmissionInterface;
+use ItkDev\F2ApiClient\Model\Document;
 use ItkDev\F2ApiClient\Model\Matter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -127,7 +128,9 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#type' => 'textfield',
           '#required' => TRUE,
           '#title' => $this->t('Document title', options: ['context' => 'os2forms_f2']),
-          '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.', options: ['context' => 'os2forms_f2']),
+          '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>. Max allowed length (after token expansion): @title_max_length.', [
+            '@title_max_length' => Document::TITLE_MAX_LENGTH,
+          ], options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->documentTitle,
         ],
 
@@ -179,7 +182,9 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           ArchiveTargetCase::MATTER_TITLE => [
             '#type' => 'textfield',
             '#title' => $this->t('Matter title', options: ['context' => 'os2forms_f2']),
-            '#description' => $this->t('The title of the matter that will be created for the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>.', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The title of the matter that will be created for the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>. Max allowed length (after token expansion): @title_max_length.', [
+              '@title_max_length' => Matter::TITLE_MAX_LENGTH,
+            ], options: ['context' => 'os2forms_f2']),
             '#default_value' => $settings->archiveTargetCase?->matterTitle,
 
             '#states' => [
@@ -219,6 +224,37 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             ],
           ],
 
+          ArchiveTargetCase::MATTER_ACCESS_LEVEL => [
+            '#type' => 'select',
+            '#options' => [
+              Matter::ACCESS_LEVEL_INVOLVED => $this->t('Involved', options: ['context' => 'os2forms_f2']),
+              Matter::ACCESS_LEVEL_UNIT => $this->t('Unit', options: ['context' => 'os2forms_f2']),
+              Matter::ACCESS_LEVEL_ALL => $this->t('All', options: ['context' => 'os2forms_f2']),
+            ],
+            '#title' => $this->t('Matter access level', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The access level of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase->matterAccessLevel ?? Matter::ACCESS_LEVEL_ALL,
+
+            '#states' => [
+              'required' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
+                  'value' => ArchiveTarget::Case->value,
+                ],
+              ],
+            ],
+          ],
+
+          ArchiveTargetCase::MATTER_RESPONSIBLE_PARTY_IDENTIFIER => [
+            '#type' => 'textfield',
+            '#title' => $this->t('Responsible party identifier', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The party responsible for the matter that will be created. Can be a party number or an email address.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase->matterResponsiblePartyIdentifier ?? NULL,
+            '#access' => ArchiveSettings::isMatterResponsiblePartyEnabled(),
+          ],
         ],
 
         ArchiveTargetMatter::NAME => [
@@ -354,6 +390,26 @@ final class WebformHandlerF2 extends WebformHandlerBase {
               ], options: ['context' => 'os2forms_f2']));
             }
           }
+
+          if (ArchiveSettings::isMatterResponsiblePartyEnabled()) {
+            // Validate responsible party identifier.
+            $key = [
+              self::ID,
+              ArchiveSettings::NAME,
+              ArchiveTargetCase::NAME,
+              ArchiveTargetCase::MATTER_RESPONSIBLE_PARTY_IDENTIFIER,
+            ];
+            $partyIdentifier = trim((string) $form_state->getValue($key));
+            if ('' !== $partyIdentifier) {
+              if (FALSE === filter_var($partyIdentifier, FILTER_VALIDATE_INT)
+              && FALSE === filter_var($partyIdentifier, FILTER_VALIDATE_EMAIL)) {
+                $setError($key, t('Party identifier "@party_identifier" must be an integer or an email address.', [
+                  '@party_identifier' => $partyIdentifier,
+                ], options: ['context' => 'os2forms_f2']));
+              }
+            }
+          }
+
           break;
 
         case ArchiveTarget::Matter:
