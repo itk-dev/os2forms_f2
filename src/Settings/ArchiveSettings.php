@@ -31,6 +31,12 @@ final class ArchiveSettings extends AbstractSettings {
   const string DOCUMENT_TITLE = 'document_title';
   public ?string $documentTitle = NULL;
 
+  const string ARCHIVE_FILES = 'archive_files';
+  public bool $archiveFiles = FALSE;
+
+  const string FILE_DOCUMENT_TITLE = 'file_document_title';
+  public ?string $fileDocumentTitle = NULL;
+
   const string ARCHIVE_TARGET = 'archive_target';
   public ?ArchiveTarget $archiveTarget = NULL;
 

@@ -205,7 +205,7 @@ tasks:
       - |
         ddev exec sed --in-place 's/id: node_type$/id: entity_bundle:node/' */modules/contrib/os2forms/config/optional/pathauto.pattern.os2forms_wf_webforms.yml
 
-      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_f2_test drupal_translation_extractor
+      - ddev drush --yes pm:install os2forms_f2 os2forms_f2_examples os2forms_f2_test drupal_translation_extractor itkdev_advancedqueue_addons
 
       # Some defaults
       - ddev drush --yes config:set os2forms_f2.settings f2_api.log_level debug

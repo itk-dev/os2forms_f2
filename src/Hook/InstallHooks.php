@@ -45,6 +45,11 @@ final class InstallHooks {
           'length' => '256',
           'not null' => TRUE,
         ],
+        'identifier' => [
+          'description' => 'Optional identifier for the item.',
+          'type' => 'varchar',
+          'length' => '256',
+        ],
         'data' => [
           'description' => 'The data (JSON serialized).',
           'type' => 'text',

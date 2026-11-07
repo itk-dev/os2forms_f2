@@ -88,7 +88,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   /**
    * {@inheritdoc}
    *
-   * @phpstan-return array<string, mixed>
+   * @return array<string, mixed>
+   *   The default configuration.
    */
   #[\Override]
   public function defaultConfiguration() {
@@ -132,6 +133,52 @@ final class WebformHandlerF2 extends WebformHandlerBase {
             '@title_max_length' => Document::TITLE_MAX_LENGTH,
           ], options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->documentTitle,
+        ],
+
+        ArchiveSettings::ARCHIVE_FILES => [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Archive files', options: ['context' => 'os2forms_f2']),
+          '#description' => $this->t('If checked, any files on a submission will be archived in F2.', [
+            '@title_max_length' => Document::TITLE_MAX_LENGTH,
+          ], options: ['context' => 'os2forms_f2']),
+          '#default_value' => $settings->archiveFiles,
+        ],
+
+        ArchiveSettings::FILE_DOCUMENT_TITLE => [
+          '#type' => 'textfield',
+          '#title' => $this->t('File document title', options: ['context' => 'os2forms_f2']),
+          '#description' => $this->t(<<<'DESCRIPTION'
+Title used for file documents. Tokens can be used in the title, and in addition the regular webform submission token (e.g. <code>[webform_submission:label]</code>) these tokens can be used:
+<ul>
+<li><code>[file:name]</code> the name of the file without any extension, e.g. <code>my-document</code> (this is recommended by F2)</li>
+<li><code>[file:filename]</code> the full filename e.g. <code>my-document.pdf</code></li>
+</ul>
+Max allowed length (after token expansion): @title_max_length.
+DESCRIPTION, [
+            '@title_max_length' => Document::TITLE_MAX_LENGTH,
+          ], options: ['context' => 'os2forms_f2']),
+          '#default_value' => $settings->fileDocumentTitle ?: '[file:name]',
+
+          '#states' => [
+            'visible' => [
+              ':input[name="settings[' . implode('][', [
+                self::ID,
+                ArchiveSettings::NAME,
+                ArchiveSettings::ARCHIVE_FILES,
+              ]) . ']"]' => [
+                'checked' => TRUE,
+              ],
+            ],
+            'required' => [
+              ':input[name="settings[' . implode('][', [
+                self::ID,
+                ArchiveSettings::NAME,
+                ArchiveSettings::ARCHIVE_FILES,
+              ]) . ']"]' => [
+                'checked' => TRUE,
+              ],
+            ],
+          ],
         ],
 
         ArchiveSettings::ARCHIVE_TARGET => [
@@ -521,7 +568,8 @@ final class WebformHandlerF2 extends WebformHandlerBase {
   /**
    * Get attachment elements.
    *
-   * @phpstan-return array<string, mixed>
+   * @return array<string, mixed>
+   *   The attachment elements.
    */
   private function getAttachmentElements(): array {
     $elements = $this->getWebform()->getElementsDecodedAndFlattened();
