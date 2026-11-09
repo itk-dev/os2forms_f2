@@ -219,6 +219,11 @@ screenshooting ${selector}
     .locator('[name="settings[os2forms_f2_f2][archive][document_title]"]')
     .fill("[webform_submission:label] ([site:url])");
   await page
+    .locator('[name="settings[os2forms_f2_f2][archive][archive_files]"]')
+    .check();
+  // Wait for checkbox animation to (hopefully) complete
+  await page.waitForTimeout(2000);
+  await page
     .locator('[name="settings[os2forms_f2_f2][archive][archive_target]"]')
     .focus();
 
