@@ -230,7 +230,7 @@ handlers:
         attachment_element: attachment
         document_title: '[webform_submission:label] ([site:url]) – [current-date:html_datetime]'
         archive_files: 1
-        file_document_title: '[file:number]: [file:filename]'
+        file_document_title: '[file:name]'
         archive_target: case
         archive_target_case:
           case_identifier: '2026 - 1234567890'
