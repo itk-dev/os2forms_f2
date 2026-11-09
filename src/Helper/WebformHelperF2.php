@@ -5,11 +5,11 @@ namespace Drupal\os2forms_f2\Helper;
 use Drupal\advancedqueue\Entity\QueueInterface;
 use Drupal\advancedqueue\Job;
 use Drupal\advancedqueue\JobResult;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\ElementInfoManager;
-use Drupal\os2forms_f2\Exception\F2Exception;
 use Drupal\os2forms_f2\Exception\InvalidAttachmentElementException;
 use Drupal\os2forms_f2\Exception\RuntimeException;
 use Drupal\os2forms_f2\Exception\SubmissionNotFoundException;
@@ -173,25 +173,6 @@ final readonly class WebformHelperF2 implements LoggerInterface {
 
       $context['webform_submission'] = $submission;
       $handlerSettings = new HandlerSettings($payload['handlerSettings']);
-      $this->replaceHandlerSettingsTokens($handlerSettings, $submission);
-
-      $documentTitle = $handlerSettings->archive->documentTitle;
-      $documentTitleLength = mb_strlen($documentTitle);
-      if ($documentTitleLength > Document::TITLE_MAX_LENGTH) {
-        throw new F2Exception(sprintf(
-          'Document title "%s" is too long. Maximum length is %s, but the actual length is %d.',
-          $documentTitle, Document::TITLE_MAX_LENGTH, $documentTitleLength
-        ));
-      }
-
-      $matterTitle = $handlerSettings->archive->archiveTargetCase->matterTitle ?? '';
-      $matterTitleLength = mb_strlen($matterTitle);
-      if ($matterTitleLength > Matter::TITLE_MAX_LENGTH) {
-        throw new F2Exception(sprintf(
-          'Matter title "%s" is too long. Maximum length is %s, but the actual length is %d.',
-          $matterTitle, Matter::TITLE_MAX_LENGTH, $matterTitleLength
-        ));
-      }
 
       $target = $handlerSettings->archive?->archiveTarget;
       return match ($target) {
@@ -208,18 +189,6 @@ final readonly class WebformHelperF2 implements LoggerInterface {
 
       return JobResult::failure($exception->getMessage());
     }
-  }
-
-  /**
-   * Replace tokens in handler settings supporting tokens.
-   */
-  private function replaceHandlerSettingsTokens(HandlerSettings $handlerSettings, WebformSubmissionInterface $submission): HandlerSettings {
-    $handlerSettings->archive->documentTitle = $this->replaceTokens((string) $handlerSettings->archive->documentTitle, $submission);
-    if ($handlerSettings->archive->archiveTargetCase?->matterTitle) {
-      $handlerSettings->archive->archiveTargetCase->matterTitle = $this->replaceTokens($handlerSettings->archive->archiveTargetCase->matterTitle, $submission);
-    }
-
-    return $handlerSettings;
   }
 
   /**
@@ -274,7 +243,8 @@ final readonly class WebformHelperF2 implements LoggerInterface {
         '@submission' => $submission->label(),
       ]);
       $matter = new Matter();
-      $matter->title = $handlerSettings->archive->archiveTargetCase->matterTitle;
+      $title = $this->replaceTokens($handlerSettings->archive->archiveTargetCase->matterTitle, $submission);
+      $matter->title = $this->truncate($title, Matter::TITLE_MAX_LENGTH);
       $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
       $matter->accessLevel = $handlerSettings->archive->archiveTargetCase->matterAccessLevel;
       // Always archive ("journaliser") matter.
@@ -331,7 +301,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       // Apparently the F2 API inspects the filename extension to determine
       // file type, i.e. we must keep the extension in the temporary filename.
       $fileUri = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
-      $title = $handlerSettings->archive->documentTitle ?? $attachment->filename;
+      $title = $this->replaceTokens($handlerSettings->archive->documentTitle ?? $attachment->filename, $submission);
       $messages[] = $this->createDocument($matter, $submission, $handlerSettings, $fileUri, 'attachment', $title);
     }
     finally {
@@ -384,7 +354,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     }
     else {
       $document = new Document();
-      $document->title = $title;
+      $document->title = $this->truncate($title, Document::TITLE_MAX_LENGTH);
       $document = $this->f2->client()->documentCreate($document, $fileUri, $matter);
       $this->info('Document on matter @matter for submission @submission created: @document', $context + [
         '@submission' => $submission->label(),
@@ -519,6 +489,13 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     $storage = $this->entityTypeManager->getStorage('file');
 
     return $storage->loadMultiple($fileIds);
+  }
+
+  /**
+   * Truncate string to a maximum length.
+   */
+  private function truncate(string $text, int $maxLength): string {
+    return Unicode::truncate($text, $maxLength);
   }
 
 }
