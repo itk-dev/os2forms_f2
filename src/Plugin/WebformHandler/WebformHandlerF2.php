@@ -15,6 +15,7 @@ use Drupal\os2forms_f2\Settings\ArchiveSettings;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetCase;
 use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTargetMatter;
+use Drupal\os2forms_f2\Settings\GeneralSettings;
 use Drupal\webform\Plugin\WebformHandlerBase;
 use Drupal\webform\Utility\WebformDialogHelper;
 use Drupal\webform\WebformSubmissionInterface;
@@ -116,6 +117,11 @@ final class WebformHandlerF2 extends WebformHandlerBase {
     $form[self::ID] = [
       '#type' => 'fieldset',
       '#title' => $this->t('F2 archive settings', options: ['context' => 'os2forms_f2']),
+      '#description' => $this->t('Configuration for archiving in F2. See <a href=":user_manual_url">the user manual</a> for details.', [
+        ':user_manual_url' => GeneralSettings::getFormBuilderUserManualUrl(),
+      ], options: ['context' => 'os2forms_f2']),
+      '#description_display' => 'before',
+
       ArchiveSettings::NAME => [
         ArchiveSettings::ATTACHMENT_ELEMENT => [
           '#type' => 'select',
@@ -150,14 +156,15 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#description' => $this->t(<<<'DESCRIPTION'
 Title used for file documents. Tokens can be used in the title, and in addition the regular webform submission token (e.g. <code>[webform_submission:label]</code>) these tokens can be used:
 <ul>
-<li><code>[file:name]</code> the name of the file without any extension, e.g. <code>my-document</code> (this is recommended by F2)</li>
+<li><code>[file:name]</code> the name of the file without any extension, e.g. <code>my-document</code></li>
 <li><code>[file:filename]</code> the full filename e.g. <code>my-document.pdf</code></li>
+<li><code>[file:element:title]</code> the title of the file element</li>
 </ul>
 Max allowed length (after token expansion): @title_max_length.
 DESCRIPTION, [
             '@title_max_length' => Document::TITLE_MAX_LENGTH,
           ], options: ['context' => 'os2forms_f2']),
-          '#default_value' => $settings->fileDocumentTitle ?: '[file:name]',
+          '#default_value' => $settings->fileDocumentTitle ?: '[file:element:name]: [file:filename]',
 
           '#states' => [
             'visible' => [

@@ -311,18 +311,17 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     }
 
     if ($handlerSettings->archive->archiveFiles) {
-      $files = $this->getFiles($submission);
-      $number = 1;
-      $numberPadLength = (int) ceil(count($files) / 10);
-      foreach ($files as $file) {
+      $fileElements = $this->getFileElements($submission);
+      $files = $this->entityTypeManager->getStorage('file')->loadMultiple(array_keys($fileElements));
+      foreach ($fileElements as $fileId => $element) {
+        $file = $files[$fileId];
         $fileUri = $file->getFileUri();
         $title = $this->replaceTokens($handlerSettings->archive->fileDocumentTitle ?? $file->getFilename(), $submission, [
           '[file:name]' => pathinfo($file->getFilename(), PATHINFO_FILENAME),
           '[file:filename]' => $file->getFilename(),
-          '[file:number]' => str_pad((string) $number, $numberPadLength, '0', STR_PAD_LEFT),
+          '[file:element:title]' => $element['#title'],
         ]);
         $messages[] = $this->createDocument($matter, $submission, $handlerSettings, $fileUri, $file->getFilename(), $title);
-        $number++;
       }
     }
 
@@ -456,12 +455,32 @@ final readonly class WebformHelperF2 implements LoggerInterface {
   ];
 
   /**
-   * Returns list of files in submission data.
+   * Returns list of file elements indexed by a file entity ID.
    *
-   * @return \Drupal\file\FileInterface[]
-   *   The list of files.
+   * Example:
+   *
+   * @code
+   * [
+   *  87 => [
+   *   '#type' => 'webform_image_file',
+   *   '#title' => 'Images',
+   *   '#multiple' => 1,
+   *  ],
+   *  42 => [
+   *   '#type' => 'webform_image_file',
+   *   '#title' => 'Images',
+   *   '#multiple' => 1,
+   *  ],
+   * ]
+   * @endcode
+   *
+   * Notice that each element can occurs multiple times in the data if multiple
+   * files are allowed in the element.
+   *
+   * @return array<int, array{'#title': string}>
+   *   The list elements indexed by file ID.
    */
-  private function getFiles(WebformSubmissionInterface $submission): array {
+  private function getFileElements(WebformSubmissionInterface $submission): array {
     $elements = $submission->getWebform()->getElementsDecodedAndFlattened();
 
     $fileElements = [];
@@ -473,22 +492,20 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     // https://dev.to/klnjmm/never-use-arraymerge-in-a-for-loop-in-php-5go1
     $fileElements = array_merge(...$fileElements);
 
+    $result = [];
     $data = $submission->getData();
-    $fileIds = [];
-    foreach (array_keys($fileElements) as $key) {
+    foreach ($fileElements as $key => $element) {
       if (empty($data[$key])) {
         continue;
       }
 
       // Convert occurrences of singular file into array.
-      $fileIds[] = (array) $data[$key];
+      foreach ((array) $data[$key] as $fileId) {
+        $result[$fileId] = $element;
+      }
     }
 
-    $fileIds = array_merge(...$fileIds);
-
-    $storage = $this->entityTypeManager->getStorage('file');
-
-    return $storage->loadMultiple($fileIds);
+    return $result;
   }
 
   /**
