@@ -202,6 +202,6 @@ Some features are not yet ready for production, but can be enabled by settings i
 
 ``` php
 # settings.local.php
-// Enable responsible party on matter
+// Enable setting responsible party on matter
 $settings['os2forms_f2']['archive']['matter_responsible_party_identifier']['enabled'] = TRUE;
 ```
