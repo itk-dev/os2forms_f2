@@ -144,9 +144,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
         ArchiveSettings::ARCHIVE_FILES => [
           '#type' => 'checkbox',
           '#title' => $this->t('Archive files', options: ['context' => 'os2forms_f2']),
-          '#description' => $this->t('If checked, any files on a submission will be archived in F2.', [
-            '@title_max_length' => Document::TITLE_MAX_LENGTH,
-          ], options: ['context' => 'os2forms_f2']),
+          '#description' => $this->t('If checked, any files on a submission will be archived in F2.', options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->archiveFiles,
         ],
 

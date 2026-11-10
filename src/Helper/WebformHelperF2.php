@@ -39,6 +39,17 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final readonly class WebformHelperF2 implements LoggerInterface {
   use LoggerTrait;
 
+  /**
+   * File element types.
+   */
+  private const array FILE_ELEMENT_TYPES = [
+    'webform_image_file',
+    'webform_document_file',
+    'webform_video_file',
+    'webform_audio_file',
+    'managed_file',
+  ];
+
   private const string PDF_MIME_TYPE = 'application/pdf';
 
   /**
@@ -442,17 +453,6 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $matter->responsible = $responsible;
     }
   }
-
-  /**
-   * File element types.
-   */
-  private const array FILE_ELEMENT_TYPES = [
-    'webform_image_file',
-    'webform_document_file',
-    'webform_video_file',
-    'webform_audio_file',
-    'managed_file',
-  ];
 
   /**
    * Returns list of file elements indexed by a file entity ID.
