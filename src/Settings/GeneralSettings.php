@@ -19,7 +19,7 @@ final class GeneralSettings extends AbstractSettings {
   public static function getUserManualUrl(): string {
     $settings = DrupalSettings::get('os2forms_f2');
 
-    return $settings['FormBuilderUserManualUrl'] ?? 'https://itk-dev.github.io/os2forms_f2/user-manual/da/';
+    return $settings['user_manual']['url'] ?? 'https://itk-dev.github.io/os2forms_f2/user-manual/da/';
   }
 
   /**
@@ -28,7 +28,7 @@ final class GeneralSettings extends AbstractSettings {
   public static function getFormBuilderUserManualUrl(): string {
     $settings = DrupalSettings::get('os2forms_f2');
 
-    return $settings['FormBuilderUserManualUrl'] ?? 'https://itk-dev.github.io/os2forms_f2/user-manual/da/form-builder.html';
+    return $settings['user_manual']['url_form_builder'] ?? 'https://itk-dev.github.io/os2forms_f2/user-manual/da/';
   }
 
 }

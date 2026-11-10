@@ -205,3 +205,13 @@ Some features are not yet ready for production, but can be enabled by settings i
 // Enable setting responsible party on matter
 $settings['os2forms_f2']['archive']['matter_responsible_party_identifier']['enabled'] = TRUE;
 ```
+
+## Global settings
+
+If need be, the user manual URLs can be overridden in `settings.local.php`:
+
+``` php
+# settings.local.php
+$settings['os2forms_f2']['user_manual']['url'] = 'https://os2form_f2.user-manual.example.com';
+$settings['os2forms_f2']['user_manual']['url_form_builder'] = 'https://os2form_f2.user-manual.example.com/form-builder';
+```
