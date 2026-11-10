@@ -13,7 +13,7 @@ uid: 0
 template: false
 archive: false
 id: os2forms_f2_ex_002
-title: F2 (archive on case with files)
+title: 'F2 (archive on case with files)'
 description: null
 categories: {  }
 elements: |-
@@ -31,7 +31,14 @@ elements: |-
     '#exclude_empty_checkbox': 0
   files:
     '#type': managed_file
-    '#title': files
+    '#title': File
+    '#multiple': true
+  images:
+    '#type': webform_image_file
+    '#title': Image
+  documents:
+    '#type': webform_document_file
+    '#title': Documents
     '#multiple': true
 css: ''
 javascript: ''
@@ -230,7 +237,7 @@ handlers:
         attachment_element: attachment
         document_title: '[webform_submission:label] ([site:url]) – [current-date:html_datetime]'
         archive_files: 1
-        file_document_title: '[file:name]'
+        file_document_title: '[file:element:title]: [file:filename]'
         archive_target: case
         archive_target_case:
           case_identifier: '2026 - 1234567890'
