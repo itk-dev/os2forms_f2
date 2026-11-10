@@ -20,6 +20,7 @@
         "drupal/coder": "^9.0",
         "ergebnis/composer-normalize": "^2.54",
         "itk-dev/drupal_translation_extractor": "^2.0",
+        "itk-dev/itkdev_advancedqueue_addons": "^1.0",
         "mglaman/composer-drupal-lenient": "^1.0",
         "mglaman/phpstan-drupal": "^2.2",
         "palantirnet/drupal-rector": "^1.1",

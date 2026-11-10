@@ -5,6 +5,7 @@ namespace Drupal\os2forms_f2\Helper;
 use Drupal\advancedqueue\Entity\QueueInterface;
 use Drupal\advancedqueue\Job;
 use Drupal\advancedqueue\JobResult;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
@@ -27,6 +28,7 @@ use Drupal\webform\WebformTokenManagerInterface;
 use Drupal\webform_attachment\Element\WebformAttachmentBase;
 use ItkDev\F2ApiClient\Model\Document;
 use ItkDev\F2ApiClient\Model\Matter;
+use ItkDev\F2ApiClient\Model\Party;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -36,6 +38,17 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 final readonly class WebformHelperF2 implements LoggerInterface {
   use LoggerTrait;
+
+  /**
+   * File element types.
+   */
+  private const array FILE_ELEMENT_TYPES = [
+    'webform_image_file',
+    'webform_document_file',
+    'webform_video_file',
+    'webform_audio_file',
+    'managed_file',
+  ];
 
   private const string PDF_MIME_TYPE = 'application/pdf';
 
@@ -92,10 +105,8 @@ final readonly class WebformHelperF2 implements LoggerInterface {
    *   The level.
    * @param string $message
    *   The message.
-   * @param array $context
+   * @param array<string, mixed> $context
    *   The context.
-   *
-   * @phpstan-param array<string, mixed> $context
    */
   #[\Override]
   public function log($level, $message, array $context = []): void {
@@ -173,7 +184,6 @@ final readonly class WebformHelperF2 implements LoggerInterface {
 
       $context['webform_submission'] = $submission;
       $handlerSettings = new HandlerSettings($payload['handlerSettings']);
-      $this->replaceTokens($handlerSettings, $submission);
 
       $target = $handlerSettings->archive?->archiveTarget;
       return match ($target) {
@@ -193,15 +203,20 @@ final readonly class WebformHelperF2 implements LoggerInterface {
   }
 
   /**
-   * Replace tokens in handler settings supporting tokens.
+   * Replace webform submission tokens in text.
+   *
+   * @param string $text
+   *   The text.
+   * @param WebformSubmissionInterface $submission
+   *   The webform submission.
+   * @param array<string, string> $additionalTokens
+   *   Additional tokens to replace in the text.
    */
-  private function replaceTokens(HandlerSettings $handlerSettings, WebformSubmissionInterface $submission): HandlerSettings {
-    $handlerSettings->archive->documentTitle = $this->webformTokenManager->replace((string) $handlerSettings->archive->documentTitle, $submission);
-    if ($handlerSettings->archive->archiveTargetCase?->matterTitle) {
-      $handlerSettings->archive->archiveTargetCase->matterTitle = $this->webformTokenManager->replace($handlerSettings->archive->archiveTargetCase->matterTitle, $submission);
-    }
-
-    return $handlerSettings;
+  private function replaceTokens(string $text, WebformSubmissionInterface $submission, array $additionalTokens = []): string {
+    return str_replace(
+      array_keys($additionalTokens), array_values($additionalTokens),
+      $this->webformTokenManager->replace($text, $submission),
+    );
   }
 
   /**
@@ -219,7 +234,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     }
     $case = $this->f2->fetchCaseByIdentifier($caseIdentifier);
 
-    $this->info('Achiving document for submission @submission on case @case ', $context + [
+    $this->info('Archiving document for submission @submission on case @case ', $context + [
       '@submission' => $submission->label(),
       '@case' => (string) $case,
     ]);
@@ -239,8 +254,13 @@ final readonly class WebformHelperF2 implements LoggerInterface {
         '@submission' => $submission->label(),
       ]);
       $matter = new Matter();
-      $matter->title = $handlerSettings->archive->archiveTargetCase->matterTitle;
+      $title = $this->replaceTokens($handlerSettings->archive->archiveTargetCase->matterTitle, $submission);
+      $matter->title = $this->truncate($title, Matter::TITLE_MAX_LENGTH);
       $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
+      $matter->accessLevel = $handlerSettings->archive->archiveTargetCase->matterAccessLevel;
+      // Always archive ("journaliser") matter.
+      $matter->archived = TRUE;
+      $this->setMatterResponsible($matter, $handlerSettings);
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
 
       $this->info('Matter for submission @submission created: @matter', $context + [
@@ -253,95 +273,117 @@ final readonly class WebformHelperF2 implements LoggerInterface {
             webformHandlerId: $handlerSettings->handlerId,
             webformSubmissionId: $submission->id(),
             type: $itemType,
+            identifier: NULL,
             data: $matter->toArray(),
           );
     }
 
     $this->itemRepository->save($item);
-    $message = $this->createDocument($matter, $submission, $handlerSettings);
 
-    return JobResult::success($message);
+    return $this->archiveOnMatter($submission, $handlerSettings, $matter);
   }
 
   /**
    * Archive on matter.
    */
-  private function archiveOnMatter(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): JobResult {
+  private function archiveOnMatter(WebformSubmissionInterface $submission, HandlerSettings $handlerSettings, ?Matter $matter = NULL): JobResult {
     $context = [
       'handler_id' => WebformHandlerF2::ID,
       'webform_submission' => $submission,
       'operation' => 'archive on matter',
     ];
-    $matterIdentifier = $handlerSettings->archive?->archiveTargetMatter?->matterIdentifier;
-    if (NULL === $matterIdentifier) {
-      throw new RuntimeException('Cannot get matter identifier');
+    if (NULL === $matter) {
+      $matterIdentifier = $handlerSettings->archive?->archiveTargetMatter?->matterIdentifier;
+      if (NULL === $matterIdentifier) {
+        throw new RuntimeException('Cannot get matter identifier');
+      }
+      $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
     }
-    $matter = $this->f2->fetchMatterByIdentifier($matterIdentifier);
 
-    $this->info('Achiving document for submission @submission on matter @matter ', $context + [
+    $this->info('Archiving document for submission @submission on matter @matter ', $context + [
       '@submission' => $submission->label(),
       '@matter' => (string) $matter,
     ]);
 
-    $message = $this->createDocument($matter, $submission, $handlerSettings);
+    $messages = [];
 
-    return JobResult::success($message);
+    $attachment = $this->getAttachment($submission, $handlerSettings);
+    try {
+      // Apparently the F2 API inspects the filename extension to determine
+      // file type, i.e. we must keep the extension in the temporary filename.
+      $fileUri = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
+      $title = $this->replaceTokens($handlerSettings->archive->documentTitle ?? $attachment->filename, $submission);
+      $messages[] = $this->createDocument($matter, $submission, $handlerSettings, $fileUri, 'attachment', $title);
+    }
+    finally {
+      if (isset($fileUri) && file_exists($fileUri)) {
+        unlink($fileUri);
+      }
+    }
+
+    if ($handlerSettings->archive->archiveFiles) {
+      $fileElements = $this->getFileElements($submission);
+      $files = $this->entityTypeManager->getStorage('file')->loadMultiple(array_keys($fileElements));
+      foreach ($fileElements as $fileId => $element) {
+        $file = $files[$fileId];
+        $fileUri = $file->getFileUri();
+        $title = $this->replaceTokens($handlerSettings->archive->fileDocumentTitle ?? $file->getFilename(), $submission, [
+          '[file:name]' => pathinfo($file->getFilename(), PATHINFO_FILENAME),
+          '[file:filename]' => $file->getFilename(),
+          '[file:element:title]' => $element['#title'],
+        ]);
+        $messages[] = $this->createDocument($matter, $submission, $handlerSettings, $fileUri, $file->getFilename(), $title);
+      }
+    }
+
+    return JobResult::success(implode(PHP_EOL, $messages));
   }
 
   /**
    * Create document in F2.
    */
-  private function createDocument(Matter $matter, WebformSubmissionInterface $submission, HandlerSettings $handlerSettings): string {
+  private function createDocument(Matter $matter, WebformSubmissionInterface $submission, HandlerSettings $handlerSettings, string $fileUri, string $identifier, string $title): string {
     $context = [
       'handler_id' => WebformHandlerF2::ID,
       'webform_submission' => $submission,
       'operation' => 'create document',
     ];
-    $attachment = $this->getAttachment($submission, $handlerSettings);
-    try {
-      $itemType = Type::Document;
-      $item = $this->itemRepository->loadOneBySubmissionAndHandlerAndType($submission, $handlerSettings->handlerId, $itemType);
-      if (NULL !== $item) {
-        // Document already exists. What to do?
-        $id = $item->data['id'];
-        $document = $this->f2->client()->documentById($id);
-        $this->info('Document on matter @matter for submission @submission already exists: @document', $context + [
-          '@submission' => $submission->label(),
-          '@matter' => (string) $matter,
-          '@document' => (string) $document,
-        ]);
-        $message = sprintf('Document %s already exists on matter %s', $document, $matter);
-      }
-      else {
-        // Apparently the F2 API inspects the filename extension to determine
-        // file type, i.e. we must keep the extension in the temporary filename.
-        $filePath = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
-        $document = new Document();
-        $document->title = $handlerSettings->archive->documentTitle ?? $attachment->filename;
-        $document = $this->f2->client()->documentCreate($document, $filePath, $matter);
-        $this->info('Document on matter @matter for submission @submission created: @document', $context + [
-          '@submission' => $submission->label(),
-          '@matter' => (string) $matter,
-          '@document' => (string) $document,
-        ]);
-        $message = sprintf('Document %s created on matter %s', $document, $matter);
-
-        $item = new F2Item(
-                webformId: $submission->getWebform()->id(),
-                webformHandlerId: $handlerSettings->handlerId,
-                webformSubmissionId: $submission->id(),
-                type: $itemType,
-                data: $document->toArray(),
-              );
-      }
-
-      $this->itemRepository->save($item);
+    $itemType = Type::Document;
+    $item = $this->itemRepository->loadOneBySubmissionAndHandlerAndType($submission, $handlerSettings->handlerId, $itemType, $identifier);
+    if (NULL !== $item) {
+      // Document already exists. What to do?
+      $id = $item->data['id'];
+      $document = $this->f2->client()->documentById($id);
+      $this->info('Document @identifier on matter @matter for submission @submission already exists: @document', $context + [
+        '@identifier' => $identifier,
+        '@submission' => $submission->label(),
+        '@matter' => (string) $matter,
+        '@document' => (string) $document,
+      ]);
+      $message = sprintf('Document %s already exists on matter %s', $document, $matter);
     }
-    finally {
-      if (isset($filePath) && file_exists($filePath)) {
-        unlink($filePath);
-      }
+    else {
+      $document = new Document();
+      $document->title = $this->truncate($title, Document::TITLE_MAX_LENGTH);
+      $document = $this->f2->client()->documentCreate($document, $fileUri, $matter);
+      $this->info('Document on matter @matter for submission @submission created: @document', $context + [
+        '@submission' => $submission->label(),
+        '@matter' => (string) $matter,
+        '@document' => (string) $document,
+      ]);
+      $message = sprintf('Document %s created on matter %s', $document, $matter);
+
+      $item = new F2Item(
+              webformId: $submission->getWebform()->id(),
+              webformHandlerId: $handlerSettings->handlerId,
+              webformSubmissionId: $submission->id(),
+              type: $itemType,
+              identifier: $identifier,
+              data: $document->toArray(),
+            );
     }
+
+    $this->itemRepository->save($item);
 
     return $message;
   }
@@ -385,6 +427,92 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $mimeType,
       $fileName
     );
+  }
+
+  /**
+   * Set responsible party on matter if requested.
+   */
+  private function setMatterResponsible(Matter $matter, HandlerSettings $handlerSettings): void {
+    if (!ArchiveSettings::isMatterResponsiblePartyEnabled()) {
+      return;
+    }
+
+    $partyIdentifier = $handlerSettings->archive->archiveTargetCase->matterResponsiblePartyIdentifier;
+    if (NULL != $partyIdentifier) {
+      $responsible = new Party();
+      if ($partyNumber = filter_var($partyIdentifier, FILTER_VALIDATE_INT)) {
+        $responsible->partyNumber = $partyNumber;
+      }
+      elseif ($email = filter_var($partyIdentifier, FILTER_VALIDATE_EMAIL)) {
+        $responsible->email = $email;
+      }
+      else {
+        // Unhandled value.
+        return;
+      }
+      $matter->responsible = $responsible;
+    }
+  }
+
+  /**
+   * Returns list of file elements indexed by a file entity ID.
+   *
+   * Example:
+   *
+   * @code
+   * [
+   *  87 => [
+   *   '#type' => 'webform_image_file',
+   *   '#title' => 'Images',
+   *   '#multiple' => 1,
+   *  ],
+   *  42 => [
+   *   '#type' => 'webform_image_file',
+   *   '#title' => 'Images',
+   *   '#multiple' => 1,
+   *  ],
+   * ]
+   * @endcode
+   *
+   * Notice that each element can occurs multiple times in the data if multiple
+   * files are allowed in the element.
+   *
+   * @return array<int, array{'#title': string}>
+   *   The list elements indexed by file ID.
+   */
+  private function getFileElements(WebformSubmissionInterface $submission): array {
+    $elements = $submission->getWebform()->getElementsDecodedAndFlattened();
+
+    $fileElements = [];
+
+    foreach (self::FILE_ELEMENT_TYPES as $type) {
+      $fileElements[] = array_filter($elements, fn(array $element) => $type === ($element['#type'] ?? NULL));
+    }
+
+    // https://dev.to/klnjmm/never-use-arraymerge-in-a-for-loop-in-php-5go1
+    $fileElements = array_merge(...$fileElements);
+
+    $result = [];
+    $data = $submission->getData();
+    foreach ($fileElements as $key => $element) {
+      if (empty($data[$key])) {
+        continue;
+      }
+
+      // Convert occurrences of singular file into array.
+      foreach ((array) $data[$key] as $fileId) {
+        $result[$fileId] = $element;
+      }
+    }
+
+    return $result;
+  }
+
+  /**
+   * Truncate string to a maximum length.
+   */
+  private function truncate(string $text, int $maxLength): string {
+    return Unicode::truncate($text, $maxLength);
   }
 
 }

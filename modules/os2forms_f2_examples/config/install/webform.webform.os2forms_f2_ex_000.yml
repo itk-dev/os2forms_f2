@@ -230,6 +230,7 @@ handlers:
           case_identifier: '2026 - 1234567890'
           matter_title: 'Matter: [webform_submission:label] ([site:url]) – [current-date:html_datetime]'
           matter_type: Internal
+          matter_access_level: All
       additional:
         states:
           - completed

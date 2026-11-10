@@ -9,6 +9,8 @@ use Drupal\webform\WebformSubmissionInterface;
 
 /**
  * Repository for F2 items.
+ *
+ * @see \Drupal\os2forms_f2\Model\F2Item
  */
 final class F2ItemRepository extends AbstractRepository {
   private const string TABLE = InstallHooks::TABLE_F2_ITEM;
@@ -16,8 +18,9 @@ final class F2ItemRepository extends AbstractRepository {
   /**
    * Load F2 items.
    *
-   * @param array $conditions
-   *   The criteria.
+   * @param list<array{0: string, 1: mixed, 2?: string}> $conditions
+   *   The conditions ([field, value, [operator]). If the value is null and no
+   *   operator is specified, 'IS NULL' will be used as the operator.
    * @param array<string, string> $orderBy
    *   The order.
    *
@@ -30,6 +33,9 @@ final class F2ItemRepository extends AbstractRepository {
       ->fields('t');
 
     foreach ($conditions as $condition) {
+      if (2 === count($condition) && NULL === $condition[1]) {
+        $condition[] = 'IS NULL';
+      }
       $query->condition(...$condition);
     }
 
@@ -47,6 +53,7 @@ final class F2ItemRepository extends AbstractRepository {
         webformHandlerId: $row->webform_handler_id,
         webformSubmissionId: $row->webform_submission_id,
         type: Type::from($row->type),
+        identifier: $row->identifier,
         data: $this->unserializeData($row->data),
         createdAt: $row->created_at,
         updatedAt: $row->updated_at,
@@ -58,15 +65,18 @@ final class F2ItemRepository extends AbstractRepository {
   /**
    * Load one item by ...
    */
-  public function loadOneBySubmissionAndHandlerAndType(WebformSubmissionInterface $submission, string $handlerId, Type $type): ?F2Item {
-    $items = $this->loadBy([
+  public function loadOneBySubmissionAndHandlerAndType(WebformSubmissionInterface $submission, string $handlerId, Type $type, ?string $identifier = NULL): ?F2Item {
+    $conditions = [
       ['webform_id', $submission->getWebform()->id()],
       ['webform_handler_id', $handlerId],
       ['webform_submission_id', $submission->id()],
       ['type', $type->value],
-    ]);
+      ['identifier', $identifier],
+    ];
 
-    return 1 === count($items) ? reset($items) : NULL;
+    $items = $this->loadBy($conditions);
+
+    return count($items) > 0 ? reset($items) : NULL;
   }
 
   /**
@@ -123,6 +133,7 @@ final class F2ItemRepository extends AbstractRepository {
         'webform_handler_id' => $item->webformHandlerId,
         'webform_submission_id' => $item->webformSubmissionId,
         'type' => $item->type->value,
+        'identifier' => $item->identifier,
         'data' => $this->serializeData($item->data),
         'created_at' => $item->createdAt,
         'updated_at' => $item->updatedAt,
@@ -133,6 +144,7 @@ final class F2ItemRepository extends AbstractRepository {
         ['webform_handler_id', $fields['webform_handler_id']],
         ['webform_submission_id', $fields['webform_submission_id']],
         ['type', $fields['type']],
+        ['identifier', $fields['identifier']],
       ]))) {
         $this->database
           ->insert(self::TABLE)
@@ -146,6 +158,7 @@ final class F2ItemRepository extends AbstractRepository {
           ->condition('webform_handler_id', $fields['webform_handler_id'])
           ->condition('webform_submission_id', $fields['webform_submission_id'])
           ->condition('type', $fields['type'])
+          ->condition('identifier', $fields['identifier'])
           ->fields($fields)
           ->execute();
       }
