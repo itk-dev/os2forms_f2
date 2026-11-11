@@ -1,0 +1,6 @@
+allselect:
+  js:
+    js/script.js: {}
+  css:
+    component:
+      css/styles.css: {}

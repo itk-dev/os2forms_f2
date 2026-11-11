@@ -76,6 +76,12 @@ screenshooting ${selector}
   await page.locator('[name="general[queue]"]').selectOption(null);
   await page.locator('[name="f2_api[uri]"]').focus();
   await page.locator('[name="f2_api[uri]"]').blur();
+
+  const element = page.locator('[name="general[queue]"]');
+  await element.focus();
+  // const boundingBox = await element.boundingBox();
+  // await page.mouse.move(boundingBox.x + boundingBox.width/2, boundingBox.y - boundingBox.height/2);
+
   await screenshot("f2-settings-empty", ".page-wrapper");
 
   await goto("admin/os2forms_f2/settings");
