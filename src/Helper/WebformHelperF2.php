@@ -193,10 +193,20 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       };
     }
     catch (\Exception $exception) {
-      $this->error('Error: @message', $context + [
-        '@message' => $exception->getMessage(),
-        'exception' => $exception,
-      ]);
+      $previous = $exception->getPrevious();
+      if (NULL !== $previous) {
+        $this->error('Error: @message (@previous)', $context + [
+          '@message' => $exception->getMessage(),
+          '@previous' => $previous->getMessage(),
+          'exception' => $exception,
+        ]);
+      }
+      else {
+        $this->error('Error: @message', $context + [
+          '@message' => $exception->getMessage(),
+          'exception' => $exception,
+        ]);
+      }
 
       return JobResult::failure($exception->getMessage());
     }
