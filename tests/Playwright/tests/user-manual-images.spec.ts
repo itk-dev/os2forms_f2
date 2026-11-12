@@ -77,12 +77,31 @@ screenshooting ${selector}
   await page.locator('[name="f2_api[uri]"]').focus();
   await page.locator('[name="f2_api[uri]"]').blur();
 
-  const element = page.locator('[name="general[queue]"]');
-  await element.focus();
+  const selector = '[name="general[queue]"]';
+  const element = page.locator(selector);
+  // await element.focus();
   // const boundingBox = await element.boundingBox();
-  // await page.mouse.move(boundingBox.x + boundingBox.width/2, boundingBox.y - boundingBox.height/2);
+  // await page.mouse.move(boundingBox.x + boundingBox.width/2, boundingBox.y - boundingBox.height/2 + 50);
+
+  // https://playwright.dev/docs/evaluating
+  console.debug(
+    await page.evaluate((data) => os2forms_f2_test.expandSelect(data), {
+      selector,
+      hover: "os2forms_f2", // Hover over item by text, value or index
+      mousePointer: "default", // Show mouse pointer over hovered element
+    }),
+  );
+
+  // console.debug(
+  //   await page.evaluate(data => os2forms_f2_test.revealMousePointer(data), {
+  //     selector,
+  //     x: boundingBox.x + boundingBox.width/2,
+  //     y: boundingBox.y - boundingBox.height/2 + 50,
+  //   })
+  // );
 
   await screenshot("f2-settings-empty", ".page-wrapper");
+  return;
 
   await goto("admin/os2forms_f2/settings");
   await page.locator('[name="f2_api[uri]"]').fill("https://f2.example.com");
