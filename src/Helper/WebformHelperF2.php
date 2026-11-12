@@ -28,6 +28,9 @@ use Drupal\webform\WebformTokenManagerInterface;
 use Drupal\webform_attachment\Element\WebformAttachmentBase;
 use ItkDev\F2ApiClient\Model\Document;
 use ItkDev\F2ApiClient\Model\Matter;
+use ItkDev\F2ApiClient\Model\Matter\Type as MatterType;
+use ItkDev\F2ApiClient\Model\Matter\Status as MatterStatus;
+use ItkDev\F2ApiClient\Model\Matter\AccessLevel as MatterAccessLevel;
 use ItkDev\F2ApiClient\Model\Party;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
@@ -266,10 +269,11 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $matter = new Matter();
       $title = $this->replaceTokens($handlerSettings->archive->archiveTargetCase->matterTitle, $submission);
       $matter->title = $this->truncate($title, Matter::TITLE_MAX_LENGTH);
-      $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
-      $matter->accessLevel = $handlerSettings->archive->archiveTargetCase->matterAccessLevel;
-      // Always archive ("journaliser") matter.
-      $matter->archived = TRUE;
+      $matter->type = MatterType::tryFrom($handlerSettings->archive->archiveTargetCase->matterType ?? '');
+      $matter->status = MatterStatus::tryFrom($handlerSettings->archive->archiveTargetCase->matterStatus ?? '');
+      $matter->accessLevel = MatterAccessLevel::tryFrom($handlerSettings->archive->archiveTargetCase->matterAccessLevel ?? '');
+      // Archive ("journaliser") matter?
+      $matter->archived = $handlerSettings->archive->archiveTargetCase->matterArchived;
       $this->setMatterResponsible($matter, $handlerSettings);
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
 

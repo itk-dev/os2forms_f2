@@ -24,6 +24,9 @@ use ItkDev\F2ApiClient\Model\Matter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use ItkDev\F2ApiClient\Model\Matter\Type as MatterType;
+use ItkDev\F2ApiClient\Model\Matter\Status as MatterStatus;
+use ItkDev\F2ApiClient\Model\Matter\AccessLevel as MatterAccessLevel;
 
 /**
  * F2 Webform Handler.
@@ -255,13 +258,55 @@ DESCRIPTION, [
           ArchiveTargetCase::MATTER_TYPE => [
             '#type' => 'select',
             '#options' => [
-              Matter::TYPE_INBOUND => $this->t('Inbound', options: ['context' => 'os2forms_f2']),
-              Matter::TYPE_INTERNAL => $this->t('Internal', options: ['context' => 'os2forms_f2']),
-              Matter::TYPE_OUTBOUND => $this->t('Outbound', options: ['context' => 'os2forms_f2']),
+              MatterType::Inbound->value => $this->t('Inbound', options: ['context' => 'os2forms_f2']),
+              MatterType::Internal->value => $this->t('Internal', options: ['context' => 'os2forms_f2']),
+              MatterType::Outbound->value => $this->t('Outbound', options: ['context' => 'os2forms_f2']),
             ],
             '#title' => $this->t('Matter type', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The type of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetCase->matterType ?? Matter::TYPE_INTERNAL,
+            '#default_value' => ($settings->archiveTargetCase->matterType ?? MatterType::Internal)->value,
+
+            '#states' => [
+              'required' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
+                  'value' => ArchiveTarget::Case->value,
+                ],
+              ],
+            ],
+          ],
+
+          ArchiveTargetCase::MATTER_STATUS => [
+            '#type' => 'select',
+            '#options' => [
+              MatterStatus::InProgress->value => $this->t('In progress', options: ['context' => 'os2forms_f2']),
+              MatterStatus::Closed->value => $this->t('Closed', options: ['context' => 'os2forms_f2']),
+            ],
+            '#title' => $this->t('Matter status', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The status of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => ($settings->archiveTargetCase->matterStatus ?? MatterStatus::Closed)->value,
+
+            '#states' => [
+              'required' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
+                  'value' => ArchiveTarget::Case->value,
+                ],
+              ],
+            ],
+          ],
+
+          ArchiveTargetCase::MATTER_ARCHIVED => [
+            '#type' => 'checkbox',
+            '#title' => $this->t('Archive matter', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('If set, the created matter will be archived.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase->matterArchived,
 
             '#states' => [
               'required' => [
@@ -279,13 +324,13 @@ DESCRIPTION, [
           ArchiveTargetCase::MATTER_ACCESS_LEVEL => [
             '#type' => 'select',
             '#options' => [
-              Matter::ACCESS_LEVEL_INVOLVED => $this->t('Involved', options: ['context' => 'os2forms_f2']),
-              Matter::ACCESS_LEVEL_UNIT => $this->t('Unit', options: ['context' => 'os2forms_f2']),
-              Matter::ACCESS_LEVEL_ALL => $this->t('All', options: ['context' => 'os2forms_f2']),
+              MatterAccessLevel::Involved->value => $this->t('Involved', options: ['context' => 'os2forms_f2']),
+              MatterAccessLevel::Unit->value => $this->t('Unit', options: ['context' => 'os2forms_f2']),
+              MatterAccessLevel::All->value => $this->t('All', options: ['context' => 'os2forms_f2']),
             ],
             '#title' => $this->t('Matter access level', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The access level of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetCase->matterAccessLevel ?? Matter::ACCESS_LEVEL_ALL,
+            '#default_value' => ($settings->archiveTargetCase->matterAccessLevel ?? MatterAccessLevel::All)->value,
 
             '#states' => [
               'required' => [
