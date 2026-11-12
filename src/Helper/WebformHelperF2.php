@@ -125,16 +125,14 @@ final readonly class WebformHelperF2 implements LoggerInterface {
    *
    * @see self::processJob()
    */
-  public function createJob(WebformSubmissionInterface $webformSubmission, WebformHandlerF2|ArchiveSettings $handlerSettings, ?string $state = NULL, ?array $payload = []): ?Job {
+  public function createJob(WebformSubmissionInterface $webformSubmission, WebformHandlerF2 $handler): ?Job {
     $context = [
       'handler_id' => WebformHandlerF2::ID,
       'webform_submission' => $webformSubmission,
     ];
 
     try {
-      if ($handlerSettings instanceof WebformHandlerF2) {
-        $handlerSettings = $this->settings->getHandlerSettings($handlerSettings);
-      }
+      $handlerSettings = $this->settings->getHandlerSettings($handler, applyGlobals: TRUE);
 
       $job = Job::create(F2::class, [
         'formId' => $webformSubmission->getWebform()->id(),

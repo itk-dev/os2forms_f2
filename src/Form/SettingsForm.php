@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\os2forms_f2\Form;
 
-use _PHPStan_b713fd2c7\Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\AutowireTrait;
