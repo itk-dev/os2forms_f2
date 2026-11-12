@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\os2forms_f2\Form;
 
+use _PHPStan_b713fd2c7\Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\AutowireTrait;
@@ -14,9 +15,15 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\os2forms_f2\Helper\F2Helper;
 use Drupal\os2forms_f2\Settings;
+use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget;
+use Drupal\os2forms_f2\Settings\GeneralSettings\ArchiveTargetCase;
 use Drupal\os2forms_f2\Settings\F2ApiSettings;
 use Drupal\os2forms_f2\Settings\GeneralSettings;
+use ItkDev\F2ApiClient\Model\Document;
 use Psr\Log\LogLevel;
+use ItkDev\F2ApiClient\Model\Matter\Type as MatterType;
+use ItkDev\F2ApiClient\Model\Matter\Status as MatterStatus;
+use ItkDev\F2ApiClient\Model\Matter\AccessLevel as MatterAccessLevel;
 
 /**
  * Configure F2 settings for this site.
@@ -156,6 +163,109 @@ final class SettingsForm extends ConfigFormBase {
    */
   private function buildFormGeneral(): array {
     $settings = $this->settings->getGeneralSettings();
+
+    $section[GeneralSettings::MATTER_FILE_DOCUMENT_TITLE_DEFAULT_VALUE] = [
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#title' => $this->t('Matter file document title default value', options: ['context' => 'os2forms_f2']),
+      '#description' => $this->t(<<<'DESCRIPTION'
+Title used for file documents. Tokens can be used in the title, and in addition the regular webform submission token (e.g. <code>[webform_submission:label]</code>) these tokens can be used:
+<ul>
+<li><code>[file:name]</code> the name of the file without any extension, e.g. <code>my-document</code></li>
+<li><code>[file:filename]</code> the full filename e.g. <code>my-document.pdf</code></li>
+<li><code>[file:element:title]</code> the title of the file element</li>
+</ul>
+Max allowed length (after token expansion): @title_max_length.
+DESCRIPTION, [
+        '@title_max_length' => Document::TITLE_MAX_LENGTH,
+      ], options: ['context' => 'os2forms_f2']),
+      '#default_value' => $settings->matterFileDocumentTitleDefaultValue,
+    ];
+
+    $section[GeneralSettings::ARCHIVE_TARGETS] = [
+      '#type' => 'checkboxes',
+      '#options' => [
+        ArchiveTarget::Case->value => $this->t('Case', options: ['context' => 'os2forms_f2']),
+        ArchiveTarget::Matter->value => $this->t('Matter', options: ['context' => 'os2forms_f2']),
+      ],
+      '#required' => TRUE,
+      '#title' => $this->t('Enabled archive targets', options: ['context' => 'os2forms_f2']),
+      '#default_value' => $settings->archiveTargets,
+    ];
+
+    $section[ArchiveTargetCase::NAME] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Settings for "Archive on case"', options: ['context' => 'os2forms_f2']),
+
+      ArchiveTargetCase::MATTER_TYPE_DEFAULT_VALUE => [
+        '#type' => 'select',
+        '#options' => [
+          MatterType::Inbound->value => $this->t('Inbound', options: ['context' => 'os2forms_f2']),
+          MatterType::Internal->value => $this->t('Internal', options: ['context' => 'os2forms_f2']),
+          MatterType::Outbound->value => $this->t('Outbound', options: ['context' => 'os2forms_f2']),
+        ],
+        '#title' => $this->t('Default matter type', options: ['context' => 'os2forms_f2']),
+        '#default_value' => $settings->archiveTargetCase->matterTypeDefaultValue->value,
+        '#required' => TRUE,
+      ],
+
+      ArchiveTargetCase::MATTER_TYPE_ALLOW_OVERRIDE => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
+        '#description' => $this->t('if set, a form builder can override the matter type'),
+        '#default_value' => $settings->archiveTargetCase->matterTypeAllowOverride,
+      ],
+
+      ArchiveTargetCase::MATTER_STATUS_DEFAULT_VALUE => [
+        '#type' => 'select',
+        '#options' => [
+          MatterStatus::InProgress->value => $this->t('In progress', options: ['context' => 'os2forms_f2']),
+          MatterStatus::Closed->value => $this->t('Closed', options: ['context' => 'os2forms_f2']),
+        ],
+        '#title' => $this->t('Default matter status', options: ['context' => 'os2forms_f2']),
+        '#default_value' => $settings->archiveTargetCase->matterStatusDefaultValue->value,
+        '#required' => TRUE,
+      ],
+
+      ArchiveTargetCase::MATTER_STATUS_ALLOW_OVERRIDE => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
+        '#description' => $this->t('if set, a form builder can override the matter status'),
+        '#default_value' => $settings->archiveTargetCase->matterStatusAllowOverride,
+      ],
+
+      ArchiveTargetCase::MATTER_ACCESS_LEVEL_DEFAULT_VALUE => [
+        '#type' => 'select',
+        '#options' => [
+          MatterAccessLevel::Involved->value => $this->t('Involved', options: ['context' => 'os2forms_f2']),
+          MatterAccessLevel::Unit->value => $this->t('Unit', options: ['context' => 'os2forms_f2']),
+          MatterAccessLevel::All->value => $this->t('All', options: ['context' => 'os2forms_f2']),
+        ],
+        '#title' => $this->t('Default matter access level', options: ['context' => 'os2forms_f2']),
+        '#default_value' => $settings->archiveTargetCase->matterAccessLevelDefaultValue->value,
+        '#required' => TRUE,
+      ],
+
+      ArchiveTargetCase::MATTER_ACCESS_LEVEL_ALLOW_OVERRIDE => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
+        '#description' => $this->t('if set, a form builder can override the matter access level'),
+        '#default_value' => $settings->archiveTargetCase->matterAccessLevelAllowOverride,
+      ],
+
+      ArchiveTargetCase::MATTER_ARCHIVED_DEFAULT_VALUE => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Archive matter by default?', options: ['context' => 'os2forms_f2']),
+        '#default_value' => $settings->archiveTargetCase->matterArchivedDefaultValue,
+      ],
+
+      ArchiveTargetCase::MATTER_ARCHIVED_ALLOW_OVERRIDE => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
+        '#description' => $this->t('if set, a form builder can override whether a not a matter is archived'),
+        '#default_value' => $settings->archiveTargetCase->matterArchivedAllowOverride,
+      ],
+    ];
 
     $description = empty($settings->queue)
       ? $this->t('Queue for F2 jobs.', options: ['context' => 'os2forms_f2'])
