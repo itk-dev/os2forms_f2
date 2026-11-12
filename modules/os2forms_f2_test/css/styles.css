@@ -1,41 +1,56 @@
-.os2forms-test.select-options-wrapper {
-  display: none;
-  cursor: default;
+.os2forms-test {
+  &.select-options-wrapper {
+    display: none;
+    cursor: default;
 
-  position: absolute;
-  z-index: 9999;
-  background: white;
-  border: solid 1px #ddd;
-  border-radius: 8px;
+    position: absolute;
+    z-index: 9999;
+    background: white;
+    border: solid 1px #ddd;
+    border-radius: 8px;
 
-  border: 1px solid var(--gin-border-color-form-element);
-  border-radius: var(--gin-border-m);
+    border: 1px solid var(--gin-border-color-form-element);
+    border-radius: var(--gin-border-m);
 
-  ol {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
 
-    padding-block: var(--input-padding-vertical);
-    padding-inline: var(--input-padding-vertical);
+      padding-block: var(--input-padding-vertical);
+      padding-inline: var(--input-padding-vertical);
 
-    li {
-      padding-inline-start: calc(1ex + var(--input-padding-horizontal));
-      border-radius: 4px;
-      border-radius: var(--gin-border-s);
-      color: var(--gin-color-text);
+      li {
+        padding-inline-start: calc(1ex + var(--input-padding-horizontal));
+        border-radius: 4px;
+        border-radius: var(--gin-border-s);
+        color: var(--gin-color-text);
+      }
+
+      li.selected::before {
+        content: "✓";
+        margin-left: -1em;
+        position: absolute;
+      }
+
+      li:hover {
+        background-color: var(--gin-color-primary);
+        color: var(--gin-color-button-text);
+      }
     }
+  }
 
-    li.selected::before {
-      content: "✓";
-      margin-left: -1em;
-      position: absolute;
-    }
+  &.mouse-pointer {
+    position: absolute;
+    z-index: 9999;
+    /* background: green; */
 
-    li:hover {
-      background-color: var(--gin-color-primary);
-      color: var(--gin-color-button-text);
-    }
+    /* https://mac-cursors.netlify.app/ */
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAATCAQAAAAO/CQiAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAJiS0dEAP+Hj8y/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6gsMCBcWuUl8kgAAAMFJREFUGNNt0KFOgmEUBuAzi8HNgsxgwMAMKlaLRa8BMBqsFq2Oe5AbcNNbMFm8Boo2A83/J2lS4dtjQH4Qv9POnvfsbG9oRX4UDvKQxqPsldSWJSl0jEv7GcjSFEJ3mWYQuialvQyEU5OiokX4Q3OoaWrqUditYEc4gmcDA49qIYUrH+rCAxcLz68Zur0RWtKbtQq8alj/HDWEe3ozeLEVEeHyTtj29W5jCpu/gdU0PNH3zflya2d4cvi/5xXH8+0HBJ6uaeh0RccAAAAASUVORK5CYII=");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    width: 12px;
+    height: 19px;
   }
 }
 
