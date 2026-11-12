@@ -211,7 +211,7 @@ DESCRIPTION, [
       ArchiveTargetCase::MATTER_TYPE_ALLOW_OVERRIDE => [
         '#type' => 'checkbox',
         '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
-        '#description' => $this->t('if set, a form builder can override the matter type'),
+        '#description' => $this->t('If set, a form builder can override the matter type in the F2 handler settings', options: ['context' => 'os2forms_f2']),
         '#default_value' => $settings->archiveTargetCase->matterTypeAllowOverride,
       ],
 
@@ -229,7 +229,7 @@ DESCRIPTION, [
       ArchiveTargetCase::MATTER_STATUS_ALLOW_OVERRIDE => [
         '#type' => 'checkbox',
         '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
-        '#description' => $this->t('if set, a form builder can override the matter status'),
+        '#description' => $this->t('If set, a form builder can override the matter status in the F2 handler settings', options: ['context' => 'os2forms_f2']),
         '#default_value' => $settings->archiveTargetCase->matterStatusAllowOverride,
       ],
 
@@ -248,7 +248,7 @@ DESCRIPTION, [
       ArchiveTargetCase::MATTER_ACCESS_LEVEL_ALLOW_OVERRIDE => [
         '#type' => 'checkbox',
         '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
-        '#description' => $this->t('if set, a form builder can override the matter access level'),
+        '#description' => $this->t('If set, a form builder can override the matter access level in the F2 handler settings', options: ['context' => 'os2forms_f2']),
         '#default_value' => $settings->archiveTargetCase->matterAccessLevelAllowOverride,
       ],
 
@@ -261,7 +261,7 @@ DESCRIPTION, [
       ArchiveTargetCase::MATTER_ARCHIVED_ALLOW_OVERRIDE => [
         '#type' => 'checkbox',
         '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
-        '#description' => $this->t('if set, a form builder can override whether a not a matter is archived'),
+        '#description' => $this->t('If set, a form builder can override whether a not a matter is archived in the F2 handler settings', options: ['context' => 'os2forms_f2']),
         '#default_value' => $settings->archiveTargetCase->matterArchivedAllowOverride,
       ],
     ];
