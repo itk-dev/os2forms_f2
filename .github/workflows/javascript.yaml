@@ -16,7 +16,8 @@ name: JavaScript
 on:
   pull_request:
     paths: &paths
-      - "tests/**/*.ts"
+      - "**/*.js"
+      - "**/*.ts"
       - "docker-compose.yml"
   push:
     branches:
@@ -36,4 +37,4 @@ jobs:
           docker network create frontend
 
       - run: |
-          docker compose run --rm prettier --no-editorconfig 'tests/**/*.{js,ts}' --check
+          docker compose run --rm prettier --no-editorconfig '**/*.{js,ts}' --check

@@ -1,6 +1,6 @@
 .os2forms-test {
   &.select-options-wrapper {
-    display: none;
+    /* display: none; */
     cursor: default;
 
     position: absolute;
@@ -25,32 +25,37 @@
         border-radius: 4px;
         border-radius: var(--gin-border-s);
         color: var(--gin-color-text);
-      }
 
-      li.selected::before {
-        content: "✓";
-        margin-left: -1em;
-        position: absolute;
-      }
+        &.selected::before {
+          content: "✓";
+          margin-left: -1em;
+          position: absolute;
+        }
 
-      li:hover {
-        background-color: var(--gin-color-primary);
-        color: var(--gin-color-button-text);
+        &.hover {
+          background-color: var(--gin-color-primary);
+          color: var(--gin-color-button-text);
+        }
       }
     }
   }
+
+  --mac-cursor-default-1x-url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAATCAQAAAAO/CQiAAAAAmJLR0QA/4ePzL8AAAAHdElNRQfqCwwWKwu/BOfOAAAAwUlEQVQY023QoU6CYRQG4DOLwc2CzGDAwAwqVotFrwEwGqwWrY57kBtw01swWbwGijYDzf8naVLh22NAfhC/086e9+xsb2hFfhQO8pDGo+yV1JYlKXSMS/sZyNIUQneZZhC6JqW9DIRTk6KiRfhDc6hpaupR2K1gRziCZwMDj2ohhSsf6sIDFwvPrxm6vRFa0pu1CrxqWP8cNYR7ejN4sRUR4fJO2Pb1bmMKm7+B1TQ80ffN+XJrZ3hy+L/nFcfz7QcEnq5p6HRFxwAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyNi0xMS0xMlQyMjo0MzoxMSswMDowMHzv2wEAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjYtMTEtMTJUMjI6NDM6MTErMDA6MDANsmO9AAAAKHRFWHRkYXRlOnRpbWVzdGFtcAAyMDI2LTExLTEyVDIyOjQzOjExKzAwOjAwWqdCYgAAAABJRU5ErkJggg==";
+  --mac-cursor-default-2x-url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAlCAQAAAADkbqNAAAAAmJLR0QA/4ePzL8AAAAHdElNRQfqCwwWKwu/BOfOAAABj0lEQVQ4y5XSPywDUQDH8V/RgalsIhaLRCISlFpMNoNFIgYRg6QmsYgYbCISo4XBpKX1JyYSEQmDwS6RWEVCxJ8BcejX8M653p/2+rZ39/28u/fuRI0qGeSJV5Jb7FcAsKACgAXAXsQ9YMFTdIAFnQbsRgBYoOjA5KLLgJ0y4C8XXTyXB/+56DYgXwK48wigOHdALgR4c5H8A9WRcpHkBWA7AATlDtjygeBc9ASDsNwB2SIQnotePyiVi15eATIOKJ17QQxL8Zhn+3ENuGYpLUhSRuOxn5DVTwgYm1QVrT6qe51KkpK6lKRDPRY9NudafYIfLp31dwBWQ7/qFAUAhu28lS+waAnMZ8zbHcE11TZYB8gE5PMmXpQ4h0k7b+IdCnT4cgAWJIk+uKXWBssAh0H5rDM/gFk7rzd/fr83n3bN2/h+ImGDOYALd/5J2rObDViy8zruAIb+b475jraZjzcaETWkeQC4okrhgxVYY4QbcwgFsiRK5Q3mRwfggHaVG/anOCNVNpUk6jhm0H/9F2nzWkoselV9AAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI2LTExLTEyVDIyOjQzOjExKzAwOjAwfO/bAQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyNi0xMS0xMlQyMjo0MzoxMSswMDowMA2yY70AAAAodEVYdGRhdGU6dGltZXN0YW1wADIwMjYtMTEtMTJUMjI6NDM6MTErMDA6MDBap0JiAAAAAElFTkSuQmCC";
 
   &.mouse-pointer {
     position: absolute;
     z-index: 9999;
     /* background: green; */
 
-    /* https://mac-cursors.netlify.app/ */
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAATCAQAAAAO/CQiAAAAAXNSR0IB2cksfwAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAJiS0dEAP+Hj8y/AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6gsMCBcWuUl8kgAAAMFJREFUGNNt0KFOgmEUBuAzi8HNgsxgwMAMKlaLRa8BMBqsFq2Oe5AbcNNbMFm8Boo2A83/J2lS4dtjQH4Qv9POnvfsbG9oRX4UDvKQxqPsldSWJSl0jEv7GcjSFEJ3mWYQuialvQyEU5OiokX4Q3OoaWrqUditYEc4gmcDA49qIYUrH+rCAxcLz68Zur0RWtKbtQq8alj/HDWEe3ozeLEVEeHyTtj29W5jCpu/gdU0PNH3zflya2d4cvi/5xXH8+0HBJ6uaeh0RccAAAAASUVORK5CYII=");
+    background-image: image-set(
+      var(--mac-cursor-default-1x-url) 1x,
+      var(--mac-cursor-default-2x-url) 2x
+    );
     background-position: 0 0;
     background-repeat: no-repeat;
-    width: 12px;
-    height: 19px;
+    width: 64px;
+    height: 64px;
   }
 }
 
