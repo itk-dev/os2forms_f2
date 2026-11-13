@@ -3,7 +3,6 @@
 namespace Drupal\os2forms_f2\Settings;
 
 use Drupal\Core\Site\Settings as DrupalSettings;
-use Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget;
 use Drupal\os2forms_f2\Settings\GeneralSettings\ArchiveTargetCase;
 use ItkDev\F2ApiClient\Model\Matter\Type as MatterType;
 
@@ -26,13 +25,22 @@ final class GeneralSettings extends AbstractSettings {
 
   const string ARCHIVE_TARGETS = 'archive_targets';
   /**
-   * The (enabled) archive target.
+   * The (enabled) archive targets.
    *
    * @var array<string, string>
+   *
+   * Each key and value will be the value of an ArchiveTarget case, e.g.
+   *
+   * @code
+   * [
+   *     ArchiveTarget::Case->value => ArchiveTarget::Case->value,.
+   * ]
+   * @endcode
+   *
+   *
+   * @see \Drupal\os2forms_f2\Settings\ArchiveSettings\ArchiveTarget
    */
-  public array $archiveTargets = [
-    ArchiveTarget::Case->value => ArchiveTarget::Case->value,
-  ];
+  public array $archiveTargets = [];
 
   const string MATTER_FILE_DOCUMENT_TITLE_DEFAULT_VALUE = 'matter_file_document_title_default_value';
   public string $matterFileDocumentTitleDefaultValue = '[file:name]';

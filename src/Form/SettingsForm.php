@@ -204,7 +204,7 @@ DESCRIPTION, [
           MatterType::Outbound->value => $this->t('Outbound', options: ['context' => 'os2forms_f2']),
         ],
         '#title' => $this->t('Default matter type', options: ['context' => 'os2forms_f2']),
-        '#default_value' => $settings->archiveTargetCase->matterTypeDefaultValue->value,
+        '#default_value' => $settings->archiveTargetCase?->matterTypeDefaultValue->value,
         '#required' => TRUE,
       ],
 
@@ -212,7 +212,7 @@ DESCRIPTION, [
         '#type' => 'checkbox',
         '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
         '#description' => $this->t('If set, a form builder can override the matter type in the F2 handler settings', options: ['context' => 'os2forms_f2']),
-        '#default_value' => $settings->archiveTargetCase->matterTypeAllowOverride,
+        '#default_value' => $settings->archiveTargetCase?->matterTypeAllowOverride,
       ],
 
       ArchiveTargetCase::MATTER_STATUS_DEFAULT_VALUE => [
@@ -222,7 +222,7 @@ DESCRIPTION, [
           MatterStatus::Closed->value => $this->t('Closed', options: ['context' => 'os2forms_f2']),
         ],
         '#title' => $this->t('Default matter status', options: ['context' => 'os2forms_f2']),
-        '#default_value' => $settings->archiveTargetCase->matterStatusDefaultValue->value,
+        '#default_value' => $settings->archiveTargetCase?->matterStatusDefaultValue->value,
         '#required' => TRUE,
       ],
 
@@ -230,7 +230,7 @@ DESCRIPTION, [
         '#type' => 'checkbox',
         '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
         '#description' => $this->t('If set, a form builder can override the matter status in the F2 handler settings', options: ['context' => 'os2forms_f2']),
-        '#default_value' => $settings->archiveTargetCase->matterStatusAllowOverride,
+        '#default_value' => $settings->archiveTargetCase?->matterStatusAllowOverride,
       ],
 
       ArchiveTargetCase::MATTER_ACCESS_LEVEL_DEFAULT_VALUE => [
@@ -241,7 +241,7 @@ DESCRIPTION, [
           MatterAccessLevel::All->value => $this->t('All', options: ['context' => 'os2forms_f2']),
         ],
         '#title' => $this->t('Default matter access level', options: ['context' => 'os2forms_f2']),
-        '#default_value' => $settings->archiveTargetCase->matterAccessLevelDefaultValue->value,
+        '#default_value' => $settings->archiveTargetCase?->matterAccessLevelDefaultValue->value,
         '#required' => TRUE,
       ],
 
@@ -249,20 +249,20 @@ DESCRIPTION, [
         '#type' => 'checkbox',
         '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
         '#description' => $this->t('If set, a form builder can override the matter access level in the F2 handler settings', options: ['context' => 'os2forms_f2']),
-        '#default_value' => $settings->archiveTargetCase->matterAccessLevelAllowOverride,
+        '#default_value' => $settings->archiveTargetCase?->matterAccessLevelAllowOverride,
       ],
 
       ArchiveTargetCase::MATTER_ARCHIVED_DEFAULT_VALUE => [
         '#type' => 'checkbox',
         '#title' => $this->t('Archive matter by default?', options: ['context' => 'os2forms_f2']),
-        '#default_value' => $settings->archiveTargetCase->matterArchivedDefaultValue,
+        '#default_value' => $settings->archiveTargetCase?->matterArchivedDefaultValue,
       ],
 
       ArchiveTargetCase::MATTER_ARCHIVED_ALLOW_OVERRIDE => [
         '#type' => 'checkbox',
         '#title' => $this->t('Allow override', options: ['context' => 'os2forms_f2']),
         '#description' => $this->t('If set, a form builder can override whether a not a matter is archived in the F2 handler settings', options: ['context' => 'os2forms_f2']),
-        '#default_value' => $settings->archiveTargetCase->matterArchivedAllowOverride,
+        '#default_value' => $settings->archiveTargetCase?->matterArchivedAllowOverride,
       ],
     ];
 
