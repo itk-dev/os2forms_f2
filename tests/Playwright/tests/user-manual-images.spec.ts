@@ -24,19 +24,38 @@ going to ${url} …`);
     return page.goto(url);
   };
 
-  const screenshot = async (name: string, selector: string = "main") => {
+  const screenshot = async (
+    name: string,
+    selector: string = "main",
+    hideHeader: bool = true,
+  ) => {
     const filePath = path.join(
       `/docs/user-manual/${locale}/images/generated/`,
       context,
       // String(screenshotCounter++).padStart(3, "0") + "-" +
       name + ".png",
     );
+    // Allow floating header to fall into place
+    await page.waitForTimeout(2000);
+    if (hideHeader) {
+      await page.evaluate(() => {
+        document.querySelector("header").style.display = "none";
+      });
+    }
     const pagePath = page.url().replace(process.env.BASEURL, "");
     console.debug(`
 screenshooting ${selector}
             on ${pagePath}
           into ${filePath}`);
-    await page.locator(selector).screenshot({ path: filePath });
+    const result = await page.locator(selector).screenshot({ path: filePath });
+
+    if (hideHeader) {
+      await page.evaluate(() => {
+        document.querySelector("header").style.display = "initial";
+      });
+    }
+
+    return result;
   };
 
   const drush = async (args: string[]) => {
@@ -76,18 +95,45 @@ screenshooting ${selector}
   await page.locator('[name="general[queue]"]').selectOption(null);
   await page.locator('[name="f2_api[uri]"]').focus();
   await page.locator('[name="f2_api[uri]"]').blur();
-  await screenshot("f2-settings-empty", ".page-wrapper");
+  await screenshot("f2-settings-empty");
+  await screenshot("f2-settings-empty-f2-api", "#edit-f2-api", true);
+  await screenshot("f2-settings-empty-general", "#edit-general", true);
+  await screenshot("f2-settings-empty");
 
   await goto("admin/os2forms_f2/settings");
   await page.locator('[name="f2_api[uri]"]').fill("https://f2.example.com");
   await page.locator('[name="f2_api[username]"]').fill("api-user");
   await page.locator('[name="f2_api[secret]"]').fill("api-$ecr3t");
   await page.locator('[name="f2_api[f2_username]"]').fill("f2-user");
+
+  await page.locator('[name="general[archive_targets][case]"]').check();
+  await page
+    .locator('[name="general[archive_target_case][matter_type_default_value]"]')
+    .selectOption("Internal");
+  await page
+    .locator(
+      '[name="general[archive_target_case][matter_status_default_value]"]',
+    )
+    .selectOption("Closed");
+  await page
+    .locator(
+      '[name="general[archive_target_case][matter_access_level_default_value]"]',
+    )
+    .selectOption("All");
+  await page
+    .locator(
+      '[name="general[archive_target_case][matter_archived_default_value]"]',
+    )
+    .check();
+
   await page.locator('[name="general[queue]"]').selectOption("os2forms_f2");
+
   await page.locator('[name="f2_api[uri]"]').focus();
   await page.locator('[name="f2_api[uri]"]').blur();
 
   await screenshot("f2-settings-filled");
+  await screenshot("f2-settings-filled-f2-api", "#edit-f2-api", true);
+  await screenshot("f2-settings-filled-general", "#edit-general", true);
 
   await page.locator(submitSelector).click();
   await screenshot("f2-settings-saved");
@@ -146,7 +192,7 @@ going to ${url} …`);
 screenshooting ${selector}
             on ${pagePath}
           into ${filePath}`);
-    await page.locator(selector).screenshot({ path: filePath });
+    return page.locator(selector).screenshot({ path: filePath });
   };
 
   const drush = async (args: string[]) => {
@@ -191,6 +237,68 @@ screenshooting ${selector}
   // Wait for the AJAX search
   await page.waitForTimeout(1000);
   await screenshot("webform-handler-select-f2", ".webform-ui-dialog");
+
+  // Aarhus is very restrictive
+  await drush([
+    "--yes",
+    "config:set",
+    "os2forms_f2.settings",
+    "general",
+    "--input-format=yaml",
+    JSON.stringify({
+      matter_file_document_title_default_value: "[file:name]",
+      archive_targets: {
+        case: "case",
+      },
+      archive_target_case: {
+        matter_type_default_value: "Internal",
+        matter_type_allow_override: 0,
+        matter_status_default_value: "Closed",
+        matter_status_allow_override: 0,
+        matter_access_level_default_value: "All",
+        matter_access_level_allow_override: 0,
+        matter_archived_default_value: 1,
+        matter_archived_allow_override: 0,
+      },
+      queue: "os2forms_f2",
+    }),
+  ]);
+
+  await goto(
+    "admin/structure/webform/manage/os2forms_f2_test_000/handlers/add/os2forms_f2_f2",
+  );
+  await screenshot("webform-handler-add-general", "#webform-handler-form");
+  await screenshot(
+    "webform-handler-add-general-archive-settings-aarhus",
+    "#edit-settings-os2forms-f2-f2",
+  );
+
+  // Allow overriding archive target and matter properties
+  await drush([
+    "--yes",
+    "config:set",
+    "os2forms_f2.settings",
+    "general",
+    "--input-format=yaml",
+    JSON.stringify({
+      matter_file_document_title_default_value: "[file:name]",
+      archive_targets: {
+        case: "case",
+        matter: "matter",
+      },
+      archive_target_case: {
+        matter_type_default_value: "Internal",
+        matter_type_allow_override: 1,
+        matter_status_default_value: "Closed",
+        matter_status_allow_override: 1,
+        matter_access_level_default_value: "All",
+        matter_access_level_allow_override: 1,
+        matter_archived_default_value: 1,
+        matter_archived_allow_override: 1,
+      },
+      queue: "os2forms_f2",
+    }),
+  ]);
 
   await goto(
     "admin/structure/webform/manage/os2forms_f2_test_000/handlers/add/os2forms_f2_f2",
@@ -422,7 +530,7 @@ going to ${url} …`);
 screenshooting ${selector}
             on ${pagePath}
           into ${filePath}`);
-    await page.locator(selector).screenshot({ path: filePath });
+    return page.locator(selector).screenshot({ path: filePath });
   };
 
   const drush = async (args: string[]) => {
