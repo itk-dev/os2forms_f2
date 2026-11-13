@@ -9,6 +9,15 @@ og konfigureres på passende vis.
 
 ![Formularbehandler](./images/generated/form-builder/webform-handler-add-general.png)
 
+> [!NOTE]
+> Bemærk at de faktiske muligheder afhænger generelle indstillinger sat af en administrator, så indstillingsformularen
+> kan fx også se ud som
+>
+> ![Aarhusindstillinger](./images/generated/form-builder/webform-handler-add-general-archive-settings-aarhus.png)
+>
+> hvor "[Arkivering på sag](#arkivering-på-sag)" er valgt på forhånd (valgmuligheden er derfor skjult) og egenskaber for
+> akten også er sat af administratoren.
+
 De afgørende indstillinger for F2-behandleren ligger under "F2-arkiveringsindstillinger":
 
 ![F2-arkiveringsindstillinger](./images/generated/form-builder/webform-handler-add-general-archive-settings.png)
