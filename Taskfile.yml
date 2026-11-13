@@ -19,6 +19,7 @@ tasks:
       - task: coding-standards:javascript:apply
       - task: coding-standards:markdown:apply
       - task: coding-standards:php:apply
+      - task: coding-standards:styles:apply
       - task: coding-standards:yaml:apply
 
   coding-standards:check:
@@ -28,6 +29,7 @@ tasks:
       - task: coding-standards:javascript:check
       - task: coding-standards:markdown:check
       - task: coding-standards:php:check
+      - task: coding-standards:styles:check
       - task: coding-standards:yaml:check
 
   coding-standards:composer:apply:
@@ -50,14 +52,14 @@ tasks:
     desc: "Apply coding standards for JavaScript"
     cmds:
       # Cf. .github/workflows/javascript.yaml
-      - docker compose run --rm prettier 'tests/**/*.{js,ts}' --write
+      - docker compose run --rm prettier '**/*.{js,ts}' --write
 
   coding-standards:javascript:check:
     desc: "Apply coding standards for JavaScript"
     cmds:
       - task: coding-standards:javascript:apply
       # Cf. .github/workflows/javascript.yaml
-      - docker compose run --rm prettier 'tests/**/*.{js,ts}' --check
+      - docker compose run --rm prettier '**/*.{js,ts}' --check
 
   coding-standards:markdown:apply:
     desc: "Apply coding standards for Markdown"
@@ -90,6 +92,19 @@ tasks:
       - task: ddev
         vars:
           TASK_ARGS: phpcs
+
+  coding-standards:styles:apply:
+    desc: "Apply coding standards for CSS styles"
+    cmds:
+      # Cf. .github/workflows/styles.yaml
+      - docker compose run --rm prettier '**/*.{css,scss}' --write
+
+  coding-standards:styles:check:
+    desc: "Apply coding standards for CSS styles"
+    cmds:
+      - task: coding-standards:styles:apply
+      # Cf. .github/workflows/styles.yaml
+      - docker compose run --rm prettier '**/*.{css,scss}' --check
 
   coding-standards:yaml:apply:
     desc: "Apply coding standards for YAML"
@@ -272,11 +287,13 @@ tasks:
       BORDER_WIDTH: 4
     # Trim and add border
     cmd:
+      # https://autocrop.org/guides/imagemagick-trim-transparent/
       cmd: |
         docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm mogrify \
           -strip \
           -background white \
           -trim \
+          +repage \
           -gravity north -splice 0x{{.BORDER_WIDTH}}+0+0 \
           -gravity south -splice 0x{{.BORDER_WIDTH}}+0+0 \
           -gravity west -splice {{.BORDER_WIDTH}}x0+0+0 \
@@ -323,3 +340,57 @@ tasks:
             fi
         done
       shopt: [globstar]
+
+  user-manual:css:cursors:
+    cmd:
+      for:
+        matrix:
+          NAME:
+            # https://mac-cursors.netlify.app/
+            # https://github.com/daviddarnes/mac-cursors/tree/main/src/png
+
+            # - beachball
+            # - busy
+            # - cell
+            # - contextualmenu
+            # - copy
+            # - cross
+            - default
+            # - handgrabbing
+            # - handopen
+            # - handpointing
+            # - help
+            # - makealias
+            # - move
+            # - notallowed
+            # - poof
+            # - resizedown
+            # - resizeeast
+            # - resizeleft
+            # - resizeleftright
+            # - resizenorth
+            # - resizenortheast
+            # - resizenortheastsouthwest
+            # - resizenorthsouth
+            # - resizenorthwest
+            # - resizenorthwestsoutheast
+            # - resizeright
+            # - resizesouth
+            # - resizesoutheast
+            # - resizesouthwest
+            # - resizeup
+            # - resizeupdown
+            # - resizewest
+            # - resizewesteast
+            # - screenshotselection
+            # - screenshotwindow
+            # - textcursor
+            # - textcursorvertical
+            # - zoomin
+            # - zoomout
+          RESOLUTION:
+            - '@1x'
+            - '@2x'
+      # https://autocrop.org/guides/imagemagick-trim-transparent/
+      cmd: >-
+        echo '--mac-cursor-{{.ITEM.NAME}}{{.ITEM.RESOLUTION | replace "@" "-"}}-url: "data:image/png;base64,'$(curl --silent --location https://github.com/daviddarnes/mac-cursors/raw/refs/heads/main/src/png/{{.ITEM.NAME}}{{.ITEM.RESOLUTION | replace "@1x" ""}}.png | ddev exec magick mogrify -trim +repage png:- | base64 --wrap 0)'";'
