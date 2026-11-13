@@ -299,7 +299,7 @@ tasks:
     cmd:
       # https://autocrop.org/guides/imagemagick-trim-transparent/
       cmd: |
-        docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm mogrify \
+        ddev exec magick mogrify \
           -strip \
           -background white \
           -trim \
@@ -333,7 +333,7 @@ tasks:
             status=$(git status --porcelain "$file")
             if [[ "$status" =~ $status_modified_pattern ]]; then
                 if git cat-file -p "$latest_commit":"$file" | \
-                    docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm compare \
+                    ddev exec magick compare \
                     - \
                     "$file" \
                     {{.COMPARE_OUTPUT_FILENAME | default "-"}} > /dev/null 2>&1; then
