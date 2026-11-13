@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-11-10
 
+* [PR-16](https://github.com/itk-dev/os2forms_f2/pull/16)
+  * Handled more matter properties
+  * Added global defaults for matter properties
 * [PR-14](https://github.com/itk-dev/os2forms_f2/pull/14)
   Improved error logging
 * [PR-13](https://github.com/itk-dev/os2forms_f2/pull/13)

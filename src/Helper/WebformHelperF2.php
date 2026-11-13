@@ -122,16 +122,14 @@ final readonly class WebformHelperF2 implements LoggerInterface {
    *
    * @see self::processJob()
    */
-  public function createJob(WebformSubmissionInterface $webformSubmission, WebformHandlerF2|ArchiveSettings $handlerSettings, ?string $state = NULL, ?array $payload = []): ?Job {
+  public function createJob(WebformSubmissionInterface $webformSubmission, WebformHandlerF2 $handler): ?Job {
     $context = [
       'handler_id' => WebformHandlerF2::ID,
       'webform_submission' => $webformSubmission,
     ];
 
     try {
-      if ($handlerSettings instanceof WebformHandlerF2) {
-        $handlerSettings = $this->settings->getHandlerSettings($handlerSettings);
-      }
+      $handlerSettings = $this->settings->getHandlerSettings($handler, applyGlobals: TRUE);
 
       $job = Job::create(F2::class, [
         'formId' => $webformSubmission->getWebform()->id(),
@@ -267,9 +265,10 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       $title = $this->replaceTokens($handlerSettings->archive->archiveTargetCase->matterTitle, $submission);
       $matter->title = $this->truncate($title, Matter::TITLE_MAX_LENGTH);
       $matter->type = $handlerSettings->archive->archiveTargetCase->matterType;
+      $matter->status = $handlerSettings->archive->archiveTargetCase->matterStatus;
       $matter->accessLevel = $handlerSettings->archive->archiveTargetCase->matterAccessLevel;
-      // Always archive ("journaliser") matter.
-      $matter->archived = TRUE;
+      // Archive ("journaliser") matter?
+      $matter->archived = $handlerSettings->archive->archiveTargetCase->matterArchived;
       $this->setMatterResponsible($matter, $handlerSettings);
       $matter = $this->f2->client()->matterCreate(matter: $matter, case: $case);
 
