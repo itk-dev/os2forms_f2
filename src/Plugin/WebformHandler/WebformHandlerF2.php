@@ -273,7 +273,7 @@ DESCRIPTION, [
             ],
             '#title' => $this->t('Matter type', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The type of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => ($settings->archiveTargetCase->matterType ?? MatterType::Internal)->value,
+            '#default_value' => ($settings->archiveTargetCase->matterType ?? $generalSettings->archiveTargetCase->matterTypeDefaultValue ?? MatterType::Internal)->value,
 
             '#states' => [
               'required' => [
@@ -296,7 +296,7 @@ DESCRIPTION, [
             ],
             '#title' => $this->t('Matter status', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The status of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => ($settings->archiveTargetCase->matterStatus ?? MatterStatus::Closed)->value,
+            '#default_value' => ($settings->archiveTargetCase->matterStatus ?? $generalSettings->archiveTargetCase->matterStatusDefaultValue ?? MatterStatus::Closed)->value,
 
             '#states' => [
               'required' => [
@@ -315,7 +315,7 @@ DESCRIPTION, [
             '#type' => 'checkbox',
             '#title' => $this->t('Archive matter', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('If set, the created matter will be archived.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetCase->matterArchived,
+            '#default_value' => $settings->archiveTargetCase->matterArchived ?? $generalSettings->archiveTargetCase->matterArchivedDefaultValue ?? TRUE,
           ],
 
           ArchiveTargetCase::MATTER_ACCESS_LEVEL => [
@@ -327,7 +327,7 @@ DESCRIPTION, [
             ],
             '#title' => $this->t('Matter access level', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The access level of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => ($settings->archiveTargetCase->matterAccessLevel ?? MatterAccessLevel::All)->value,
+            '#default_value' => ($settings->archiveTargetCase->matterAccessLevel ?? $generalSettings->archiveTargetCase->matterAccessLevelDefaultValue ?? MatterAccessLevel::All)->value,
 
             '#states' => [
               'required' => [
