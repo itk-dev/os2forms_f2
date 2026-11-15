@@ -102,6 +102,15 @@ header.region-sticky--is-sticky + .sticky-shadow {
   // const boundingBox = await element.boundingBox();
   // await page.mouse.move(boundingBox.x + boundingBox.width/2, boundingBox.y - boundingBox.height/2 + 50);
 
+  console.debug(
+    await page.addStyleTag({
+      url: "http://web/modules/custom/os2forms_f2/modules/os2forms_f2_test/css/styles.css",
+    }),
+    await page.addScriptTag({
+      url: "http://web/modules/custom/os2forms_f2/modules/os2forms_f2_test/js/script.js",
+    }),
+  );
+
   // https://playwright.dev/docs/evaluating
   console.debug(
     await page.evaluate((data) => os2forms_f2_test.expandSelect(data), {

@@ -374,7 +374,7 @@ tasks:
             # https://mac-cursors.netlify.app/
             # https://github.com/daviddarnes/mac-cursors/tree/main/src/png
 
-            # - beachball
+            - beachball
             # - busy
             # - cell
             # - contextualmenu

@@ -16,7 +16,7 @@ class PageHooks {
  */
   #[Hook('page_attachments')]
   public function pageAttachments(array &$page): void {
-    $page['#attached']['library'][] = 'os2forms_f2_test/allselect';
+//    $page['#attached']['library'][] = 'os2forms_f2_test/allselect';
   }
 
 }
