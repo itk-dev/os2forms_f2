@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { DrupalPage } from "./drupal-page.ts";
 
 // We want run and complete the administrator stuff before running the form-builder stuff.
 // https://playwright.dev/docs/test-parallel
@@ -7,6 +8,43 @@ test.describe.configure({ mode: "serial" });
 import dotenv from "dotenv";
 import path from "path";
 dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
+
+test("xxxxxxxxxx", async ({ page }) => {
+  const drupalPage = new DrupalPage(page);
+
+  await drupalPage.goToPath("/admin/config/system/cron");
+  await drupalPage.takeScreenshot("cron-before");
+  const response = await drupalPage.drush(["core:cron"]);
+  await drupalPage.goToPath("/admin/config/system/cron");
+  await drupalPage.takeScreenshot("cron-after");
+
+  await page.addStyleTag({
+    url: "http://web/modules/custom/os2forms_f2/modules/os2forms_f2_test/css/module.css",
+  });
+  await page.addScriptTag({
+    type: "module",
+    content: `
+    import { revealMousePointer } from "http://web/modules/custom/os2forms_f2/modules/os2forms_f2_test/js/module.js";
+    revealMousePointer({
+      selector: '[data-drupal-selector="edit-run"]',
+      // position: ['left'],
+    })
+    `,
+  });
+  await drupalPage.takeScreenshot("cron-mouse");
+
+  await page.addScriptTag({
+    type: "module",
+    content: `
+    import { expandSelect } from "http://web/modules/custom/os2forms_f2/modules/os2forms_f2_test/js/module.js";
+    expandSelect({
+      selector: '[data-drupal-selector="edit-interval"]',
+      hover: '12 timer',
+    })
+    `,
+  });
+  await drupalPage.takeScreenshot("cron-interval");
+});
 
 const submitSelector = 'input[data-drupal-selector="edit-submit"]';
 

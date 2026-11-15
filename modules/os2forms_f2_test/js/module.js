@@ -17,29 +17,29 @@ const getElement = (selector) => {
 const px = (value) => value.toFixed(4) + "px";
 
 const createElement = (name, attributes, ...children) => {
-  const element = document.createElement(name)
-  Object.entries(attributes ?? {}).forEach(entry => {
+  const element = document.createElement(name);
+  Object.entries(attributes ?? {}).forEach((entry) => {
     const [name, value] = entry;
-    if ('class' === name) {
+    if ("class" === name) {
       element.classList.add(...value);
     } else {
-      element.setAttribute(name, value)
+      element.setAttribute(name, value);
     }
     console.log(name, value);
   });
-document.body.appendChild(element)
+  document.body.appendChild(element);
 
-  return element
-}
+  return element;
+};
 
 const revealMousePointer = ({ element, selector, x, y, cursor, position }) => {
   console.log("revealMousePointer", { element, x, y });
   if (!position) {
-    position = []
-}
+    position = [];
+  }
 
   if (selector) {
-    element = getElement(selector)
+    element = getElement(selector);
   }
 
   if (element) {
@@ -79,14 +79,14 @@ const revealMousePointer = ({ element, selector, x, y, cursor, position }) => {
     y = rect.top + offsetY;
   }
 
-  const mousePointer = createElement("div", {'class':["ui-mouse-pointer"]});
+  const mousePointer = createElement("div", { class: ["ui-mouse-pointer"] });
   if (cursor) {
     mousePointer.classList.add("cursor-" + cursor);
   }
   mousePointer.style.left = px(x);
   mousePointer.style.top = px(y);
 
-  return mousePointer
+  return mousePointer;
 };
 
 const expandSelect = ({ selector, hover, mouse }) => {
@@ -110,7 +110,7 @@ const expandSelect = ({ selector, hover, mouse }) => {
   // const wrapper = document.createElement("div");
   // el.after(wrapper);
   // wrapper.classList.add("ui-select");
-  const wrapper = createElement('div', {'class': ['ui-select']})
+  const wrapper = createElement("div", { class: ["ui-select"] });
   wrapper.style.left = px(rect.left);
   wrapper.style.top = px(rect.top);
   wrapper.style.width = px(el.offsetWidth);
@@ -132,7 +132,7 @@ const expandSelect = ({ selector, hover, mouse }) => {
     }
   });
 
-  return wrapper
+  return wrapper;
 };
 
 const highlightElement = ({
@@ -147,7 +147,7 @@ const highlightElement = ({
 
   const el = getElement(selector);
   const rect = el.getBoundingClientRect();
-  const wrapper = createElement("div", {'class': ["ui-highlight", type]});
+  const wrapper = createElement("div", { class: ["ui-highlight", type] });
 
   wrapper.style.borderColor = color;
   wrapper.style.borderWidth = px(width);
