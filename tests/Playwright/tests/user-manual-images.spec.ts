@@ -37,25 +37,22 @@ going to ${url} …`);
     );
     // Allow floating header to fall into place
     await page.waitForTimeout(2000);
-    if (hideHeader) {
-      await page.evaluate(() => {
-        document.querySelector("header").style.display = "none";
-      });
-    }
     const pagePath = page.url().replace(process.env.BASEURL, "");
     console.debug(`
 screenshooting ${selector}
             on ${pagePath}
           into ${filePath}`);
-    const result = await page.locator(selector).screenshot({ path: filePath });
-
-    if (hideHeader) {
-      await page.evaluate(() => {
-        document.querySelector("header").style.display = "initial";
-      });
-    }
-
-    return result;
+    // https://playwright.dev/docs/api/class-page#page-screenshot
+    return page.locator(selector).screenshot({
+      path: filePath,
+      animations: "disabled",
+      style: `
+header.region-sticky--is-sticky,
+header.region-sticky--is-sticky + .sticky-shadow {
+  display: none;
+}
+`,
+    });
   };
 
   const drush = async (args: string[]) => {
@@ -98,7 +95,6 @@ screenshooting ${selector}
   await screenshot("f2-settings-empty");
   await screenshot("f2-settings-empty-f2-api", "#edit-f2-api", true);
   await screenshot("f2-settings-empty-general", "#edit-general", true);
-  await screenshot("f2-settings-empty");
 
   await goto("admin/os2forms_f2/settings");
   await page.locator('[name="f2_api[uri]"]').fill("https://f2.example.com");
