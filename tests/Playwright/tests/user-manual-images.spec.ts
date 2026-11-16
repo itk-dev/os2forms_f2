@@ -13,6 +13,22 @@ test("xxxxxxxxxx", async ({ page }) => {
   const drupalPage = new DrupalPage(page);
 
   await drupalPage.goToPath("/admin/config/system/cron");
+
+  await page.addStyleTag({
+    url: "http://web/modules/custom/os2forms_f2/modules/os2forms_f2_test/css/module.css",
+  });
+  await page.addScriptTag({
+    type: "module",
+    content: `
+    import { highlightElement } from "http://web/modules/custom/os2forms_f2/modules/os2forms_f2_test/js/module.js";
+    highlightElement({
+      selector: '[data-drupal-selector="edit-run"] + p',
+      type: 'rectangle',
+      offset: 5,
+    })
+    `,
+  });
+
   await drupalPage.takeScreenshot("cron-before");
   const response = await drupalPage.drush(["core:cron"]);
   await drupalPage.goToPath("/admin/config/system/cron");

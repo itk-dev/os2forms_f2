@@ -414,8 +414,8 @@ tasks:
             # - zoomin
             # - zoomout
           RESOLUTION:
-            - '@1x'
-            - '@2x'
+            - "@1x"
+            - "@2x"
       # https://autocrop.org/guides/imagemagick-trim-transparent/
       cmd: >-
         echo '--mac-cursor-{{.ITEM.NAME}}{{.ITEM.RESOLUTION | replace "@" "-"}}-url: "data:image/png;base64,'$(curl --silent --location https://github.com/daviddarnes/mac-cursors/raw/refs/heads/main/src/png/{{.ITEM.NAME}}{{.ITEM.RESOLUTION | replace "@1x" ""}}.png | ddev exec magick mogrify -trim +repage png:- | base64 --wrap 0)'";'

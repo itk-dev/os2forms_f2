@@ -135,6 +135,17 @@ const expandSelect = ({ selector, hover, mouse }) => {
   return wrapper;
 };
 
+/**
+ *
+ * @param param0
+ * @param param0.selector
+ * @param param0.type
+ * @param param0.color
+ * @param param0.width
+ * @param param0.offset
+ * @param param0.radius
+ * @returns {HTMLAnchorElement | HTMLElement | HTMLAreaElement | HTMLAudioElement | HTMLBaseElement | HTMLQuoteElement | HTMLBodyElement | HTMLBRElement | HTMLButtonElement | HTMLCanvasElement | HTMLTableCaptionElement | HTMLTableColElement | HTMLDataElement | HTMLDataListElement | HTMLModElement | HTMLDetailsElement | HTMLDialogElement | HTMLDivElement | HTMLDListElement | HTMLEmbedElement | HTMLFieldSetElement | HTMLFormElement | HTMLHeadingElement | HTMLHeadElement | HTMLHRElement | HTMLHtmlElement | HTMLIFrameElement | HTMLImageElement | HTMLInputElement | HTMLLabelElement | HTMLLegendElement | HTMLLIElement | HTMLLinkElement | HTMLMapElement | HTMLMenuElement | HTMLMetaElement | HTMLMeterElement | HTMLObjectElement | HTMLOListElement | HTMLOptGroupElement | HTMLOptionElement | HTMLOutputElement | HTMLParagraphElement | HTMLPictureElement | HTMLPreElement | HTMLProgressElement | HTMLScriptElement | HTMLSelectElement | HTMLSlotElement | HTMLSourceElement | HTMLSpanElement | HTMLStyleElement | HTMLTableElement | HTMLTableSectionElement | HTMLTableCellElement | HTMLTemplateElement | HTMLTextAreaElement | HTMLTimeElement | HTMLTitleElement | HTMLTableRowElement | HTMLTrackElement | HTMLUListElement | HTMLVideoElement}
+ */
 const highlightElement = ({
   selector,
   type = "ellipse",
@@ -165,7 +176,10 @@ const highlightElement = ({
     wrapper.style.top = px(center.y - highlightHeight / 2 - offset - width / 2);
     wrapper.style.width = px(highlightWidth + 2 * offset + width / 2);
     wrapper.style.height = px(highlightHeight + 2 * offset + width / 2);
+    // } else if ("filled-rectangle") {
+    // } else if ("blur") {
   } else {
+    // rectangle
     wrapper.style.left = px(rect.left - offset - width / 2);
     wrapper.style.top = px(rect.top - offset - width / 2);
     wrapper.style.width = px(rect.width + 2 * offset + width / 2);
