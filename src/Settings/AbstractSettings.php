@@ -141,6 +141,9 @@ abstract class AbstractSettings implements \JsonSerializable {
         if ($value instanceof self) {
           $value = $value->toArray($recursive);
         }
+        elseif ($value instanceof \BackedEnum) {
+          $value = $value->value;
+        }
       }
     }
 

@@ -24,6 +24,9 @@ use ItkDev\F2ApiClient\Model\Matter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use ItkDev\F2ApiClient\Model\Matter\Type as MatterType;
+use ItkDev\F2ApiClient\Model\Matter\Status as MatterStatus;
+use ItkDev\F2ApiClient\Model\Matter\AccessLevel as MatterAccessLevel;
 
 /**
  * F2 Webform Handler.
@@ -110,7 +113,19 @@ final class WebformHandlerF2 extends WebformHandlerBase {
    */
   #[\Override]
   public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
+    $generalSettings = $this->settingsService->getGeneralSettings();
     $settings = $this->settingsService->getArchiveSettings((array) ($this->getSetting(ArchiveSettings::NAME)));
+
+    $archiveTargetOptions = [
+      ArchiveTarget::Case->value => $this->t('Case', options: ['context' => 'os2forms_f2']),
+      ArchiveTarget::Matter->value => $this->t('Matter', options: ['context' => 'os2forms_f2']),
+    ];
+    $enabledArchiveTargets = $generalSettings->getEnabledArchiveTargets();
+    $archiveTargetOptions = array_filter(
+      $archiveTargetOptions,
+      static fn (string $target): bool => in_array($target, $enabledArchiveTargets),
+      ARRAY_FILTER_USE_KEY
+    );
 
     // We have to wrap all handler setting fields in a container to show them on
     // the "General" page only.
@@ -162,7 +177,7 @@ Max allowed length (after token expansion): @title_max_length.
 DESCRIPTION, [
             '@title_max_length' => Document::TITLE_MAX_LENGTH,
           ], options: ['context' => 'os2forms_f2']),
-          '#default_value' => $settings->fileDocumentTitle ?: '[file:element:name]: [file:filename]',
+          '#default_value' => $settings->fileDocumentTitle ?: $generalSettings->matterFileDocumentTitleDefaultValue,
 
           '#states' => [
             'visible' => [
@@ -191,10 +206,7 @@ DESCRIPTION, [
           '#required' => TRUE,
           '#title' => $this->t('Archive target', options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->archiveTarget?->value,
-          '#options' => [
-            ArchiveTarget::Case->value => $this->t('Case', options: ['context' => 'os2forms_f2']),
-            ArchiveTarget::Matter->value => $this->t('Matter', options: ['context' => 'os2forms_f2']),
-          ],
+          '#options' => $archiveTargetOptions,
         ],
 
         ArchiveTargetCase::NAME => [
@@ -255,13 +267,13 @@ DESCRIPTION, [
           ArchiveTargetCase::MATTER_TYPE => [
             '#type' => 'select',
             '#options' => [
-              Matter::TYPE_INBOUND => $this->t('Inbound', options: ['context' => 'os2forms_f2']),
-              Matter::TYPE_INTERNAL => $this->t('Internal', options: ['context' => 'os2forms_f2']),
-              Matter::TYPE_OUTBOUND => $this->t('Outbound', options: ['context' => 'os2forms_f2']),
+              MatterType::Inbound->value => $this->t('Inbound', options: ['context' => 'os2forms_f2']),
+              MatterType::Internal->value => $this->t('Internal', options: ['context' => 'os2forms_f2']),
+              MatterType::Outbound->value => $this->t('Outbound', options: ['context' => 'os2forms_f2']),
             ],
             '#title' => $this->t('Matter type', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The type of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetCase->matterType ?? Matter::TYPE_INTERNAL,
+            '#default_value' => ($settings->archiveTargetCase->matterType ?? $generalSettings->archiveTargetCase->matterTypeDefaultValue ?? MatterType::Internal)->value,
 
             '#states' => [
               'required' => [
@@ -276,16 +288,46 @@ DESCRIPTION, [
             ],
           ],
 
+          ArchiveTargetCase::MATTER_STATUS => [
+            '#type' => 'select',
+            '#options' => [
+              MatterStatus::InProgress->value => $this->t('In progress', options: ['context' => 'os2forms_f2']),
+              MatterStatus::Closed->value => $this->t('Closed', options: ['context' => 'os2forms_f2']),
+            ],
+            '#title' => $this->t('Matter status', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('The status of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => ($settings->archiveTargetCase->matterStatus ?? $generalSettings->archiveTargetCase->matterStatusDefaultValue ?? MatterStatus::Closed)->value,
+
+            '#states' => [
+              'required' => [
+                ':input[name="settings[' . implode('][', [
+                  self::ID,
+                  ArchiveSettings::NAME,
+                  ArchiveSettings::ARCHIVE_TARGET,
+                ]) . ']"]' => [
+                  'value' => ArchiveTarget::Case->value,
+                ],
+              ],
+            ],
+          ],
+
+          ArchiveTargetCase::MATTER_ARCHIVED => [
+            '#type' => 'checkbox',
+            '#title' => $this->t('Archive matter', options: ['context' => 'os2forms_f2']),
+            '#description' => $this->t('If set, the created matter will be archived.', options: ['context' => 'os2forms_f2']),
+            '#default_value' => $settings->archiveTargetCase->matterArchived ?? $generalSettings->archiveTargetCase->matterArchivedDefaultValue ?? TRUE,
+          ],
+
           ArchiveTargetCase::MATTER_ACCESS_LEVEL => [
             '#type' => 'select',
             '#options' => [
-              Matter::ACCESS_LEVEL_INVOLVED => $this->t('Involved', options: ['context' => 'os2forms_f2']),
-              Matter::ACCESS_LEVEL_UNIT => $this->t('Unit', options: ['context' => 'os2forms_f2']),
-              Matter::ACCESS_LEVEL_ALL => $this->t('All', options: ['context' => 'os2forms_f2']),
+              MatterAccessLevel::Involved->value => $this->t('Involved', options: ['context' => 'os2forms_f2']),
+              MatterAccessLevel::Unit->value => $this->t('Unit', options: ['context' => 'os2forms_f2']),
+              MatterAccessLevel::All->value => $this->t('All', options: ['context' => 'os2forms_f2']),
             ],
             '#title' => $this->t('Matter access level', options: ['context' => 'os2forms_f2']),
             '#description' => $this->t('The access level of the matter that will be created for the document.', options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetCase->matterAccessLevel ?? Matter::ACCESS_LEVEL_ALL,
+            '#default_value' => ($settings->archiveTargetCase->matterAccessLevel ?? $generalSettings->archiveTargetCase->matterAccessLevelDefaultValue ?? MatterAccessLevel::All)->value,
 
             '#states' => [
               'required' => [
@@ -345,6 +387,35 @@ DESCRIPTION, [
         ],
       ],
     ];
+
+    // Hide archive target selector when only a single options is enabled.
+    if (1 === count($archiveTargetOptions)) {
+      $element = &$form[self::ID][ArchiveSettings::NAME][ArchiveSettings::ARCHIVE_TARGET];
+      $element['#type'] = 'hidden';
+      $element['#default_value'] = array_key_first($archiveTargetOptions);
+    }
+
+    // Hide elements and set default values if overriding is not allowed.
+    if (!($generalSettings->archiveTargetCase->matterTypeAllowOverride ?? TRUE)) {
+      $element = &$form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::MATTER_TYPE];
+      $element['#type'] = 'hidden';
+      $element['#default_value'] = $generalSettings->archiveTargetCase->matterTypeDefaultValue->value;
+    }
+    if (!($generalSettings->archiveTargetCase->matterStatusAllowOverride ?? TRUE)) {
+      $element = &$form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::MATTER_STATUS];
+      $element['#type'] = 'hidden';
+      $element['#default_value'] = $generalSettings->archiveTargetCase->matterStatusDefaultValue->value;
+    }
+    if (!($generalSettings->archiveTargetCase->matterAccessLevelAllowOverride ?? TRUE)) {
+      $element = &$form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::MATTER_ACCESS_LEVEL];
+      $element['#type'] = 'hidden';
+      $element['#default_value'] = $generalSettings->archiveTargetCase->matterAccessLevelDefaultValue->value;
+    }
+    if (!($generalSettings->archiveTargetCase->matterArchivedAllowOverride ?? TRUE)) {
+      $element = &$form[self::ID][ArchiveSettings::NAME][ArchiveTargetCase::NAME][ArchiveTargetCase::MATTER_ARCHIVED];
+      $element['#type'] = 'hidden';
+      $element['#default_value'] = $generalSettings->archiveTargetCase->matterArchivedDefaultValue ? '1' : '0';
+    }
 
     // Show some details in the archive target.
     if (Request::METHOD_GET === $this->requestStack->getMainRequest()->getRealMethod()) {

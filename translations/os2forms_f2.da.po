@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2026-11-10 11:36+0100\n"
-"PO-Revision-Date: 2026-11-10 11:36+0100\n"
+"POT-Creation-Date: 2026-11-12 19:13+0100\n"
+"PO-Revision-Date: 2026-11-12 19:13+0100\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -54,8 +54,20 @@ msgid "All"
 msgstr "Alle"
 
 msgctxt "os2forms_f2"
+msgid "Allow override"
+msgstr "Tillad overskrivning"
+
+msgctxt "os2forms_f2"
 msgid "Archive files"
 msgstr "Arkivér filer"
+
+msgctxt "os2forms_f2"
+msgid "Archive matter"
+msgstr "Arkivér akt"
+
+msgctxt "os2forms_f2"
+msgid "Archive matter by default?"
+msgstr "Arkivér akt som standard?"
 
 msgctxt "os2forms_f2"
 msgid "Archive on case \"@case_identifier\"."
@@ -98,6 +110,10 @@ msgid "Case number or search terms that uniquely identify a single case."
 msgstr "Sagsnummer eller søgetermer der entydigt identificerer en enkelt sag."
 
 msgctxt "os2forms_f2"
+msgid "Closed"
+msgstr "Lukket"
+
+msgctxt "os2forms_f2"
 msgid ""
 "Configuration for archiving in F2. See <a "
 "href=\":user_manual_url\">the user manual</a> for details."
@@ -118,12 +134,28 @@ msgid "Debug"
 msgstr "Fejlsøgning"
 
 msgctxt "os2forms_f2"
+msgid "Default matter access level"
+msgstr "Standardaktadgang"
+
+msgctxt "os2forms_f2"
+msgid "Default matter status"
+msgstr "Standardaktstatus"
+
+msgctxt "os2forms_f2"
+msgid "Default matter type"
+msgstr "Standardakttype"
+
+msgctxt "os2forms_f2"
 msgid "Document title"
 msgstr "Dokumenttitel"
 
 msgctxt "os2forms_f2"
 msgid "Emergency"
 msgstr "Nødsituation"
+
+msgctxt "os2forms_f2"
+msgid "Enabled archive targets"
+msgstr "Aktiverede arkiveringstyper"
 
 msgctxt "os2forms_f2"
 msgid "Error"
@@ -174,6 +206,46 @@ msgid "If checked, any files on a submission will be archived in F2."
 msgstr "Hvis sat, vil alle filer på en besvarelse blive arkiveret i F2."
 
 msgctxt "os2forms_f2"
+msgid ""
+"If set, a form builder can override the matter access level in the F2 "
+"handler settings"
+msgstr ""
+"Hvis sat, kan en formularbygger overskrive aktadgangen i "
+"F2-behandlerindstillingerne"
+
+msgctxt "os2forms_f2"
+msgid ""
+"If set, a form builder can override the matter status in the F2 "
+"handler settings"
+msgstr ""
+"Hvis sat, kan en formularbygger overskrive aktstatussen i "
+"F2-behandlerindstillingerne"
+
+msgctxt "os2forms_f2"
+msgid ""
+"If set, a form builder can override the matter type in the F2 handler "
+"settings"
+msgstr ""
+"Hvis sat, kan en formularbygger overskrive akttypen i "
+"F2-behandlerindstillingerne"
+
+msgctxt "os2forms_f2"
+msgid ""
+"If set, a form builder can override whether a not a matter is archived "
+"in the F2 handler settings"
+msgstr ""
+"Hvis sat, kan en formularbygger overskrive hvorvidt en akt arkiveres "
+"eller ej i F2-behandlerindstillingerne"
+
+msgctxt "os2forms_f2"
+msgid "If set, the created matter will be archived."
+msgstr "Hvis sat, vil akter blive arkiveret"
+
+msgctxt "os2forms_f2"
+msgid "In progress"
+msgstr "I gang"
+
+msgctxt "os2forms_f2"
 msgid "Inbound"
 msgstr "Indgående"
 
@@ -206,12 +278,20 @@ msgid "Matter details"
 msgstr "Aktdetaljer"
 
 msgctxt "os2forms_f2"
+msgid "Matter file document title default value"
+msgstr "Standardværdi for titel på fildokumenter"
+
+msgctxt "os2forms_f2"
 msgid "Matter identifier"
 msgstr "Akt-id"
 
 msgctxt "os2forms_f2"
 msgid "Matter number or search terms that uniquely identify a single matter."
 msgstr "Aktnummer eller søgetermer der entydigt identificerer en enkelt akt."
+
+msgctxt "os2forms_f2"
+msgid "Matter status"
+msgstr "Aktstatus"
 
 msgctxt "os2forms_f2"
 msgid "Matter title"
@@ -308,6 +388,10 @@ msgid "Sends webform submission to F2."
 msgstr "Sender formularbesvarelser til F2."
 
 msgctxt "os2forms_f2"
+msgid "Settings for \"Archive on case\""
+msgstr "Indstillinger for \"Arkivér på sag\""
+
+msgctxt "os2forms_f2"
 msgid "The F2 API base URI"
 msgstr "F2-api'ets base-url"
 
@@ -334,6 +418,10 @@ msgid ""
 msgstr ""
 "Part der er ansvarlig for akten der oprettes. Kan være en "
 "e-mailadresse eller et partsnummer."
+
+msgctxt "os2forms_f2"
+msgid "The status of the matter that will be created for the document."
+msgstr "Statussen på akten der oprettes"
 
 msgctxt "os2forms_f2"
 msgid ""

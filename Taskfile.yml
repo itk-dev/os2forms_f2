@@ -236,6 +236,7 @@ tasks:
     decs: Create settings for os2forms_f2 module
     prompt: Really reset Drupal site?
     cmds:
+      - ddev drush config:delete os2forms_f2.settings
       - ddev drush --yes config:import --partial --source modules/custom/os2forms_f2/modules/os2forms_f2_examples/config/install
       - ddev drush --yes config:import --partial --source modules/custom/os2forms_f2/modules/os2forms_f2_test/config/install
       - >-
@@ -248,6 +249,30 @@ tasks:
         ALTER TABLE webform_submission AUTO_INCREMENT = 1;
         UPDATE webform SET next_serial = 1;
         "
+
+  drupal:site:reset:aarhus:
+    decs: Create Aarhus settings for os2forms_f2 module
+    prompt: Really reset Drupal site?
+    deps:
+      - drupal:site:reset
+    vars:
+      CONFIG_GENERAL: |
+        matter_file_document_title_default_value: '[file:name]'
+        archive_targets:
+          case: case
+        archive_target_case:
+          matter_type_default_value: Internal
+          matter_type_allow_override: 0
+          matter_status_default_value: Closed
+          matter_status_allow_override: 0
+          matter_access_level_default_value: All
+          matter_access_level_allow_override: 0
+          matter_archived_default_value: 1
+          matter_archived_allow_override: 0
+        queue: os2forms_f2
+    cmds:
+      - ddev drush --yes config:set os2forms_f2.settings general --input-format=yaml "{{.CONFIG_GENERAL}}"
+      - ddev drush --yes config:get os2forms_f2.settings
 
   playwright:install:
     desc: Install Playwright stuff
@@ -272,11 +297,13 @@ tasks:
       BORDER_WIDTH: 4
     # Trim and add border
     cmd:
+      # https://autocrop.org/guides/imagemagick-trim-transparent/
       cmd: |
-        docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm mogrify \
+        ddev exec magick mogrify \
           -strip \
           -background white \
           -trim \
+          +repage \
           -gravity north -splice 0x{{.BORDER_WIDTH}}+0+0 \
           -gravity south -splice 0x{{.BORDER_WIDTH}}+0+0 \
           -gravity west -splice {{.BORDER_WIDTH}}x0+0+0 \
@@ -306,7 +333,7 @@ tasks:
             status=$(git status --porcelain "$file")
             if [[ "$status" =~ $status_modified_pattern ]]; then
                 if git cat-file -p "$latest_commit":"$file" | \
-                    docker run --volume $PWD:/app --workdir /app --rm itkdev/php8.5-fpm compare \
+                    ddev exec magick compare \
                     - \
                     "$file" \
                     {{.COMPARE_OUTPUT_FILENAME | default "-"}} > /dev/null 2>&1; then
