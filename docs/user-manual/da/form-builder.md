@@ -10,7 +10,7 @@ og konfigureres på passende vis.
 ![Formularbehandler](./images/generated/form-builder/webform-handler-add-general.png)
 
 > [!NOTE]
-> Bemærk at de faktiske muligheder afhænger generelle indstillinger sat af en administrator, så indstillingsformularen
+> Bemærk at de faktiske muligheder afhænger af generelle indstillinger sat af en administrator, så indstillingsformularen
 > kan fx også se ud som
 >
 > ![Aarhusindstillinger](./images/generated/form-builder/webform-handler-add-general-archive-settings-aarhus.png)
