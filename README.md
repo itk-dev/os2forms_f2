@@ -25,6 +25,11 @@ a case, the handler first creates a matter before attaching a document to it.
 >
 > for some help and examples on how to use the command.
 
+### Translations
+
+This module comes wth Danish translations in the `os2forms_f2` context (cf. [Translations](#translations)). Go to
+`/admin/config/regional/translate?context=os2forms_f2` to edit the module translations after they've been imported.
+
 ## Usage
 
 When the F2 module has been installed and configured, an F2 handler can be added to a webform.
