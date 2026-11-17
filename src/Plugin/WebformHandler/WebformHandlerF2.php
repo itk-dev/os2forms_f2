@@ -142,6 +142,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#type' => 'select',
           '#required' => TRUE,
           '#title' => $this->t('Attachment element', options: ['context' => 'os2forms_f2']),
+          '#description' => $this->t('The element with the content for the main document in F2.'),
           '#default_value' => $settings->attachmentElement,
           '#options' => $this->getAttachmentElements(),
         ],
@@ -150,7 +151,13 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#type' => 'textfield',
           '#required' => TRUE,
           '#title' => $this->t('Document title', options: ['context' => 'os2forms_f2']),
-          '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>. Max allowed length (after token expansion): @title_max_length.', [
+          '#description' => $this->t(<<<'DESCRIPTION'
+Title used for the attachment document. Tokens can be used in the title, and in addition the regular webform submission token (e.g. <code>[webform_submission:label]</code>) this token can be used:
+<ul>
+<li><code>[attachment:title]</code> the title of the selected attachment element</li>
+</ul>
+Max allowed length (after token expansion): @title_max_length.
+DESCRIPTION, [
             '@title_max_length' => Document::TITLE_MAX_LENGTH,
           ], options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->documentTitle,

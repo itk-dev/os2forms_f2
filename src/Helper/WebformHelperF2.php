@@ -321,7 +321,9 @@ final readonly class WebformHelperF2 implements LoggerInterface {
       // Apparently the F2 API inspects the filename extension to determine
       // file type, i.e. we must keep the extension in the temporary filename.
       $fileUri = $this->fileSystem->saveData($attachment->contents, 'temporary://' . uniqid('os2forms_f2') . '-' . $attachment->filename);
-      $title = $this->replaceTokens($handlerSettings->archive->documentTitle ?? $attachment->filename, $submission);
+      $title = $this->replaceTokens($handlerSettings->archive->documentTitle ?? $attachment->filename, $submission, [
+        '[attachment:title]' => $attachment->title,
+      ]);
       $messages[] = $this->createDocument($matter, $submission, $handlerSettings, $fileUri, 'attachment', $title);
     }
     finally {
@@ -432,6 +434,7 @@ final readonly class WebformHelperF2 implements LoggerInterface {
     $content = $instance::getFileContent($element, $submission);
 
     return new Attachment(
+      $element['#title'] ?? $element['#webform_key'],
       $content,
       $mimeType,
       $fileName
