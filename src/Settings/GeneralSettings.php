@@ -20,6 +20,9 @@ final class GeneralSettings extends AbstractSettings {
     self::ARCHIVE_TARGET_CASE => ArchiveTargetCase::class,
   ];
 
+  const string DOCUMENT_TITLE_DEFAULT_VALUE = 'document_title_default_value';
+  public ?string $documentTitleDefaultValue = '[attachment:title]';
+
   const string QUEUE = 'queue';
   public ?string $queue = NULL;
 

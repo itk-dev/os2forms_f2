@@ -19,6 +19,7 @@ use Drupal\os2forms_f2\Settings\GeneralSettings\ArchiveTargetCase;
 use Drupal\os2forms_f2\Settings\F2ApiSettings;
 use Drupal\os2forms_f2\Settings\GeneralSettings;
 use ItkDev\F2ApiClient\Model\Document;
+use ItkDev\F2ApiClient\Model\Matter;
 use Psr\Log\LogLevel;
 use ItkDev\F2ApiClient\Model\Matter\Type as MatterType;
 use ItkDev\F2ApiClient\Model\Matter\Status as MatterStatus;
@@ -163,10 +164,34 @@ final class SettingsForm extends ConfigFormBase {
   private function buildFormGeneral(): array {
     $settings = $this->settings->getGeneralSettings();
 
+    $section[GeneralSettings::DOCUMENT_TITLE_DEFAULT_VALUE] = [
+      '#type' => 'textfield',
+      '#required' => TRUE,
+      '#title' => $this->t('Default value for %document_title',
+                           [
+                             '%document_title' => $this->t('Document title', options: ['context' => 'os2forms_f2']),
+                           ],
+                           options: ['context' => 'os2forms_f2']),
+      '#description' => $this->t(<<<'DESCRIPTION'
+Title used for the attachment document. Tokens can be used in the title, and in addition the regular webform submission token (e.g. <code>[webform_submission:label]</code>) this token can be used:
+<ul>
+<li><code>[attachment:title]</code> the title of the selected attachment element</li>
+</ul>
+Max allowed length (after token expansion): @title_max_length.
+DESCRIPTION, [
+        '@title_max_length' => Document::TITLE_MAX_LENGTH,
+      ], options: ['context' => 'os2forms_f2']),
+      '#default_value' => $settings->documentTitleDefaultValue,
+    ];
+
     $section[GeneralSettings::MATTER_FILE_DOCUMENT_TITLE_DEFAULT_VALUE] = [
       '#type' => 'textfield',
       '#required' => TRUE,
-      '#title' => $this->t('Matter file document title default value', options: ['context' => 'os2forms_f2']),
+      '#title' => $this->t('Default value for %matter_file_document_title',
+                           [
+                             '%matter_file_document_title' => $this->t('File document title', options: ['context' => 'os2forms_f2']),
+                           ],
+                           options: ['context' => 'os2forms_f2']),
       '#description' => $this->t(<<<'DESCRIPTION'
 Title used for file documents. Tokens can be used in the title, and in addition the regular webform submission token (e.g. <code>[webform_submission:label]</code>) these tokens can be used:
 <ul>
@@ -195,6 +220,20 @@ DESCRIPTION, [
     $section[ArchiveTargetCase::NAME] = [
       '#type' => 'fieldset',
       '#title' => $this->t('Settings for "Archive on case"', options: ['context' => 'os2forms_f2']),
+
+      ArchiveTargetCase::MATTER_TITLE_DEFAULT_VALUE => [
+        '#type' => 'textfield',
+        '#required' => TRUE,
+        '#title' => $this->t('Default value for %matter_title',
+                             [
+                               '%matter_title' => $this->t('Matter title', options: ['context' => 'os2forms_f2']),
+                             ],
+                             options: ['context' => 'os2forms_f2']),
+        '#description' => $this->t('The title of the matter that will be created for the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>. Max allowed length (after token expansion): @title_max_length.', [
+          '@title_max_length' => Matter::TITLE_MAX_LENGTH,
+        ], options: ['context' => 'os2forms_f2']),
+        '#default_value' => $settings->archiveTargetCase?->matterTitleDefaultValue,
+      ],
 
       ArchiveTargetCase::MATTER_TYPE_DEFAULT_VALUE => [
         '#type' => 'select',

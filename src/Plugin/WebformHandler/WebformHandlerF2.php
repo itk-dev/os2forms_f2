@@ -142,7 +142,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#type' => 'select',
           '#required' => TRUE,
           '#title' => $this->t('Attachment element', options: ['context' => 'os2forms_f2']),
-          '#description' => $this->t('The element with the content for the main document in F2.'),
+          '#description' => $this->t('The element with the content for the main document in F2.', options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->attachmentElement,
           '#options' => $this->getAttachmentElements(),
         ],
@@ -160,7 +160,7 @@ Max allowed length (after token expansion): @title_max_length.
 DESCRIPTION, [
             '@title_max_length' => Document::TITLE_MAX_LENGTH,
           ], options: ['context' => 'os2forms_f2']),
-          '#default_value' => $settings->documentTitle,
+          '#default_value' => $settings->documentTitle ?? $generalSettings->documentTitleDefaultValue ?? NULL,
         ],
 
         ArchiveSettings::ARCHIVE_FILES => [
@@ -256,7 +256,7 @@ DESCRIPTION, [
             '#description' => $this->t('The title of the matter that will be created for the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>. Max allowed length (after token expansion): @title_max_length.', [
               '@title_max_length' => Matter::TITLE_MAX_LENGTH,
             ], options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetCase?->matterTitle,
+            '#default_value' => $settings->archiveTargetCase->matterTitle ?? $generalSettings->archiveTargetCase->matterTitleDefaultValue ?? NULL,
 
             '#states' => [
               'required' => [

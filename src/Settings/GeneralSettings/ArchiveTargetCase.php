@@ -20,6 +20,9 @@ final class ArchiveTargetCase extends AbstractSettings {
 
   const string NAME = ArchiveSettings::ARCHIVE_TARGET_CASE;
 
+  const string MATTER_TITLE_DEFAULT_VALUE = 'matter_title_default_value';
+  public ?string $matterTitleDefaultValue = '[webform_submission:label]';
+
   const string MATTER_TYPE_DEFAULT_VALUE = 'matter_type_default_value';
   public ?MatterType $matterTypeDefaultValue = MatterType::Internal;
 
