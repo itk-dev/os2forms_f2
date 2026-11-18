@@ -3,8 +3,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2026-11-18 00:29+0100\n"
-"PO-Revision-Date: 2026-11-18 00:29+0100\n"
+"POT-Creation-Date: 2026-11-18 10:20+0100\n"
+"PO-Revision-Date: 2026-11-18 10:20+0100\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
@@ -111,7 +111,7 @@ msgstr "Sagsnummer eller søgetermer der entydigt identificerer en enkelt sag."
 
 msgctxt "os2forms_f2"
 msgid "Closed"
-msgstr "Lukket"
+msgstr "Afsluttet"
 
 msgctxt "os2forms_f2"
 msgid ""
@@ -255,7 +255,7 @@ msgstr "Hvis sat, vil akter blive arkiveret."
 
 msgctxt "os2forms_f2"
 msgid "In progress"
-msgstr "I gang"
+msgstr "Behandles"
 
 msgctxt "os2forms_f2"
 msgid "Inbound"
