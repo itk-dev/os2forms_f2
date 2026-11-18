@@ -104,6 +104,16 @@ header.region-sticky--is-sticky + .sticky-shadow {
 
   await page.locator('[name="general[archive_targets][case]"]').check();
   await page
+    .locator(
+      '[name="general[archive_target_case][matter_title_default_value]"]',
+    )
+    .fill("[webform_submission:label]");
+  await page
+    .locator(
+      '[name="general[archive_target_case][matter_title_default_value]"]',
+    )
+    .fill("[webform_submission:label]");
+  await page
     .locator('[name="general[archive_target_case][matter_type_default_value]"]')
     .selectOption("Internal");
   await page
