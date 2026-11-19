@@ -12,6 +12,7 @@ final readonly class Attachment {
    * Constructor.
    */
   public function __construct(
+    public string $title,
     public string $contents,
     public string $mimeType,
     public string $filename,
