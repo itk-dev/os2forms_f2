@@ -177,7 +177,6 @@ DESCRIPTION, [
 Title used for file documents. Tokens can be used in the title, and in addition the regular webform submission token (e.g. <code>[webform_submission:label]</code>) these tokens can be used:
 <ul>
 <li><code>[file:name]</code> the name of the file without any extension, e.g. <code>my-document</code></li>
-<li><code>[file:filename]</code> the full filename e.g. <code>my-document.pdf</code></li>
 <li><code>[file:element:title]</code> the title of the file element</li>
 </ul>
 Max allowed length (after token expansion): @title_max_length.
