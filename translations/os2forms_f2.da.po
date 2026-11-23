@@ -421,7 +421,7 @@ msgstr "Adgang for akten der oprettes."
 
 msgctxt "os2forms_f2"
 msgid "The element with the content for the main document in F2."
-msgstr "Elementet med indhold til hovedokumentet i F2."
+msgstr "Elementet med indhold til hoveddokumentet i F2."
 
 msgctxt "os2forms_f2"
 msgid ""
