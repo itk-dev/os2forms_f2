@@ -142,6 +142,7 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#type' => 'select',
           '#required' => TRUE,
           '#title' => $this->t('Attachment element', options: ['context' => 'os2forms_f2']),
+          '#description' => $this->t('The element with the content for the main document in F2.', options: ['context' => 'os2forms_f2']),
           '#default_value' => $settings->attachmentElement,
           '#options' => $this->getAttachmentElements(),
         ],
@@ -150,10 +151,16 @@ final class WebformHandlerF2 extends WebformHandlerBase {
           '#type' => 'textfield',
           '#required' => TRUE,
           '#title' => $this->t('Document title', options: ['context' => 'os2forms_f2']),
-          '#description' => $this->t('The title of the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>. Max allowed length (after token expansion): @title_max_length.', [
+          '#description' => $this->t(<<<'DESCRIPTION'
+Title used for the attachment document. Tokens can be used in the title, and in addition the regular webform submission token (e.g. <code>[webform_submission:label]</code>) this token can be used:
+<ul>
+<li><code>[attachment:title]</code> the title of the selected attachment element</li>
+</ul>
+Max allowed length (after token expansion): @title_max_length.
+DESCRIPTION, [
             '@title_max_length' => Document::TITLE_MAX_LENGTH,
           ], options: ['context' => 'os2forms_f2']),
-          '#default_value' => $settings->documentTitle,
+          '#default_value' => $settings->documentTitle ?? $generalSettings->documentTitleDefaultValue ?? NULL,
         ],
 
         ArchiveSettings::ARCHIVE_FILES => [
@@ -170,7 +177,6 @@ final class WebformHandlerF2 extends WebformHandlerBase {
 Title used for file documents. Tokens can be used in the title, and in addition the regular webform submission token (e.g. <code>[webform_submission:label]</code>) these tokens can be used:
 <ul>
 <li><code>[file:name]</code> the name of the file without any extension, e.g. <code>my-document</code></li>
-<li><code>[file:filename]</code> the full filename e.g. <code>my-document.pdf</code></li>
 <li><code>[file:element:title]</code> the title of the file element</li>
 </ul>
 Max allowed length (after token expansion): @title_max_length.
@@ -249,7 +255,7 @@ DESCRIPTION, [
             '#description' => $this->t('The title of the matter that will be created for the document. Tokens can be used in the title, e.g. <code>[webform_submission:label]</code>. Max allowed length (after token expansion): @title_max_length.', [
               '@title_max_length' => Matter::TITLE_MAX_LENGTH,
             ], options: ['context' => 'os2forms_f2']),
-            '#default_value' => $settings->archiveTargetCase?->matterTitle,
+            '#default_value' => $settings->archiveTargetCase->matterTitle ?? $generalSettings->archiveTargetCase->matterTitleDefaultValue ?? NULL,
 
             '#states' => [
               'required' => [
