@@ -102,12 +102,15 @@ header.region-sticky--is-sticky + .sticky-shadow {
   await page.locator('[name="f2_api[secret]"]').fill("api-$ecr3t");
   await page.locator('[name="f2_api[f2_username]"]').fill("f2-user");
 
-  await page.locator('[name="general[archive_targets][case]"]').check();
   await page
-    .locator(
-      '[name="general[archive_target_case][matter_title_default_value]"]',
-    )
-    .fill("[webform_submission:label]");
+    .locator('[name="general[document_title_default_value]"]')
+    .fill("[attachment:title]");
+  await page
+    .locator('[name="general[matter_file_document_title_default_value]"]')
+    .fill("[file:name]");
+
+  await page.locator('[name="general[archive_targets][case]"]').check();
+
   await page
     .locator(
       '[name="general[archive_target_case][matter_title_default_value]"]',
