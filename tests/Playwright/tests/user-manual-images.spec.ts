@@ -1,12 +1,45 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { DrupalPage, HighlightElementType } from "./drupal-page.ts";
+import dotenv from "dotenv";
+import path from "path";
 
 // We want run and complete the administrator stuff before running the form-builder stuff.
 // https://playwright.dev/docs/test-parallel
 test.describe.configure({ mode: "serial" });
 
-import dotenv from "dotenv";
-import path from "path";
 dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
+
+test("xxxxxxxxxx", async ({ page }) => {
+  const drupalPage = new DrupalPage(page);
+
+  await drupalPage.goToPath("/admin/config/system/cron");
+
+  await drupalPage.highlightElement({
+    selector: '[data-drupal-selector="edit-run"] + p',
+    type: HighlightElementType.Rectangle,
+    offset: 5,
+    width: 3,
+  });
+
+  await drupalPage.takeScreenshot("cron-before");
+  const response = await drupalPage.drush(["core:cron"]);
+  await drupalPage.goToPath("/admin/config/system/cron");
+  await drupalPage.takeScreenshot("cron-after");
+
+  await drupalPage.revealMousePointer({
+    selector: '[data-drupal-selector="edit-run"]',
+    // position: ['left'],
+  });
+
+  await drupalPage.takeScreenshot("cron-mouse");
+
+  await drupalPage.expandSelect({
+    selector: '[data-drupal-selector="edit-interval"]',
+    hover: "6 timer",
+  });
+
+  await drupalPage.takeScreenshot("cron-interval");
+});
 
 const submitSelector = 'input[data-drupal-selector="edit-submit"]';
 
@@ -95,6 +128,40 @@ header.region-sticky--is-sticky + .sticky-shadow {
   await screenshot("f2-settings-empty");
   await screenshot("f2-settings-empty-f2-api", "#edit-f2-api", true);
   await screenshot("f2-settings-empty-general", "#edit-general", true);
+
+  const selector = '[name="general[queue]"]';
+  const element = page.locator(selector);
+  // await element.focus();
+  // const boundingBox = await element.boundingBox();
+  // await page.mouse.move(boundingBox.x + boundingBox.width/2, boundingBox.y - boundingBox.height/2 + 50);
+
+  console.debug(
+    await page.addStyleTag({
+      url: "http://web/modules/custom/os2forms_f2/modules/os2forms_f2_test/css/styles.css",
+    }),
+    await page.addScriptTag({
+      url: "http://web/modules/custom/os2forms_f2/modules/os2forms_f2_test/js/script.js",
+    }),
+  );
+
+  // https://playwright.dev/docs/evaluating
+  console.debug(
+    await page.evaluate((data) => os2forms_f2_test.expandSelect(data), {
+      selector,
+      hover: "os2forms_f2", // Hover over item by text, value or index
+      mousePointer: "default", // Show mouse pointer over hovered element
+    }),
+  );
+
+  // console.debug(
+  //   await page.evaluate(data => os2forms_f2_test.revealMousePointer(data), {
+  //     selector,
+  //     x: boundingBox.x + boundingBox.width/2,
+  //     y: boundingBox.y - boundingBox.height/2 + 50,
+  //   })
+  // );
+
+  await screenshot("f2-settings-empty", ".page-wrapper");
 
   await goto("admin/os2forms_f2/settings");
   await page.locator('[name="f2_api[uri]"]').fill("https://f2.example.com");
